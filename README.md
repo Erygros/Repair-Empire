@@ -1,6 +1,14 @@
 # Repair Empire
 
-Ein spielbarer Werkstatt-Prototyp mit Next.js, TypeScript und Tailwind CSS.
+Ein spielbarer Werkstatt-Tycoon mit Next.js, TypeScript und Tailwind CSS.
+
+## Enthaltene Systeme
+
+- zeitbasierte Reparaturaufträge mit Materialkosten und Auszahlung
+- fünf Werkzeuge mit echten Reparatur- und Reputation-Freischaltungen
+- fünf permanente Werkstatt-Upgrades mit jeweils fünf Leveln
+- Repair-Level, Reputation und progressive Auftragsgenerierung
+- versionierter, lokal gespeicherter Spielstand mit Migration älterer Saves
 
 ## Lokal starten
 
