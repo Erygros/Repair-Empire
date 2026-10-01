@@ -62,10 +62,10 @@ export function generateCandidateMarket(firstNumber: number, reputation: number,
 }
 
 export const WORKSTATION_CONFIG = [
-  { purchasePrice: 0, requiredReputation: 0 },
-  { purchasePrice: 1_800, requiredReputation: 18 },
-  { purchasePrice: 5_200, requiredReputation: 38 },
-  { purchasePrice: 12_000, requiredReputation: 68 },
+  { purchasePrice: 0, requiredReputation: 0, requiredLevel: 1 },
+  { purchasePrice: 12_000, requiredReputation: 30, requiredLevel: 60 },
+  { purchasePrice: 45_000, requiredReputation: 90, requiredLevel: 150 },
+  { purchasePrice: 140_000, requiredReputation: 180, requiredLevel: 300 },
 ] as const;
 
 export function createInitialWorkstations(): Workstation[] {
@@ -75,6 +75,7 @@ export function createInitialWorkstations(): Workstation[] {
     status: index === 0 ? "available" : "locked",
     purchasePrice: config.purchasePrice,
     requiredReputation: config.requiredReputation,
+    requiredLevel: config.requiredLevel,
     assignedEmployeeId: null,
     activeRepair: null,
     automationEnabled: false,

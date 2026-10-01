@@ -14,7 +14,7 @@ import {
 import { DIFFICULTY_LABELS } from "@/game/data/orders";
 import { getTool } from "@/game/data/progression";
 import { canAccessOrder, getJobEconomy } from "@/game/logic/game";
-import type { DeviceKind, RepairOrder, ToolId, UpgradeLevels } from "@/game/types";
+import type { DeviceKind, RepairOrder, ResearchId, ToolId, UpgradeLevels } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
 
 const DEVICE_ICONS: Record<DeviceKind, typeof Smartphone> = {
@@ -33,11 +33,12 @@ interface OrderBoardProps {
   reputation: number;
   ownedTools: ToolId[];
   upgrades: UpgradeLevels;
+  researchedNodes: ResearchId[];
   now: number;
   onAccept: (orderId: string) => void;
 }
 
-export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, now, onAccept }: OrderBoardProps) {
+export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, researchedNodes, now, onAccept }: OrderBoardProps) {
   return (
     <section className="panel orders-panel">
       <div className="panel-header">
@@ -51,7 +52,7 @@ export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, no
       <div className="order-list">
         {orders.map((order) => {
           const DeviceIcon = DEVICE_ICONS[order.device];
-          const accessible = canAccessOrder(order, { ownedTools, reputation, upgrades });
+          const accessible = canAccessOrder(order, { ownedTools, reputation, upgrades, companyLevel: 1, researchedNodes });
           const enoughMoney = money >= order.materialCost;
           const missingTool = !ownedTools.includes(order.requiredTool);
           const locked = !accessible;
@@ -84,7 +85,8 @@ export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, no
                   <span><WalletCards size={13} /> Kosten {formatMoney(order.materialCost)}</span>
                   <strong>Gewinn {formatMoney(economy.estimatedProfit)}</strong>
                 </div>
-                <div className="order-economy"><span>Umsatz {formatMoney(order.reward)}</span><span>{formatMoney(economy.profitPerMinute)}/Min.</span><span>Skill {order.skillRequirement}</span></div>
+                {researchedNodes.includes("basic-diagnostics") && <p className="order-diagnostic">{order.diagnostic}</p>}
+                <div className="order-economy"><span>Umsatz {formatMoney(order.reward)}</span>{researchedNodes.includes("job-analysis") && <span>{formatMoney(economy.profitPerMinute)}/Min.</span>}{researchedNodes.includes("advanced-diagnostics") && <span>Skill {order.skillRequirement}</span>}</div>
                 {locked && (
                   <div className="lock-reason">
                     {missingTool ? `${getTool(order.requiredTool).name} fehlt` : `Reputation ${order.requiredReputation} benötigt`}

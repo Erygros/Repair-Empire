@@ -8,6 +8,10 @@ export function formatMoney(value: number) {
   }).format(value);
 }
 
+export function formatNumber(value: number) {
+  return new Intl.NumberFormat("de-DE", { notation: Math.abs(value) >= 1_000_000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);
+}
+
 export function formatClock(milliseconds: number) {
   const seconds = Math.max(0, Math.ceil(milliseconds / 1000));
   const minutes = Math.floor(seconds / 60);

@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { MARKET_REFRESH_COST, generateCandidateMarket } from "@/game/data/employees";
-import { REPUTATION_MILESTONES, SAVE_VERSION, getTool, getUpgrade } from "@/game/data/progression";
+import { getMilestone } from "@/game/data/milestones";
+import { REPUTATION_MILESTONES, RESEARCH_NODES, SAVE_VERSION, getTool, getUpgrade } from "@/game/data/progression";
 import {
   createInitialState,
   createOrderBoard,
@@ -18,8 +19,10 @@ import {
 } from "@/game/logic/game";
 import { migrateSave } from "@/game/logic/save";
 import { applyTransaction } from "@/game/logic/economy";
-import { getCurrentTime } from "@/game/logic/time";
-import type { AutomationPriority, GameState, OfflineSummary, ToolId, UpgradeId } from "@/game/types";
+import { ensureChallenges } from "@/game/logic/challenges";
+import { awardCompanyXp } from "@/game/logic/progression";
+import { getCurrentTime, getDayKey } from "@/game/logic/time";
+import type { AutomationPriority, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
 
 const STORAGE_KEY = "repair-empire-save-v1";
 
@@ -117,7 +120,7 @@ export function useGame() {
     const progress = settled.leveledEmployee
       ? ` · ${settled.leveledEmployee} ist aufgestiegen`
       : newLevel > oldLevel
-        ? ` · Repair-Level ${newLevel} erreicht`
+        ? ` · Unternehmenslevel ${newLevel} erreicht · +${settled.researchPointsGained} FP`
         : crossed
           ? ` · Reputation ${crossed} erreicht`
           : "";
@@ -127,6 +130,7 @@ export function useGame() {
   const purchaseWorkstation = useCallback((workstationId: string) => commit((current) => {
     const workstation = current.workstations.find((item) => item.id === workstationId);
     if (!workstation || workstation.status !== "locked") return { state: current, notice: "Arbeitsplatz ist bereits freigeschaltet" };
+    if (current.companyLevel < workstation.requiredLevel) return { state: current, notice: `Unternehmenslevel ${workstation.requiredLevel} benötigt` };
     if (current.reputation < workstation.requiredReputation) return { state: current, notice: `Reputation ${workstation.requiredReputation} benötigt` };
     if (current.money < workstation.purchasePrice) return { state: current, notice: `Für Arbeitsplatz ${workstation.index} fehlen ${workstation.purchasePrice - current.money} €` };
     const previous = current.workstations.find((item) => item.index === workstation.index - 1);
@@ -194,10 +198,10 @@ export function useGame() {
     return { state: { ...current, workstations: current.workstations.map((item) => item.id === workstationId ? { ...item, automationEnabled: enabled } : item) }, notice: `Auto Repair an Arbeitsplatz ${workstation.index}: ${enabled ? "ON" : "OFF"}` };
   }), [commit]);
 
-  const setAutomationPriority = useCallback((workstationId: string, priority: AutomationPriority) => commit((current) => ({
-    state: { ...current, workstations: current.workstations.map((item) => item.id === workstationId ? { ...item, automationPriority: priority } : item) },
-    notice: "Automationspriorität aktualisiert",
-  })), [commit]);
+  const setAutomationPriority = useCallback((workstationId: string, priority: AutomationPriority) => commit((current) => {
+    if (priority === "fastest-jobs" && !current.researchedNodes.includes("advanced-automation")) return { state: current, notice: "Advanced Automation muss zuerst erforscht werden" };
+    return { state: { ...current, workstations: current.workstations.map((item) => item.id === workstationId ? { ...item, automationPriority: priority } : item) }, notice: "Automationspriorität aktualisiert" };
+  }), [commit]);
 
   const purchaseTool = useCallback((toolId: ToolId) => commit((current) => {
     const tool = getTool(toolId);
@@ -206,8 +210,8 @@ export function useGame() {
     if (tool.requiredTool && !current.ownedTools.includes(tool.requiredTool)) return { state: current, notice: `Zuerst ${getTool(tool.requiredTool).name} anschaffen` };
     if (current.money < tool.price) return { state: current, notice: `Für ${tool.name} fehlen ${tool.price - current.money} €` };
     const ownedTools = [...current.ownedTools, toolId];
-    const context = { ownedTools, reputation: current.reputation, upgrades: current.upgrades };
-    const count = getBoardSize(current.upgrades);
+    const context = { ownedTools, reputation: current.reputation, upgrades: current.upgrades, companyLevel: current.companyLevel, researchedNodes: current.researchedNodes };
+    const count = getBoardSize(current.upgrades, current.researchedNodes);
     const orders = createOrderBoard(count, current.nextOrderNumber, context);
     const charged = applyTransaction(current, "TOOL_PURCHASE", -tool.price, tool.id, getCurrentTime());
     return { state: { ...charged, ownedTools, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count }, notice: `${tool.name} gekauft · neue Reparaturen freigeschaltet` };
@@ -225,12 +229,47 @@ export function useGame() {
     const partial = { ...charged, upgrades };
     const context = getProgressionContext(partial);
     if (upgradeId === "customer-network") {
-      const count = getBoardSize(upgrades);
+      const count = getBoardSize(upgrades, current.researchedNodes);
       const orders = createOrderBoard(count, current.nextOrderNumber, context);
       return { state: { ...partial, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count }, notice: `${upgrade.name} Level ${level + 1} · Aufträge aktualisiert` };
     }
     const filled = fillOrderBoard(partial, context);
     return { state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber }, notice: `${upgrade.name} auf Level ${level + 1} verbessert` };
+  }), [commit]);
+
+  const purchaseResearch = useCallback((researchId: ResearchId) => commit((current) => {
+    const node = RESEARCH_NODES.find((item) => item.id === researchId);
+    if (!node || current.researchedNodes.includes(researchId)) return { state: current, notice: "Forschung bereits abgeschlossen" };
+    if (current.companyLevel < node.requiredLevel) return { state: current, notice: `Unternehmenslevel ${node.requiredLevel} benötigt` };
+    if (node.requires.some((required) => !current.researchedNodes.includes(required))) return { state: current, notice: "Vorausgehende Forschung fehlt" };
+    if (current.researchPoints < node.cost) return { state: current, notice: `${node.cost - current.researchPoints} Forschungspunkte fehlen` };
+    const researchedNodes = [...current.researchedNodes, researchId];
+    const offlineCapacityMs = researchId === "offline-operations" ? 12 * 60 * 60 * 1000 : current.offlineCapacityMs;
+    const partial = { ...current, researchPoints: current.researchPoints - node.cost, researchedNodes, offlineCapacityMs };
+    const filled = fillOrderBoard(partial, getProgressionContext(partial));
+    return { state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber }, notice: `${node.name} erforscht · ${node.effect}` };
+  }), [commit]);
+
+  const claimMilestone = useCallback((milestoneId: string) => commit((current) => {
+    const progress = current.milestones.find((item) => item.id === milestoneId);
+    const milestone = getMilestone(milestoneId);
+    if (!progress || progress.claimed || !milestone) return { state: current, notice: "Meilenstein bereits beansprucht" };
+    const rewarded = applyTransaction(current, "MILESTONE_REWARD", milestone.rewardMoney, milestone.id, getCurrentTime());
+    const milestones = rewarded.milestones.map((item) => item.id === milestoneId ? { ...item, claimed: true } : item);
+    return { state: { ...rewarded, researchPoints: rewarded.researchPoints + milestone.rewardResearchPoints, milestones, pendingMilestoneId: milestones.find((item) => !item.claimed)?.id ?? null }, notice: `${milestone.name} · Belohnung erhalten` };
+  }), [commit]);
+
+  const claimChallenge = useCallback((challengeId: string) => commit((current) => {
+    const challenge = [...current.activeChallenges, ...current.dailyChallenges].find((item) => item.id === challengeId);
+    if (!challenge?.completed || challenge.claimed) return { state: current, notice: "Challenge ist noch nicht abgeschlossen" };
+    const now = getCurrentTime();
+    let rewarded = applyTransaction(current, "CHALLENGE_REWARD", challenge.reward.money, challenge.id, now);
+    rewarded = { ...rewarded, reputation: rewarded.reputation + challenge.reward.reputation, researchPoints: rewarded.researchPoints + challenge.reward.researchPoints, completedChallenges: rewarded.completedChallenges + 1 };
+    rewarded = awardCompanyXp(rewarded, challenge.reward.xp, now).state;
+    if (challenge.daily) rewarded = { ...rewarded, dailyChallenges: rewarded.dailyChallenges.map((item) => item.id === challengeId ? { ...item, claimed: true } : item) };
+    else rewarded = { ...rewarded, activeChallenges: rewarded.activeChallenges.filter((item) => item.id !== challengeId) };
+    rewarded = ensureChallenges(rewarded, now, getDayKey(now));
+    return { state: rewarded, notice: `${challenge.title} abgeschlossen · Belohnung erhalten` };
   }), [commit]);
 
   return {
@@ -247,6 +286,9 @@ export function useGame() {
     assignEmployee,
     toggleAutomation,
     setAutomationPriority,
+    purchaseResearch,
+    claimMilestone,
+    claimChallenge,
     dismissOfflineSummary: () => setOfflineSummary(null),
     purchaseTool,
     purchaseUpgrade,

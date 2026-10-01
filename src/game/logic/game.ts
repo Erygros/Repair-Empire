@@ -1,8 +1,10 @@
 import { CUSTOMER_NAMES, DIFFICULTY_BALANCE, ORDER_TEMPLATES, ORDER_VARIANTS } from "@/game/data/orders";
 import { EMPLOYEE_XP_THRESHOLDS, createInitialWorkstations, generateCandidateMarket, getEmployeeOperatingCost } from "@/game/data/employees";
-import { INITIAL_UPGRADES, REPAIR_LEVEL_THRESHOLDS, SAVE_VERSION, getUpgrade } from "@/game/data/progression";
+import { INITIAL_UPGRADES, SAVE_VERSION, getCompanyLevelProgress, getUpgrade } from "@/game/data/progression";
+import { applyChallengeEvent, ensureChallenges } from "@/game/logic/challenges";
 import { applyTransaction, createDailyStats, createEconomyStats, recordRepairEconomy } from "@/game/logic/economy";
-import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, URGENT_JOB_LIFETIME_MS, getCurrentTime, getOfflineWindow } from "@/game/logic/time";
+import { awardCompanyXp } from "@/game/logic/progression";
+import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, URGENT_JOB_LIFETIME_MS, getCurrentTime, getDayKey, getOfflineWindow } from "@/game/logic/time";
 import type { ActiveRepair, Employee, GameState, OfflineSummary, OrderVariant, ProgressionContext, RepairOrder, RepairSource, ToolId, UpgradeId, UpgradeLevels, Workstation } from "@/game/types";
 
 const INITIAL_ORDER_COUNT = 5;
@@ -33,9 +35,9 @@ function getTemplatePool(context: ProgressionContext, preference: "accessible" |
   return accessible.length > 0 ? accessible : locked;
 }
 
-function getOrderVariant(orderNumber: number, reputation: number): OrderVariant {
+function getOrderVariant(orderNumber: number, context: ProgressionContext): OrderVariant {
   const roll = seededUnit(orderNumber * 7);
-  if (reputation >= 45 && roll > 0.9) return "premium";
+  if ((context.reputation >= 45 || context.researchedNodes.includes("advanced-repair")) && roll > 0.9) return "premium";
   if (roll > 0.74) return "urgent";
   if (roll > 0.58) return "complex";
   return "normal";
@@ -53,12 +55,12 @@ export function createOrder(
     Array.from({ length: 1 + Math.max(0, template.difficulty - 1) * networkLevel }, () => template),
   );
   const template = pick(weightedPool, orderNumber * 3);
-  const variant = getOrderVariant(orderNumber, context.reputation);
+  const variant = getOrderVariant(orderNumber, context);
   const modifiers = ORDER_VARIANTS[variant];
   const difficulty = DIFFICULTY_BALANCE[template.difficulty];
   const urgency = variant === "urgent" ? "express" : "standard";
   const rewardMultiplier = 1 + networkLevel * 0.05 + context.upgrades["workshop-organization"] * 0.03;
-  const materialMultiplier = 1 - context.upgrades["better-diagnostics"] * 0.06;
+  const materialMultiplier = (1 - context.upgrades["better-diagnostics"] * 0.06) * (context.researchedNodes.includes("material-efficiency") ? 0.92 : 1);
 
   return {
     ...template,
@@ -77,8 +79,8 @@ export function createOrder(
   };
 }
 
-export function getBoardSize(upgrades: UpgradeLevels) {
-  return INITIAL_ORDER_COUNT + upgrades["job-board-expansion"];
+export function getBoardSize(upgrades: UpgradeLevels, researchedNodes: GameState["researchedNodes"] = []) {
+  return INITIAL_ORDER_COUNT + upgrades["job-board-expansion"] + (researchedNodes.includes("management-systems") ? 1 : 0);
 }
 
 export function createOrderBoard(
@@ -101,7 +103,7 @@ export function createOrderBoard(
 }
 
 export function fillOrderBoard(state: GameState, context: ProgressionContext, now = getCurrentTime()) {
-  const missing = Math.max(0, getBoardSize(context.upgrades) - state.availableOrders.length);
+  const missing = Math.max(0, getBoardSize(context.upgrades, context.researchedNodes) - state.availableOrders.length);
   const additions = Array.from({ length: missing }, (_, index) =>
     createOrder(state.nextOrderNumber + index, context, now + index),
   );
@@ -114,7 +116,7 @@ export function fillOrderBoard(state: GameState, context: ProgressionContext, no
 export function refreshOrderBoard(state: GameState, now = getCurrentTime()) {
   const activeOrderIds = new Set(state.workstations.flatMap((station) => station.activeRepair ? [station.activeRepair.order.id] : []));
   const availableOrders = state.availableOrders.filter((order) => !order.expiresAt || order.expiresAt > now || activeOrderIds.has(order.id));
-  if (availableOrders.length === state.availableOrders.length && availableOrders.length >= getBoardSize(state.upgrades) && now < state.nextBoardRefreshAt) return state;
+  if (availableOrders.length === state.availableOrders.length && availableOrders.length >= getBoardSize(state.upgrades, state.researchedNodes) && now < state.nextBoardRefreshAt) return state;
   const partial = { ...state, availableOrders };
   const filled = fillOrderBoard(partial, getProgressionContext(partial), now);
   return { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber, nextBoardRefreshAt: now + JOB_BOARD_REFRESH_MS };
@@ -147,38 +149,45 @@ export function getUpgradeEffect(upgradeId: UpgradeId, level: number) {
 }
 
 export function getRepairLevel(repairXp: number) {
-  let level = 1;
-  REPAIR_LEVEL_THRESHOLDS.forEach((threshold, index) => {
-    if (repairXp >= threshold) level = index + 1;
-  });
-  return level;
+  return getCompanyLevelProgress(repairXp).level;
 }
 
 export function getRepairLevelProgress(repairXp: number) {
-  const level = getRepairLevel(repairXp);
-  const currentThreshold = REPAIR_LEVEL_THRESHOLDS[level - 1] ?? 0;
-  const nextThreshold = REPAIR_LEVEL_THRESHOLDS[level] ?? currentThreshold;
-  if (nextThreshold === currentThreshold) return { current: repairXp, required: repairXp, percent: 100 };
-  return {
-    current: repairXp - currentThreshold,
-    required: nextThreshold - currentThreshold,
-    percent: ((repairXp - currentThreshold) / (nextThreshold - currentThreshold)) * 100,
-  };
+  return getCompanyLevelProgress(repairXp);
 }
 
-export function getProgressionContext(state: Pick<GameState, "ownedTools" | "reputation" | "upgrades">): ProgressionContext {
-  return { ownedTools: state.ownedTools, reputation: state.reputation, upgrades: state.upgrades };
+export function getProgressionContext(state: Pick<GameState, "ownedTools" | "reputation" | "upgrades" | "companyLevel" | "researchedNodes">): ProgressionContext {
+  return { ownedTools: state.ownedTools, reputation: state.reputation, upgrades: state.upgrades, companyLevel: state.companyLevel, researchedNodes: state.researchedNodes };
 }
 
 export function createInitialState(): GameState {
   const now = getCurrentTime();
-  const context: ProgressionContext = { ownedTools: ["basic-kit"], reputation: 10, upgrades: { ...INITIAL_UPGRADES } };
+  const context: ProgressionContext = { ownedTools: ["basic-kit"], reputation: 10, upgrades: { ...INITIAL_UPGRADES }, companyLevel: 1, researchedNodes: [] };
   const availableOrders = createOrderBoard(INITIAL_ORDER_COUNT, 1, context, now);
-  return {
+  const initial: GameState = {
     saveVersion: SAVE_VERSION,
+    identity: {
+      accountId: "local-account",
+      companyId: "company-001",
+      companyName: "Repair Empire",
+      characterId: "character-001",
+      cosmetics: { outfit: null, headwear: null, accessory: null, workwear: null, characterSkin: null, workstationSkin: null, buildingSkin: null },
+    },
     money: 500,
     reputation: 10,
     repairXp: 0,
+    companyLevel: 1,
+    currentLevelXp: 0,
+    lifetimeXp: 0,
+    researchPoints: 0,
+    researchedNodes: [],
+    milestones: [],
+    pendingMilestoneId: null,
+    activeChallenges: [],
+    dailyChallenges: [],
+    completedChallenges: 0,
+    nextChallengeSeed: 1,
+    dailyChallengeDayKey: createDailyStats(now).dayKey,
     ownedTools: ["basic-kit"],
     upgrades: { ...INITIAL_UPGRADES },
     availableOrders,
@@ -196,6 +205,7 @@ export function createInitialState(): GameState {
     dailyStats: createDailyStats(now),
     transactions: [],
   };
+  return ensureChallenges(initial, now, getDayKey(now));
 }
 
 export function getRepairProgress(activeRepair: ActiveRepair | null, now: number) {
@@ -238,7 +248,8 @@ export function getWorkstationEligibility(state: GameState, workstation: Worksta
   if (!employee) return { eligible: false, reason: "Kein Mitarbeiter zugewiesen" };
   if (employee.skill < order.skillRequirement) return { eligible: false, reason: `Skill ${order.skillRequirement} benötigt` };
   const specializationBonus = employee.specialization === order.category;
-  return { eligible: true, reason: employee.name, speed: employee.speed, quality: employee.quality, specializationBonus };
+  const researchSpeed = specializationBonus && state.researchedNodes.includes("specialized-repair") ? 1.25 / 1.15 : 1;
+  return { eligible: true, reason: employee.name, speed: employee.speed * researchSpeed, quality: employee.quality, specializationBonus };
 }
 
 export function getWorkstationDuration(order: RepairOrder, upgrades: UpgradeLevels, speed: number, specializationBonus: boolean) {
@@ -305,7 +316,7 @@ function improveEmployee(employee: Employee, activeRepair: ActiveRepair) {
 
 export function settleWorkstation(state: GameState, workstationId: string, now = getCurrentTime(), source?: RepairSource) {
   const workstation = state.workstations.find((item) => item.id === workstationId);
-  if (!workstation?.activeRepair || now < workstation.activeRepair.endsAt) return { state, error: "Reparatur ist noch nicht abgeschlossen", earnings: 0, materialCost: 0, operatingCost: 0, profit: 0, reputation: 0, employeeXp: 0, leveledEmployee: null as string | null };
+  if (!workstation?.activeRepair || now < workstation.activeRepair.endsAt) return { state, error: "Reparatur ist noch nicht abgeschlossen", earnings: 0, materialCost: 0, operatingCost: 0, profit: 0, reputation: 0, employeeXp: 0, leveledEmployee: null as string | null, companyLevelsGained: 0, researchPointsGained: 0 };
   const activeRepair = workstation.activeRepair;
   const repairSource: RepairSource = source ?? (workstation.automationEnabled ? "automated" : "manual");
   const operatingCost = getRepairOperatingCost(state, activeRepair, workstation);
@@ -334,14 +345,22 @@ export function settleWorkstation(state: GameState, workstationId: string, now =
     source: repairSource,
   }, now);
   const profit = activeRepair.order.reward - activeRepair.chargedMaterialCost - operatingCost;
-  const partial: GameState = {
+  let partial: GameState = {
     ...economicState,
     reputation: state.reputation + reputationGain,
-    repairXp: state.repairXp + activeRepair.order.repairXp,
     employees,
     workstations: state.workstations.map((item) => item.id === workstationId ? { ...item, status: "available" as const, activeRepair: null } : item),
     completedRepairs: [{ id: activeRepair.order.id, device: activeRepair.order.device, issue: activeRepair.order.issue, reward: activeRepair.order.reward, materialCost: activeRepair.chargedMaterialCost, operatingCost, profit, category: activeRepair.order.category, source: repairSource, reputationReward: reputationGain, completedAt: now }, ...state.completedRepairs].slice(0, 20),
   };
+  const companyProgress = awardCompanyXp(partial, activeRepair.order.repairXp, now);
+  partial = applyChallengeEvent(companyProgress.state, {
+    type: "REPAIR_COMPLETED",
+    profit,
+    reputation: reputationGain,
+    order: activeRepair.order,
+    source: repairSource,
+    specializationMatched: activeRepair.specializationBonus,
+  });
   const filled = fillOrderBoard(partial, getProgressionContext(partial), now);
   return {
     state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber },
@@ -353,6 +372,8 @@ export function settleWorkstation(state: GameState, workstationId: string, now =
     reputation: reputationGain,
     employeeXp,
     leveledEmployee,
+    companyLevelsGained: companyProgress.levelsGained,
+    researchPointsGained: companyProgress.researchPointsGained,
   };
 }
 
@@ -370,13 +391,14 @@ function automationScore(order: RepairOrder, employee: Employee, priority: Works
 export function selectAutomationOrder(state: GameState, workstation: Workstation) {
   const employee = getAssignedEmployee(state, workstation);
   if (!employee) return null;
+  const priority = workstation.automationPriority === "fastest-jobs" && !state.researchedNodes.includes("advanced-automation") ? "highest-profit" : workstation.automationPriority;
   return state.availableOrders
     .filter((order) => getWorkstationEligibility(state, workstation, order).eligible)
-    .sort((a, b) => automationScore(b, employee, workstation.automationPriority, state.upgrades) - automationScore(a, employee, workstation.automationPriority, state.upgrades))[0] ?? null;
+    .sort((a, b) => automationScore(b, employee, priority, state.upgrades) - automationScore(a, employee, priority, state.upgrades))[0] ?? null;
 }
 
 export function runWorkstationTick(state: GameState, now = getCurrentTime()) {
-  let next = refreshOrderBoard(state, now);
+  let next = ensureChallenges(refreshOrderBoard(state, now), now, getDayKey(now));
   let changed = next !== state;
   const messages: string[] = [];
 
@@ -436,6 +458,8 @@ export function processOfflineProgress(state: GameState, now = getCurrentTime())
     reputation: 0,
     employeeXp: 0,
     levelUps: [],
+    companyLevelsGained: 0,
+    researchPointsGained: 0,
   };
   if (window.productiveDurationMs <= 0) return { state: { ...next, lastActiveAt: now }, summary: null };
 
@@ -475,6 +499,8 @@ export function processOfflineProgress(state: GameState, now = getCurrentTime())
     summary.profit += settled.profit;
     summary.reputation += settled.reputation;
     summary.employeeXp += settled.employeeXp;
+    summary.companyLevelsGained += settled.companyLevelsGained;
+    summary.researchPointsGained += settled.researchPointsGained;
     if (settled.leveledEmployee && !summary.levelUps.includes(settled.leveledEmployee)) summary.levelUps.push(settled.leveledEmployee);
     const current = next.workstations.find((item) => item.id === station.id)!;
     let selected = selectAutomationOrder(next, current);

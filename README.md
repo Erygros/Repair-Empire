@@ -16,6 +16,10 @@ Ein spielbarer Werkstatt-Tycoon mit Next.js, TypeScript und Tailwind CSS.
 - dringende, Premium- und komplexe Auftragsvarianten mit gespeichertem dynamischem Job Board
 - zentrale Economy-Transaktionen für Umsatz, Material-, Betriebs- und Investitionskosten
 - Tageskennzahlen, Lifetime-Statistiken und kompaktes Unternehmens-Dashboard
+- mathematisch unbegrenztes Company-Level mit Kapitel- und Langzeitmeilensteinen
+- Forschungsbaum mit vier Bereichen, Abhängigkeiten und funktionalen Freischaltungen
+- prozedurale Challenges und gespeicherte Daily Tasks mit ereignisbasiertem Fortschritt
+- getrennte Account-, Company-, Character- und kosmetikbereite Identitätsdaten
 - versionierter, lokal gespeicherter Spielstand mit Migration älterer Saves
 
 ## Lokal starten

@@ -10,7 +10,7 @@ export type DeviceKind =
 export type Urgency = "standard" | "express";
 export type OrderVariant = "normal" | "urgent" | "premium" | "complex";
 export type RepairSource = "manual" | "automated" | "offline";
-export type TransactionType = "REPAIR_REWARD" | "MATERIAL_COST" | "OPERATING_COST" | "TOOL_PURCHASE" | "UPGRADE_PURCHASE" | "EMPLOYEE_HIRE" | "WORKSTATION_PURCHASE" | "MARKET_REFRESH";
+export type TransactionType = "REPAIR_REWARD" | "MATERIAL_COST" | "OPERATING_COST" | "TOOL_PURCHASE" | "UPGRADE_PURCHASE" | "EMPLOYEE_HIRE" | "WORKSTATION_PURCHASE" | "MARKET_REFRESH" | "CHALLENGE_REWARD" | "MILESTONE_REWARD";
 export type ToolId = "basic-kit" | "multimeter" | "soldering-station" | "hot-air-station" | "microscope";
 export type UpgradeId = "efficient-workflow" | "better-diagnostics" | "customer-network" | "workshop-organization" | "job-board-expansion";
 export type UpgradeLevels = Record<UpgradeId, number>;
@@ -18,6 +18,9 @@ export type RepairCategory = "Mobile Devices" | "Consoles" | "Computers" | "Elec
 export type EmployeeClass = "Apprentice" | "Junior Technician" | "Technician" | "Senior Technician" | "Specialist";
 export type AutomationPriority = "highest-profit" | "fastest-jobs" | "reputation" | "specialization";
 export type WorkstationStatus = "locked" | "available" | "repairing" | "completed";
+export type ResearchId = "basic-diagnostics" | "advanced-diagnostics" | "job-analysis" | "material-efficiency" | "advanced-repair" | "specialized-repair" | "management-systems" | "advanced-automation" | "offline-operations";
+export type ResearchCategory = "Diagnostics" | "Repair Technology" | "Management" | "Automation";
+export type ChallengeCategory = "repair" | "profit" | "reputation" | "specialist" | "automation" | "difficulty" | "urgent";
 
 export interface ToolDefinition {
   id: ToolId;
@@ -103,6 +106,7 @@ export interface Workstation {
   status: WorkstationStatus;
   purchasePrice: number;
   requiredReputation: number;
+  requiredLevel: number;
   assignedEmployeeId: string | null;
   activeRepair: ActiveRepair | null;
   automationEnabled: boolean;
@@ -121,6 +125,38 @@ export interface OfflineSummary {
   reputation: number;
   employeeXp: number;
   levelUps: string[];
+  companyLevelsGained: number;
+  researchPointsGained: number;
+}
+
+export interface MilestoneState {
+  id: string;
+  completedAt: number;
+  claimed: boolean;
+}
+
+export interface ChallengeReward {
+  money: number;
+  xp: number;
+  reputation: number;
+  researchPoints: number;
+}
+
+export interface Challenge {
+  id: string;
+  seed: number;
+  category: ChallengeCategory;
+  title: string;
+  description: string;
+  target: number;
+  progress: number;
+  targetCategory?: RepairCategory;
+  targetDifficulty?: number;
+  reward: ChallengeReward;
+  createdAt: number;
+  completed: boolean;
+  claimed: boolean;
+  daily: boolean;
 }
 
 export interface CompletedRepair {
@@ -172,11 +208,40 @@ export interface EconomyTransaction {
   reference: string;
 }
 
+export interface IdentityState {
+  accountId: string;
+  companyId: string;
+  companyName: string;
+  characterId: string;
+  cosmetics: {
+    outfit: string | null;
+    headwear: string | null;
+    accessory: string | null;
+    workwear: string | null;
+    characterSkin: string | null;
+    workstationSkin: string | null;
+    buildingSkin: string | null;
+  };
+}
+
 export interface GameState {
   saveVersion: number;
+  identity: IdentityState;
   money: number;
   reputation: number;
   repairXp: number;
+  companyLevel: number;
+  currentLevelXp: number;
+  lifetimeXp: number;
+  researchPoints: number;
+  researchedNodes: ResearchId[];
+  milestones: MilestoneState[];
+  pendingMilestoneId: string | null;
+  activeChallenges: Challenge[];
+  dailyChallenges: Challenge[];
+  completedChallenges: number;
+  nextChallengeSeed: number;
+  dailyChallengeDayKey: string;
   ownedTools: ToolId[];
   upgrades: UpgradeLevels;
   availableOrders: RepairOrder[];
@@ -199,5 +264,7 @@ export interface ProgressionContext {
   ownedTools: ToolId[];
   reputation: number;
   upgrades: UpgradeLevels;
+  companyLevel: number;
+  researchedNodes: ResearchId[];
 }
 

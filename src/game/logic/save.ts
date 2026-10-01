@@ -1,9 +1,11 @@
 import { createInitialWorkstations, generateCandidateMarket } from "@/game/data/employees";
+import { getReachedMilestones } from "@/game/data/milestones";
 import { ORDER_TEMPLATES } from "@/game/data/orders";
-import { INITIAL_UPGRADES, SAVE_VERSION } from "@/game/data/progression";
+import { INITIAL_UPGRADES, SAVE_VERSION, getCompanyLevelProgress } from "@/game/data/progression";
 import { createInitialState } from "@/game/logic/game";
+import { ensureChallenges } from "@/game/logic/challenges";
 import { createDailyStats, createEconomyStats } from "@/game/logic/economy";
-import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, getCurrentTime } from "@/game/logic/time";
+import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, getCurrentTime, getDayKey } from "@/game/logic/time";
 import type { ActiveRepair, CompletedRepair, Employee, EmployeeCandidate, GameState, RepairOrder, UpgradeId, Workstation } from "@/game/types";
 
 type LegacySave = Partial<GameState> & { activeRepair?: unknown };
@@ -118,12 +120,34 @@ export function migrateSave(value: unknown): GameState | null {
   });
   const lastSavedAt = Number.isFinite(value.lastSavedAt) ? Math.min(value.lastSavedAt!, now) : now;
   const lastActiveAt = Number.isFinite(value.lastActiveAt) ? Math.min(value.lastActiveAt!, now) : lastSavedAt;
+  const lifetimeXp = Number.isFinite(value.lifetimeXp) ? Math.max(0, value.lifetimeXp!) : Math.max(0, value.repairXp ?? value.completedRepairs.length * 12);
+  const companyProgress = getCompanyLevelProgress(lifetimeXp);
+  const milestones = Array.isArray(value.milestones)
+    ? value.milestones
+    : getReachedMilestones(1, companyProgress.level).map((milestone) => ({ id: milestone.id, completedAt: now, claimed: false }));
 
-  return {
+  const migrated: GameState = {
     ...base,
     ...value,
     saveVersion: SAVE_VERSION,
-    repairXp: typeof value.repairXp === "number" ? value.repairXp : value.completedRepairs.length * 12,
+    identity: {
+      ...base.identity,
+      ...(value.identity ?? {}),
+      cosmetics: { ...base.identity.cosmetics, ...(value.identity?.cosmetics ?? {}) },
+    },
+    repairXp: lifetimeXp,
+    companyLevel: companyProgress.level,
+    currentLevelXp: companyProgress.current,
+    lifetimeXp,
+    researchPoints: Number.isFinite(value.researchPoints) ? Math.max(0, value.researchPoints!) : 0,
+    researchedNodes: Array.isArray(value.researchedNodes) ? value.researchedNodes : [],
+    milestones,
+    pendingMilestoneId: typeof value.pendingMilestoneId === "string" ? value.pendingMilestoneId : milestones.find((milestone) => !milestone.claimed)?.id ?? null,
+    activeChallenges: Array.isArray(value.activeChallenges) ? value.activeChallenges : [],
+    dailyChallenges: Array.isArray(value.dailyChallenges) ? value.dailyChallenges : [],
+    completedChallenges: Number.isFinite(value.completedChallenges) ? Math.max(0, value.completedChallenges!) : 0,
+    nextChallengeSeed: Number.isFinite(value.nextChallengeSeed) ? Math.max(1, value.nextChallengeSeed!) : 1,
+    dailyChallengeDayKey: typeof value.dailyChallengeDayKey === "string" ? value.dailyChallengeDayKey : getDayKey(now),
     ownedTools: Array.isArray(value.ownedTools) && value.ownedTools.length > 0 ? value.ownedTools : ["basic-kit"],
     upgrades,
     availableOrders: value.availableOrders.map(migrateOrder),
@@ -140,5 +164,6 @@ export function migrateSave(value: unknown): GameState | null {
     dailyStats: value.dailyStats && typeof value.dailyStats === "object" ? { ...createDailyStats(now), ...value.dailyStats } : createDailyStats(now),
     transactions: Array.isArray(value.transactions) ? value.transactions.slice(0, 80) : [],
   };
+  return ensureChallenges(migrated, now, getDayKey(now));
 }
 

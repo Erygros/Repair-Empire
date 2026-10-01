@@ -1,6 +1,6 @@
-import type { ToolDefinition, ToolId, UpgradeDefinition, UpgradeId, UpgradeLevels } from "@/game/types";
+import type { ResearchCategory, ResearchId, ToolDefinition, ToolId, UpgradeDefinition, UpgradeId, UpgradeLevels } from "@/game/types";
 
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 export const INITIAL_UPGRADES: UpgradeLevels = {
   "efficient-workflow": 0,
   "better-diagnostics": 0,
@@ -26,7 +26,66 @@ export const UPGRADES: UpgradeDefinition[] = [
 ];
 
 export const REPUTATION_MILESTONES = [15, 28, 48, 72];
-export const REPAIR_LEVEL_THRESHOLDS = [0, 40, 105, 200, 330, 500, 720, 1_000];
+export const PROGRESSION_BALANCE = {
+  xpPowerFactor: 18,
+  xpPower: 1.55,
+  xpQuadraticFactor: 3,
+  researchPointEveryLevels: 5,
+  activeChallengeCount: 3,
+  dailyChallengeCount: 3,
+} as const;
+
+export function totalXpForLevel(level: number) {
+  const normalized = Math.max(0, Math.floor(level) - 1);
+  return Math.round(PROGRESSION_BALANCE.xpPowerFactor * normalized ** PROGRESSION_BALANCE.xpPower + PROGRESSION_BALANCE.xpQuadraticFactor * normalized ** 2);
+}
+
+export function getCompanyLevel(lifetimeXp: number) {
+  const xp = Math.max(0, Number.isFinite(lifetimeXp) ? lifetimeXp : 0);
+  let low = 1;
+  let high = Math.max(2, Math.floor(Math.sqrt(xp / PROGRESSION_BALANCE.xpQuadraticFactor)) + 3);
+  while (totalXpForLevel(high) <= xp) high *= 2;
+  while (low + 1 < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (totalXpForLevel(middle) <= xp) low = middle;
+    else high = middle;
+  }
+  return low;
+}
+
+export function getCompanyLevelProgress(lifetimeXp: number) {
+  const level = getCompanyLevel(lifetimeXp);
+  const currentThreshold = totalXpForLevel(level);
+  const nextThreshold = totalXpForLevel(level + 1);
+  return { level, current: lifetimeXp - currentThreshold, required: nextThreshold - currentThreshold, percent: ((lifetimeXp - currentThreshold) / (nextThreshold - currentThreshold)) * 100 };
+}
+
+export function getResearchPointsForLevels(fromLevel: number, toLevel: number) {
+  return Math.max(0, Math.floor(toLevel / PROGRESSION_BALANCE.researchPointEveryLevels) - Math.floor(fromLevel / PROGRESSION_BALANCE.researchPointEveryLevels));
+}
+
+export interface ResearchDefinition {
+  id: ResearchId;
+  category: ResearchCategory;
+  name: string;
+  description: string;
+  cost: number;
+  requiredLevel: number;
+  requires: ResearchId[];
+  effect: string;
+}
+
+export const RESEARCH_NODES: ResearchDefinition[] = [
+  { id: "basic-diagnostics", category: "Diagnostics", name: "Basic Diagnostics", description: "Zeigt technische Fehlerbilder direkt am Auftrag.", cost: 1, requiredLevel: 3, requires: [], effect: "Diagnose sichtbar" },
+  { id: "advanced-diagnostics", category: "Diagnostics", name: "Advanced Diagnostics", description: "Legt Qualitäts- und Skill-Anforderungen präziser offen.", cost: 2, requiredLevel: 8, requires: ["basic-diagnostics"], effect: "Erweiterte Jobdaten" },
+  { id: "job-analysis", category: "Diagnostics", name: "Job Analysis", description: "Berechnet den erwarteten Gewinn pro Minute.", cost: 2, requiredLevel: 12, requires: ["advanced-diagnostics"], effect: "Profit/Minute sichtbar" },
+  { id: "material-efficiency", category: "Repair Technology", name: "Efficient Material Usage", description: "Standardisierte Teileprüfung senkt Materialverluste.", cost: 3, requiredLevel: 16, requires: ["basic-diagnostics"], effect: "8 % weniger Materialkosten" },
+  { id: "advanced-repair", category: "Repair Technology", name: "Advanced Repair Methods", description: "Neue Prozessfenster für Professional- und Expert-Jobs.", cost: 2, requiredLevel: 20, requires: [], effect: "Premium-Aufträge früher" },
+  { id: "specialized-repair", category: "Repair Technology", name: "Specialized Repair", description: "Spezialisierte Techniker nutzen ihr Fachwissen effektiver.", cost: 3, requiredLevel: 28, requires: ["advanced-repair"], effect: "25 % Spezialisierungsbonus" },
+  { id: "management-systems", category: "Management", name: "Management Systems", description: "Strukturierte Annahme schafft einen zusätzlichen Job-Slot.", cost: 2, requiredLevel: 18, requires: [], effect: "+1 Job-Board-Slot" },
+  { id: "advanced-automation", category: "Automation", name: "Advanced Automation", description: "Auto Repair kann nach Gewinn pro Minute priorisieren.", cost: 3, requiredLevel: 25, requires: ["management-systems"], effect: "Priorität Fastest Jobs" },
+  { id: "offline-operations", category: "Automation", name: "Offline Operations", description: "Schichtpläne erweitern den produktiven Offline-Betrieb.", cost: 4, requiredLevel: 35, requires: ["advanced-automation"], effect: "12 Stunden Offline-Kapazität" },
+];
 
 export function getTool(toolId: ToolId) { return TOOLS.find((tool) => tool.id === toolId)!; }
 export function getUpgrade(upgradeId: UpgradeId) { return UPGRADES.find((upgrade) => upgrade.id === upgradeId)!; }

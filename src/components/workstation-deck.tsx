@@ -33,6 +33,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
   if (workstation.status === "locked") {
     const affordable = state.money >= workstation.purchasePrice;
     const reputationReady = state.reputation >= workstation.requiredReputation;
+    const levelReady = state.companyLevel >= workstation.requiredLevel;
     const previousWorkstation = state.workstations.find((item) => item.index === workstation.index - 1);
     const previousUnlocked = !previousWorkstation || previousWorkstation.status !== "locked";
     return (
@@ -41,10 +42,12 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
         <LockKeyhole size={27} />
         <h4>Arbeitsplatz {workstation.index}</h4>
         <p>Zusätzliche Kapazität für einen eigenständigen Techniker.</p>
-        <div className="station-requirements"><span>Rep. {workstation.requiredReputation}</span><strong>{formatMoney(workstation.purchasePrice)}</strong></div>
-        <button disabled={!previousUnlocked || !affordable || !reputationReady} onClick={() => onPurchase(workstation.id)}>
+        <div className="station-requirements"><span>Level {workstation.requiredLevel} · Rep. {workstation.requiredReputation}</span><strong>{formatMoney(workstation.purchasePrice)}</strong></div>
+        <button disabled={!previousUnlocked || !affordable || !reputationReady || !levelReady} onClick={() => onPurchase(workstation.id)}>
           {!previousUnlocked
             ? `Arbeitsplatz ${workstation.index - 1} zuerst`
+            : !levelReady
+              ? `Level ${workstation.requiredLevel} benötigt`
             : !reputationReady
               ? `Reputation ${workstation.requiredReputation}`
               : affordable
@@ -98,7 +101,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
             <Bot size={15} /> Auto Repair: {workstation.automationEnabled ? "ON" : "OFF"}
           </button>
           <select disabled={!employee || !workstation.automationEnabled} value={workstation.automationPriority} onChange={(event) => onSetPriority(workstation.id, event.target.value as AutomationPriority)} aria-label={`Priorität für Arbeitsplatz ${workstation.index}`}>
-            {PRIORITIES.map((priority) => <option key={priority.value} value={priority.value}>{priority.label}</option>)}
+            {PRIORITIES.filter((priority) => priority.value !== "fastest-jobs" || state.researchedNodes.includes("advanced-automation") || workstation.automationPriority === "fastest-jobs").map((priority) => <option key={priority.value} value={priority.value}>{priority.label}{priority.value === "fastest-jobs" && !state.researchedNodes.includes("advanced-automation") ? " (gesperrt)" : ""}</option>)}
           </select>
         </div>
       )}
