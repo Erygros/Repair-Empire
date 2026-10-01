@@ -1,0 +1,2 @@
+import { notFound } from "next/navigation"; import { PublicShell } from "@/components/public-shell"; import { getNews } from "@/content/news";
+export default async function NewsDetail({params}:{params:Promise<{slug:string}>}){const item=getNews((await params).slug);if(!item)notFound();return <PublicShell><article className="public-article"><span>{item.category} · {item.publishedAt}</span><h1>{item.title}</h1><p className="lead">{item.excerpt}</p>{item.content.map((p)=><p key={p}>{p}</p>)}</article></PublicShell>}

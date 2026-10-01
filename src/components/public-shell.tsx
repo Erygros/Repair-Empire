@@ -1,0 +1,4 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Wrench } from "lucide-react";
+export function PublicShell({ children }: { children: ReactNode }) { return <div className="public-site"><header className="public-header"><Link href="/" className="public-brand"><span><Wrench size={20}/></span><strong>REPAIR <b>EMPIRE</b></strong></Link><nav><Link href="/#game">Spiel</Link><Link href="/news">News</Link><Link href="/events">Events & Seasons</Link></nav><div><Link href="/login">Einloggen</Link><Link className="public-primary" href="/register">Registrieren</Link></div></header>{children}<footer><strong>REPAIR EMPIRE</strong><nav><Link href="/news">News</Link><Link href="/events">Events</Link><Link href="/login">Login</Link><Link href="/register">Register</Link><span>Impressum</span><span>Datenschutz</span></nav></footer></div>; }

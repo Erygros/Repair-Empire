@@ -19,6 +19,7 @@ import {
   startRepairAtWorkstation,
 } from "@/game/logic/game";
 import { acceptContract, claimContract } from "@/game/logic/contracts";
+import { applyFounderBonus } from "@/game/data/founder-skills";
 import { migrateSave } from "@/game/logic/save";
 import { applyTransaction } from "@/game/logic/economy";
 import { ensureChallenges } from "@/game/logic/challenges";
@@ -280,7 +281,8 @@ export function useGame() {
     if (!challenge?.completed || challenge.claimed) return { state: current, notice: "Challenge ist noch nicht abgeschlossen" };
     const now = getCurrentTime();
     let rewarded = applyTransaction(current, "CHALLENGE_REWARD", challenge.reward.money, challenge.id, now);
-    rewarded = { ...rewarded, reputation: rewarded.reputation + challenge.reward.reputation, researchPoints: rewarded.researchPoints + challenge.reward.researchPoints, completedChallenges: rewarded.completedChallenges + 1 };
+    const researchReward=applyFounderBonus(rewarded.playerCharacter?.founderSkill,"research",challenge.reward.researchPoints);
+    rewarded = { ...rewarded, reputation: rewarded.reputation + challenge.reward.reputation, researchPoints: rewarded.researchPoints + researchReward, completedChallenges: rewarded.completedChallenges + 1 };
     rewarded = awardCompanyXp(rewarded, challenge.reward.xp, now).state;
     if (challenge.daily) rewarded = { ...rewarded, dailyChallenges: rewarded.dailyChallenges.map((item) => item.id === challengeId ? { ...item, claimed: true } : item) };
     else rewarded = { ...rewarded, activeChallenges: rewarded.activeChallenges.filter((item) => item.id !== challengeId) };

@@ -81,10 +81,10 @@ function CompanyMapComponent({ state, onOpenBuilding, onOpenProfile }: { state: 
         onPointerCancel={(event) => { pointers.current.delete(event.pointerId); dragOrigin.current = null; pinchDistance.current = null; }}
       >
         <div className="map-world" style={{ width: CAMPUS_CONFIG.width, height: CAMPUS_CONFIG.height, transform: `translate(calc(-50% + ${camera.x}px), calc(-50% + ${camera.y}px)) scale(${camera.zoom})` }}>
-          <div className="campus-boundary" />
-          <div className="campus-road road-main" /><div className="campus-road road-cross" />
+          <div className="campus-boundary" /><div className="campus-green green-a"/><div className="campus-green green-b"/>
+          <div className="campus-road road-main" /><div className="campus-road road-cross" /><div className="campus-path path-admin"/><div className="campus-path path-lab"/>
           <div className="parking-lot">{Array.from({ length: 8 }, (_, index) => <i key={index} />)}</div>
-          <div className="service-yard"><span>DELIVERY / 04</span></div>
+          <div className="service-yard"><span>LIEFERZONE</span></div><div className="campus-props"><i/><i/><i/><b/><b/><span/></div>
           {FUTURE_PLOTS.map((plot) => <div className="future-plot" key={plot.id} style={{ left: plot.x, top: plot.y, width: plot.width, height: plot.depth }}><span>{plot.label}</span></div>)}
           {CAMPUS_PLOTS.map((plot) => <CampusBuilding key={plot.buildingId} plot={plot} state={state} notification={getNotification(state, plot.buildingId)} selected={selected === plot.buildingId} recentUpgrade={state.lastBuildingUpgrade?.buildingId === plot.buildingId} onSelect={selectBuilding} />)}
           {state.playerCharacter && <div className="map-entity-layer"><button className="founder-map-entity" onClick={onOpenProfile} aria-label={`${state.playerCharacter.displayName} Profil öffnen`}><CharacterRenderer appearance={state.playerCharacter.appearance} cosmetics={state.playerCharacter.equippedCosmetics} mode="MAP" /><span>{state.playerCharacter.displayName}<small>FOUNDER</small></span></button></div>}

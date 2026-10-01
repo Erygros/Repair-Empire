@@ -31,7 +31,7 @@ export function CampusBuilding({ plot, state, notification, selected, recentUpgr
           {tier >= 5 && <span className="building-crown" />}
         </span>
       </span>
-      <span className="building-map-label"><Icon size={15} /><span>{definition.name}<small>{plot.label} · LVL {building.level}</small></span></span>
+      <span className="building-map-label"><Icon size={15} /><span>{definition.name}<small>GEBÄUDELEVEL {building.level}</small></span></span>
       {notification && <span className="building-notification">{notification}</span>}
     </button>
   );

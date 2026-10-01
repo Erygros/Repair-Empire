@@ -1,0 +1,9 @@
+export type NewsStatus = "DRAFT" | "PUBLISHED";
+export interface NewsItem { id: string; slug: string; title: string; excerpt: string; content: string[]; category: string; publishedAt: string; featured: boolean; status: NewsStatus; imageAssetId?: string; }
+export const NEWS: NewsItem[] = [
+  { id: "N-003", slug: "company-campus-2", title: "Der Campus wird zur Tycoon-Welt", excerpt: "Gebäude, Wege und sichtbare Expansion erhalten eine räumliche 2.5D-Darstellung.", content: ["Der Company Campus wird zum zentralen Ort für alle Unternehmensbereiche.", "Visuelle Gebäudetiers zeigen Fortschritt dauerhaft und ohne die Spielbalance zu verändern."], category: "Development", publishedAt: "2026-10-01", featured: true, status: "PUBLISHED", imageAssetId: "map.campus.prototype" },
+  { id: "N-002", slug: "workshop-live-floor", title: "Reparaturen werden sichtbar", excerpt: "Geräte, Techniker und echte Reparaturphasen arbeiten jetzt gemeinsam auf dem Live Floor.", content: ["Jeder Arbeitsplatz visualisiert den tatsächlichen Domain-State.", "Offline-Fortschritt und Automation bleiben dabei die Source of Truth."], category: "Prototype", publishedAt: "2026-09-30", featured: false, status: "PUBLISHED" },
+  { id: "N-001", slug: "foundation-prototype", title: "Foundation Prototype abgeschlossen", excerpt: "Der erste Entwicklungsblock verbindet Economy, Mitarbeiter, Gebäude und Founder Identity.", content: ["Repair Empire besitzt nun einen durchgehenden spielbaren Unternehmensloop."], category: "Milestone", publishedAt: "2026-09-29", featured: false, status: "PUBLISHED" },
+];
+export const PUBLISHED_NEWS = NEWS.filter((item) => item.status === "PUBLISHED").sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+export function getNews(slug: string) { return PUBLISHED_NEWS.find((item) => item.slug === slug); }

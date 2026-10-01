@@ -4,6 +4,7 @@ import { applyTransaction } from "@/game/logic/economy";
 import { getRelationshipState } from "@/game/logic/customers";
 import type { Contract, ContractType, Customer, GameState, RepairOrder } from "@/game/types";
 import { getBuildingFeatureValue } from "@/game/data/buildings";
+import { applyFounderBonus } from "@/game/data/founder-skills";
 
 export function getActiveContractLimit(state: GameState) {
   const officeCapacity = getBuildingFeatureValue(state, "BUSINESS_OFFICE", "contract-capacity");
@@ -89,13 +90,15 @@ export function claimContract(state: GameState, contractId: string, now: number)
   const contract = state.contracts.find((item) => item.id === contractId);
   if (!contract || contract.status !== "completed" || contract.rewardedAt) return { state, error: "Vertragsbonus nicht verfügbar" };
   let rewarded = applyTransaction(state, "CONTRACT_REWARD", contract.reward.money, contract.id, now);
-  rewarded = awardCompanyXp({ ...rewarded, reputation: rewarded.reputation + contract.reward.reputation, researchPoints: rewarded.researchPoints + contract.reward.researchPoints }, contract.reward.xp, now).state;
+  const researchReward=applyFounderBonus(rewarded.playerCharacter?.founderSkill,"research",contract.reward.researchPoints);
+  const loyaltyReward=applyFounderBonus(rewarded.playerCharacter?.founderSkill,"loyalty",contract.reward.loyalty);
+  rewarded = awardCompanyXp({ ...rewarded, reputation: rewarded.reputation + contract.reward.reputation, researchPoints: rewarded.researchPoints + researchReward }, contract.reward.xp, now).state;
   rewarded = {
     ...rewarded,
     contracts: rewarded.contracts.map((item) => item.id === contractId ? { ...item, status: "claimed" as const, rewardedAt: now } : item),
     persistentCustomers: rewarded.persistentCustomers.map((customer) => {
       if (customer.id !== contract.customerId) return customer;
-      const loyalty = Math.min(100, customer.loyalty + contract.reward.loyalty);
+      const loyalty = Math.min(100, customer.loyalty + loyaltyReward);
       return { ...customer, activeContractId: null, loyalty, relationshipState: getRelationshipState(loyalty) };
     }),
     lifetimeStats: { ...rewarded.lifetimeStats, contractRevenue: rewarded.lifetimeStats.contractRevenue + contract.reward.money, highestContractBonus: Math.max(rewarded.lifetimeStats.highestContractBonus, contract.reward.money) },

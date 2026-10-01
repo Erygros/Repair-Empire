@@ -1,0 +1,2 @@
+import { CharacterCreator3D } from "@/components/character-creator-3d"; import { requireSession } from "@/lib/session";
+export const metadata={title:"Founder erstellen | Repair Empire",robots:{index:false,follow:false}};export default async function CreateCharacter(){let name="Founder";if(process.env.NODE_ENV==="production"||process.env.DATABASE_URL){const s=await requireSession();name=(s.user as typeof s.user&{ceoName?:string}).ceoName??s.user.name}return <CharacterCreator3D initialName={name}/>}

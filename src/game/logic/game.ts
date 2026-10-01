@@ -9,6 +9,7 @@ import { expireContracts, maybeCreateContractOffer, recordContractProgress } fro
 import { CUSTOMER_TYPE_CONFIG } from "@/game/data/customers";
 import { createInitialBuildings } from "@/game/data/buildings";
 import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, URGENT_JOB_LIFETIME_MS, getCurrentTime, getDayKey, getOfflineWindow } from "@/game/logic/time";
+import { FOUNDER_SKILL_VALUES } from "@/game/data/founder-skills";
 import type { ActiveRepair, Customer, Employee, GameState, OfflineSummary, OrderVariant, ProgressionContext, RepairOrder, RepairSource, ToolId, UpgradeId, UpgradeLevels, Workstation } from "@/game/types";
 
 const INITIAL_ORDER_COUNT = 5;
@@ -317,7 +318,8 @@ export function startRepairAtWorkstation(state: GameState, orderId: string, work
   if (!order || !workstation) return { state, error: "Auftrag oder Arbeitsplatz nicht gefunden" };
   const eligibility = getWorkstationEligibility(state, workstation, order);
   if (!eligibility.eligible) return { state, error: eligibility.reason };
-  const duration = getWorkstationDuration(order, state.upgrades, eligibility.speed ?? 1, eligibility.specializationBonus ?? false);
+  const founderSpeed = state.playerCharacter?.founderSkill === "TECHNICIAN" ? 1 + FOUNDER_SKILL_VALUES.TECHNICIAN_SPEED : 1;
+  const duration = Math.max(4, Math.round(getWorkstationDuration(order, state.upgrades, eligibility.speed ?? 1, eligibility.specializationBonus ?? false) / founderSpeed));
   const activeRepair: ActiveRepair = {
     order,
     startedAt: now,
@@ -347,8 +349,8 @@ export function getRepairOperatingCost(state: GameState, activeRepair: ActiveRep
   return employee ? getEmployeeOperatingCost(employee.class) + Math.max(0, workstation.index - 1) * 2 : 0;
 }
 
-function improveEmployee(employee: Employee, activeRepair: ActiveRepair) {
-  const gainedXp = Math.round(activeRepair.order.repairXp * (activeRepair.specializationBonus ? 1.25 : 1));
+function improveEmployee(employee: Employee, activeRepair: ActiveRepair, managerBonus: boolean) {
+  const gainedXp = Math.round(activeRepair.order.repairXp * (activeRepair.specializationBonus ? 1.25 : 1) * (managerBonus ? 1 + FOUNDER_SKILL_VALUES.MANAGER_XP : 1));
   const oldLevel = employee.level;
   const xp = employee.xp + gainedXp;
   const level = getEmployeeLevel(xp);
@@ -375,35 +377,38 @@ export function settleWorkstation(state: GameState, workstationId: string, now =
   const operatingCost = getRepairOperatingCost(state, activeRepair, workstation);
   const qualityBonus = Math.max(0, Math.floor((activeRepair.qualityRating - 82) / 10));
   const reputationGain = activeRepair.order.reputationReward + qualityBonus;
+  const baseProfit = activeRepair.order.reward - activeRepair.chargedMaterialCost - operatingCost;
+  const founderFinanceBonus = state.playerCharacter?.founderSkill === "FINANCE" ? Math.max(0, Math.round(baseProfit * FOUNDER_SKILL_VALUES.FINANCE_PROFIT)) : 0;
+  const repairReward = activeRepair.order.reward + founderFinanceBonus;
   let employeeXp = 0;
   let leveledEmployee: string | null = null;
   let employees = state.employees;
   if (activeRepair.assignedEmployeeId) {
     employees = state.employees.map((employee) => {
       if (employee.id !== activeRepair.assignedEmployeeId) return employee;
-      const improved = improveEmployee(employee, activeRepair);
+      const improved = improveEmployee(employee, activeRepair, state.playerCharacter?.founderSkill === "MANAGER");
       employeeXp = improved.gainedXp;
       if (improved.leveledUp) leveledEmployee = improved.employee.name;
-      return { ...improved.employee, repairsCompleted: improved.employee.repairsCompleted + 1, revenueGenerated: improved.employee.revenueGenerated + activeRepair.order.reward };
+      return { ...improved.employee, repairsCompleted: improved.employee.repairsCompleted + 1, revenueGenerated: improved.employee.revenueGenerated + repairReward };
     });
   }
-  let economicState = applyTransaction(state, "REPAIR_REWARD", activeRepair.order.reward, activeRepair.order.id, now);
+  let economicState = applyTransaction(state, "REPAIR_REWARD", repairReward, activeRepair.order.id, now);
   if (operatingCost > 0) economicState = applyTransaction(economicState, "OPERATING_COST", -operatingCost, activeRepair.order.id, now);
   economicState = recordRepairEconomy(economicState, {
-    revenue: activeRepair.order.reward,
+    revenue: repairReward,
     materialCost: activeRepair.chargedMaterialCost,
     operatingCost,
     reputation: reputationGain,
     category: activeRepair.order.category,
     source: repairSource,
   }, now);
-  const profit = activeRepair.order.reward - activeRepair.chargedMaterialCost - operatingCost;
+  const profit = repairReward - activeRepair.chargedMaterialCost - operatingCost;
   let partial: GameState = {
     ...economicState,
     reputation: state.reputation + reputationGain,
     employees,
     workstations: state.workstations.map((item) => item.id === workstationId ? { ...item, status: "available" as const, activeRepair: null } : item),
-    completedRepairs: [{ id: activeRepair.order.id, device: activeRepair.order.device, issue: activeRepair.order.issue, reward: activeRepair.order.reward, materialCost: activeRepair.chargedMaterialCost, operatingCost, profit, category: activeRepair.order.category, source: repairSource, reputationReward: reputationGain, completedAt: now }, ...state.completedRepairs].slice(0, 20),
+    completedRepairs: [{ id: activeRepair.order.id, device: activeRepair.order.device, issue: activeRepair.order.issue, reward: repairReward, materialCost: activeRepair.chargedMaterialCost, operatingCost, profit, category: activeRepair.order.category, source: repairSource, reputationReward: reputationGain, completedAt: now }, ...state.completedRepairs].slice(0, 20),
   };
   const companyProgress = awardCompanyXp(partial, activeRepair.order.repairXp, now);
   partial = applyChallengeEvent(companyProgress.state, {
@@ -430,7 +435,7 @@ export function settleWorkstation(state: GameState, workstationId: string, now =
   return {
     state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber, nextCustomerNumber: filled.nextCustomerNumber },
     error: null,
-    earnings: activeRepair.order.reward,
+    earnings: repairReward,
     materialCost: activeRepair.chargedMaterialCost,
     operatingCost,
     profit,

@@ -60,6 +60,8 @@ export interface PlayerCharacter {
   appearance: CharacterAppearance;
   equippedCosmetics: EquippedCharacterCosmetics;
   createdAt: number;
+  founderSkill?: "FINANCE" | "TECHNICIAN" | "RESEARCHER" | "MANAGER" | "NEGOTIATOR";
+  model3d?: unknown;
 }
 
 export interface CosmeticDefinition {

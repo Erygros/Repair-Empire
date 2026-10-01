@@ -1,13 +1,15 @@
 import { getReachedMilestones } from "@/game/data/milestones";
 import { getCompanyLevel, getCompanyLevelProgress, getResearchPointsForLevels } from "@/game/data/progression";
 import type { GameState } from "@/game/types";
+import { applyFounderBonus } from "@/game/data/founder-skills";
 
 export function awardCompanyXp(state: GameState, amount: number, now: number) {
   const oldLevel = state.companyLevel;
   const lifetimeXp = Math.max(0, state.lifetimeXp + Math.max(0, Math.round(amount)));
   const companyLevel = getCompanyLevel(lifetimeXp);
   const progress = getCompanyLevelProgress(lifetimeXp);
-  const researchPointsGained = getResearchPointsForLevels(oldLevel, companyLevel);
+  const baseResearchPoints = getResearchPointsForLevels(oldLevel, companyLevel);
+  const researchPointsGained = applyFounderBonus(state.playerCharacter?.founderSkill, "research", baseResearchPoints);
   const existing = new Set(state.milestones.map((milestone) => milestone.id));
   const reached = getReachedMilestones(oldLevel, companyLevel).filter((milestone) => !existing.has(milestone.id));
   return {

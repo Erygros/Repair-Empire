@@ -1,0 +1,3 @@
+import Link from "next/link"; import { PublicShell } from "@/components/public-shell"; import { PUBLISHED_NEWS } from "@/content/news";
+export const metadata={title:"News | Repair Empire",description:"Entwicklungsnews zu Repair Empire."};
+export default function NewsPage(){return <PublicShell><main className="public-subpage"><p className="panel-label">WERKSTATT-FUNK</p><h1>News</h1><div className="news-list">{PUBLISHED_NEWS.map(n=><article key={n.id}><span>{n.category} · {n.publishedAt}</span><h2>{n.title}</h2><p>{n.excerpt}</p><Link href={`/news/${n.slug}`}>Weiterlesen</Link></article>)}</div></main></PublicShell>}

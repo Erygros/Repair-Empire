@@ -16,19 +16,20 @@ export interface CampusPlot {
   width: number;
   depth: number;
   label: string;
+  entranceAnchor: { x: number; y: number };
 }
 
 export const CAMPUS_PLOTS: CampusPlot[] = [
-  { buildingId: "WORKSHOP", x: 650, y: 350, width: 330, depth: 210, label: "A-01" },
-  { buildingId: "TOOL_WAREHOUSE", x: 1060, y: 485, width: 245, depth: 165, label: "A-02" },
-  { buildingId: "PERSONNEL", x: 310, y: 220, width: 225, depth: 155, label: "B-01" },
-  { buildingId: "BUSINESS_OFFICE", x: 275, y: 580, width: 250, depth: 170, label: "B-02" },
-  { buildingId: "RESEARCH", x: 1080, y: 160, width: 260, depth: 180, label: "C-01" },
-  { buildingId: "FINANCE", x: 760, y: 700, width: 220, depth: 145, label: "C-02" },
+  { buildingId: "WORKSHOP", x: 610, y: 310, width: 370, depth: 240, label: "A-01", entranceAnchor:{x:800,y:550} },
+  { buildingId: "TOOL_WAREHOUSE", x: 1080, y: 500, width: 270, depth: 180, label: "A-02", entranceAnchor:{x:1140,y:680} },
+  { buildingId: "PERSONNEL", x: 310, y: 210, width: 220, depth: 165, label: "B-01", entranceAnchor:{x:420,y:375} },
+  { buildingId: "BUSINESS_OFFICE", x: 255, y: 585, width: 285, depth: 185, label: "B-02", entranceAnchor:{x:400,y:770} },
+  { buildingId: "RESEARCH", x: 1090, y: 145, width: 275, depth: 190, label: "C-01", entranceAnchor:{x:1225,y:335} },
+  { buildingId: "FINANCE", x: 710, y: 705, width: 225, depth: 150, label: "C-02", entranceAnchor:{x:820,y:855} },
 ];
 
 export const FUTURE_PLOTS = [
-  { id: "future-logistics", x: 1370, y: 655, width: 155, depth: 115, label: "D-01" },
-  { id: "future-expansion", x: 70, y: 390, width: 160, depth: 120, label: "D-02" },
+  { id: "future-logistics", x: 1370, y: 655, width: 155, depth: 115, label: "Baureserve" },
+  { id: "future-expansion", x: 70, y: 390, width: 160, depth: 120, label: "Erweiterungsfläche" },
 ];
 

@@ -1,5 +1,6 @@
 import { BUSINESS_PREFIXES, BUSINESS_SUFFIXES, CUSTOMER_TYPE_CONFIG, PRIVATE_FIRST_NAMES, PRIVATE_LAST_NAMES, RECENT_CUSTOMER_LIMIT, RELATIONSHIP_THRESHOLDS } from "@/game/data/customers";
 import type { Customer, CustomerType, GameState, ProgressionContext, RepairCategory, RepairOrder } from "@/game/types";
+import { applyFounderBonus } from "@/game/data/founder-skills";
 
 function seededUnit(seed: number) {
   const value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
@@ -69,7 +70,8 @@ export function recordCustomerRepair(state: GameState, order: RepairOrder, now: 
     relationshipState: "NEW", totalJobs: 0, successfulJobs: 0, totalRevenueGenerated: 0,
     firstSeenAt: order.createdAt, lastSeenAt: order.createdAt, isPersistent: false, activeContractId: null, recentRepairs: [],
   };
-  const loyaltyGain = order.variant === "premium" ? 8 : order.variant === "urgent" ? 7 : 5;
+  const baseLoyaltyGain = order.variant === "premium" ? 8 : order.variant === "urgent" ? 7 : 5;
+  const loyaltyGain = applyFounderBonus(state.playerCharacter?.founderSkill, "loyalty", baseLoyaltyGain);
   const loyalty = Math.min(100, base.loyalty + loyaltyGain);
   const successfulJobs = base.successfulJobs + 1;
   const business = ["SMALL_BUSINESS", "RETAILER", "CORPORATE"].includes(base.customerType);

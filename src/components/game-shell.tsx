@@ -6,7 +6,6 @@ import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
 import { CompanyMap } from "@/components/company-map";
 import { BuildingViewShell } from "@/components/building-view-shell";
-import { CharacterCreator } from "@/components/character-creator";
 import { CharacterProfile } from "@/components/character-profile";
 import { CosmeticUnlock } from "@/components/cosmetic-unlock";
 import { CustomerCenter } from "@/components/customer-center";
@@ -113,7 +112,6 @@ export function GameShell() {
       {selectedOrder && <AssignmentDock order={selectedOrder} state={state} onClose={() => setSelectedOrderId(null)} onAssign={(workstationId) => { game.assignOrder(selectedOrder.id, workstationId); setSelectedOrderId(null); }} />}
       {game.offlineSummary && <OfflineReport summary={game.offlineSummary} onClose={game.dismissOfflineSummary} />}
       <MilestoneReport state={state} onClaim={game.claimMilestone} />
-      {!state.playerCharacter && <CharacterCreator onCreate={game.createFounder} />}
       {state.cosmeticUnlockNotice && state.playerCharacter && <CosmeticUnlock cosmeticId={state.cosmeticUnlockNotice} character={state.playerCharacter} onClose={game.dismissCosmeticUnlock} />}
       {game.notice && <div className="toast" role="status"><span className="toast-light" />{game.notice}</div>}
       {levelFeedback && <div className="level-feedback" role="status"><span>PROGRESSION UPDATE</span><strong>{levelFeedback}</strong><button onClick={() => setLevelFeedback(null)}>OK</button></div>}
