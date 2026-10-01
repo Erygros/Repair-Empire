@@ -8,10 +8,11 @@ export interface MilestoneDefinition {
   rewardMoney: number;
   rewardResearchPoints: number;
   presentation: "chapter" | "major";
+  rewardCosmeticId?: string;
 }
 
 export const MILESTONES: MilestoneDefinition[] = [
-  { id: "chapter-1", level: 60, chapter: "Kapitel I abgeschlossen", name: "Die kleine Werkstatt", description: "Dein Betrieb ist bereit für die erste große Erweiterung.", unlock: "Werkbank 2", rewardMoney: 1_500, rewardResearchPoints: 3, presentation: "chapter" },
+  { id: "chapter-1", level: 60, chapter: "Kapitel I abgeschlossen", name: "Die kleine Werkstatt", description: "Dein Betrieb ist bereit für die erste große Erweiterung.", unlock: "Werkbank 2", rewardMoney: 1_500, rewardResearchPoints: 3, rewardCosmeticId: "outfit-orange-jacket", presentation: "chapter" },
   { id: "workshop-expansion", level: 150, chapter: "Expansion", name: "Regionaler Reparaturbetrieb", description: "Die nächste Produktionsstufe wird verfügbar.", unlock: "Werkbank 3", rewardMoney: 5_000, rewardResearchPoints: 5, presentation: "major" },
   { id: "professional-workshop", level: 300, chapter: "Professional Workshop", name: "Industrielle Werkstatt", description: "Dein Unternehmen erreicht professionellen Maßstab.", unlock: "Werkbank 4", rewardMoney: 15_000, rewardResearchPoints: 8, presentation: "major" },
 ];

@@ -26,7 +26,8 @@ import { awardCompanyXp } from "@/game/logic/progression";
 import { getCurrentTime, getDayKey } from "@/game/logic/time";
 import { getBuildingFeatureValue, getBuildingState } from "@/game/data/buildings";
 import { upgradeBuilding } from "@/game/logic/buildings";
-import type { AutomationPriority, BuildingType, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
+import { createPlayerCharacter, ensureDefaultCosmetics, equipCosmetic, grantCosmetic, unequipCosmetic } from "@/game/logic/cosmetics";
+import type { AutomationPriority, BuildingType, CharacterAppearance, CharacterCosmeticSlot, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
 
 const STORAGE_KEY = "repair-empire-save-v1";
 
@@ -268,7 +269,9 @@ export function useGame() {
     if (!progress || progress.claimed || !milestone) return { state: current, notice: "Meilenstein bereits beansprucht" };
     const rewarded = applyTransaction(current, "MILESTONE_REWARD", milestone.rewardMoney, milestone.id, getCurrentTime());
     const milestones = rewarded.milestones.map((item) => item.id === milestoneId ? { ...item, claimed: true } : item);
-    return { state: { ...rewarded, researchPoints: rewarded.researchPoints + milestone.rewardResearchPoints, milestones, pendingMilestoneId: milestones.find((item) => !item.claimed)?.id ?? null }, notice: `${milestone.name} · Belohnung erhalten` };
+    let next = { ...rewarded, researchPoints: rewarded.researchPoints + milestone.rewardResearchPoints, milestones, pendingMilestoneId: milestones.find((item) => !item.claimed)?.id ?? null };
+    if (milestone.rewardCosmeticId) next = grantCosmetic(next, milestone.rewardCosmeticId, "PROGRESSION", getCurrentTime()).state;
+    return { state: next, notice: `${milestone.name} · Belohnung erhalten${milestone.rewardCosmeticId ? " · Cosmetic freigeschaltet" : ""}` };
   }), [commit]);
 
   const claimChallenge = useCallback((challengeId: string) => commit((current) => {
@@ -308,6 +311,22 @@ export function useGame() {
     return { state: result.state, notice: `${before.buildingId.replaceAll("_", " ")} Level ${event.newLevel}${visual} · ${event.unlockedFeatures.join(" · ")}` };
   }), [commit]);
 
+  const createFounder = useCallback((name: string, appearance: CharacterAppearance, outfitId: string) => commit((current) => {
+    if (current.playerCharacter) return { state: current, notice: "Founder existiert bereits" };
+    const now = getCurrentTime();
+    const withDefaults = ensureDefaultCosmetics(current, now);
+    return { state: { ...withDefaults, playerCharacter: createPlayerCharacter(name, appearance, outfitId, now), cosmeticUnlockNotice: null }, notice: `Founder ${name} erstellt` };
+  }), [commit]);
+
+  const equipCharacterCosmetic = useCallback((cosmeticId: string) => commit((current) => {
+    const result = equipCosmetic(current, cosmeticId);
+    return { state: result.state, notice: result.error ?? "Cosmetic ausgerüstet" };
+  }), [commit]);
+
+  const unequipCharacterCosmetic = useCallback((slot: CharacterCosmeticSlot) => commit((current) => ({ state: unequipCosmetic(current, slot), notice: `${slot} entfernt` })), [commit]);
+
+  const updateFounderAppearance = useCallback((appearance: CharacterAppearance) => commit((current) => current.playerCharacter ? { state: { ...current, playerCharacter: { ...current.playerCharacter, appearance } }, notice: "Founder-Aussehen aktualisiert" } : { state: current, notice: "Founder Character fehlt" }), [commit]);
+
   return {
     state,
     hydrated,
@@ -329,6 +348,11 @@ export function useGame() {
     takeContract,
     collectContractReward,
     purchaseBuildingUpgrade,
+    createFounder,
+    equipCharacterCosmetic,
+    unequipCharacterCosmetic,
+    updateFounderAppearance,
+    dismissCosmeticUnlock: () => commit((current) => ({ state: { ...current, cosmeticUnlockNotice: null }, notice: "" })),
     dismissOfflineSummary: () => setOfflineSummary(null),
     purchaseTool,
     purchaseUpgrade,

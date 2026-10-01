@@ -29,6 +29,58 @@ export type ContractStatus = "offered" | "active" | "completed" | "failed" | "cl
 export type BuildingType = "WORKSHOP" | "PERSONNEL" | "FINANCE" | "TOOL_WAREHOUSE" | "RESEARCH" | "BUSINESS_OFFICE";
 export type BuildingStatus = "LOCKED" | "AVAILABLE" | "OWNED" | "UPGRADE_AVAILABLE";
 export type BuildingFeatureId = "workstation-capacity" | "employee-capacity" | "tool-tier" | "research-tier" | "contract-capacity" | "finance-reports" | "workshop-grade";
+export type CharacterBodyPreset = "COMPACT" | "BALANCED" | "TALL";
+export type CharacterSkinTone = "LIGHT" | "WARM" | "MEDIUM" | "DEEP";
+export type CharacterFacePreset = "FOCUSED" | "CALM" | "BOLD";
+export type CharacterHairStyle = "SHORT" | "CROP" | "WAVES" | "TIED";
+export type CharacterHairColor = "BLACK" | "BROWN" | "COPPER" | "BLONDE" | "SILVER";
+export type CharacterRenderMode = "PORTRAIT" | "FULL_BODY" | "MAP" | "SMALL";
+export type CosmeticCategory = "OUTFIT" | "HEADWEAR" | "ACCESSORY" | "CHARACTER_SKIN" | "WORKSTATION_SKIN" | "TOOL_SKIN" | "BUILDING_THEME" | "BUILDING_DECORATION" | "VEHICLE_SKIN" | "PROFILE_COSMETIC";
+export type CosmeticRarity = "COMMON" | "UNCOMMON" | "RARE" | "EPIC" | "LEGENDARY";
+export type CosmeticSourceType = "DEFAULT" | "PROGRESSION" | "EVENT" | "SEASON" | "PREMIUM" | "ACHIEVEMENT" | "SPECIAL";
+export type CharacterCosmeticSlot = "OUTFIT" | "HEADWEAR" | "ACCESSORY";
+
+export interface CharacterAppearance {
+  bodyPreset: CharacterBodyPreset;
+  skinTone: CharacterSkinTone;
+  facePreset: CharacterFacePreset;
+  hairStyle: CharacterHairStyle;
+  hairColor: CharacterHairColor;
+}
+
+export interface EquippedCharacterCosmetics {
+  OUTFIT: string | null;
+  HEADWEAR: string | null;
+  ACCESSORY: string | null;
+}
+
+export interface PlayerCharacter {
+  characterId: string;
+  displayName: string;
+  appearance: CharacterAppearance;
+  equippedCosmetics: EquippedCharacterCosmetics;
+  createdAt: number;
+}
+
+export interface CosmeticDefinition {
+  cosmeticId: string;
+  name: string;
+  category: CosmeticCategory;
+  rarity: CosmeticRarity;
+  assetReference: string;
+  equipSlot: CharacterCosmeticSlot | null;
+  sourceType: CosmeticSourceType;
+  setId?: string;
+  seasonAllowed: boolean;
+  gameplayEffects: "NONE";
+}
+
+export interface CosmeticEntitlement {
+  cosmeticId: string;
+  grantedAt: number;
+  sourceType: CosmeticSourceType;
+  authority: "LOCAL_DEVELOPMENT" | "SERVER";
+}
 export type BuildingRequirement =
   | { type: "companyLevel"; value: number }
   | { type: "reputation"; value: number }
@@ -396,6 +448,9 @@ export interface GameState {
   nextContractNumber: number;
   buildings: BuildingState[];
   lastBuildingUpgrade: BuildingUpgradeEvent | null;
+  playerCharacter: PlayerCharacter | null;
+  cosmeticEntitlements: CosmeticEntitlement[];
+  cosmeticUnlockNotice: string | null;
 }
 
 export interface ProgressionContext {

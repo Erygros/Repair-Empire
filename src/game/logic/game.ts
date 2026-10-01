@@ -254,6 +254,9 @@ export function createInitialState(): GameState {
     nextContractNumber: 1,
     buildings: createInitialBuildings(),
     lastBuildingUpgrade: null,
+    playerCharacter: null,
+    cosmeticEntitlements: [],
+    cosmeticUnlockNotice: null,
   };
   return ensureChallenges(initial, now, getDayKey(now));
 }

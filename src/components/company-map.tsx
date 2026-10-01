@@ -3,6 +3,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { LocateFixed, Minus, Plus } from "lucide-react";
 import { CampusBuilding } from "@/components/campus-building";
+import { CharacterRenderer } from "@/components/character-renderer";
 import { CAMPUS_CONFIG, CAMPUS_PLOTS, FUTURE_PLOTS } from "@/game/data/campus";
 import { getBuildingUpgradeCheck } from "@/game/logic/buildings";
 import type { BuildingType, GameState } from "@/game/types";
@@ -23,7 +24,7 @@ function getNotification(state: GameState, buildingId: BuildingType) {
   return null;
 }
 
-function CompanyMapComponent({ state, onOpenBuilding }: { state: GameState; onOpenBuilding: (buildingId: BuildingType) => void }) {
+function CompanyMapComponent({ state, onOpenBuilding, onOpenProfile }: { state: GameState; onOpenBuilding: (buildingId: BuildingType) => void; onOpenProfile: () => void }) {
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0, zoom: CAMPUS_CONFIG.defaultZoom });
   const [selected, setSelected] = useState<BuildingType | null>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
@@ -59,7 +60,7 @@ function CompanyMapComponent({ state, onOpenBuilding }: { state: GameState; onOp
         className="map-viewport"
         onWheel={(event) => { event.preventDefault(); zoomBy(event.deltaY > 0 ? -.08 : .08); }}
         onPointerDown={(event) => {
-          if ((event.target as HTMLElement).closest(".campus-building")) return;
+          if ((event.target as HTMLElement).closest(".campus-building, .founder-map-entity")) return;
           event.currentTarget.setPointerCapture(event.pointerId);
           pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
           if (pointers.current.size === 1) dragOrigin.current = { x: event.clientX, y: event.clientY, camera };
@@ -86,6 +87,7 @@ function CompanyMapComponent({ state, onOpenBuilding }: { state: GameState; onOp
           <div className="service-yard"><span>DELIVERY / 04</span></div>
           {FUTURE_PLOTS.map((plot) => <div className="future-plot" key={plot.id} style={{ left: plot.x, top: plot.y, width: plot.width, height: plot.depth }}><span>{plot.label}</span></div>)}
           {CAMPUS_PLOTS.map((plot) => <CampusBuilding key={plot.buildingId} plot={plot} state={state} notification={getNotification(state, plot.buildingId)} selected={selected === plot.buildingId} recentUpgrade={state.lastBuildingUpgrade?.buildingId === plot.buildingId} onSelect={selectBuilding} />)}
+          {state.playerCharacter && <div className="map-entity-layer"><button className="founder-map-entity" onClick={onOpenProfile} aria-label={`${state.playerCharacter.displayName} Profil öffnen`}><CharacterRenderer appearance={state.playerCharacter.appearance} cosmetics={state.playerCharacter.equippedCosmetics} mode="MAP" /><span>{state.playerCharacter.displayName}<small>FOUNDER</small></span></button></div>}
         </div>
       </div>
       <div className="map-controls" aria-label="Kartensteuerung"><button onClick={() => zoomBy(.12)} title="Vergrößern"><Plus size={17} /></button><button onClick={() => zoomBy(-.12)} title="Verkleinern"><Minus size={17} /></button><button onClick={resetCamera} title="Karte zentrieren"><LocateFixed size={17} /></button></div>
@@ -94,5 +96,5 @@ function CompanyMapComponent({ state, onOpenBuilding }: { state: GameState; onOp
   );
 }
 
-export const CompanyMap = memo(CompanyMapComponent, (previous, next) => previous.state.buildings === next.state.buildings && previous.state.contractOffers === next.state.contractOffers && previous.state.workstations === next.state.workstations && previous.state.researchPoints === next.state.researchPoints && previous.state.lastBuildingUpgrade === next.state.lastBuildingUpgrade && previous.state.identity.companyName === next.state.identity.companyName && previous.onOpenBuilding === next.onOpenBuilding);
+export const CompanyMap = memo(CompanyMapComponent, (previous, next) => previous.state.buildings === next.state.buildings && previous.state.contractOffers === next.state.contractOffers && previous.state.workstations === next.state.workstations && previous.state.researchPoints === next.state.researchPoints && previous.state.lastBuildingUpgrade === next.state.lastBuildingUpgrade && previous.state.playerCharacter === next.state.playerCharacter && previous.state.identity.companyName === next.state.identity.companyName && previous.onOpenBuilding === next.onOpenBuilding && previous.onOpenProfile === next.onOpenProfile);
 
