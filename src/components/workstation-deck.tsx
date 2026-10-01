@@ -1,5 +1,5 @@
 import { Bot, Check, Clock3, LockKeyhole, Power, UserRound, Wrench } from "lucide-react";
-import { getRepairProgress } from "@/game/logic/game";
+import { getRepairOperatingCost, getRepairProgress } from "@/game/logic/game";
 import type { AutomationPriority, Employee, GameState, Workstation } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
 
@@ -28,6 +28,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
   const progress = getRepairProgress(active, now);
   const completed = workstation.status === "completed" || progress >= 100;
   const remaining = active ? active.endsAt - now : 0;
+  const projectedProfit = active ? active.order.reward - active.chargedMaterialCost - getRepairOperatingCost(state, active, workstation) : 0;
 
   if (workstation.status === "locked") {
     const affordable = state.money >= workstation.purchasePrice;
@@ -78,7 +79,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
       {active ? (
         <div className="station-job">
           <div className="station-device"><Wrench size={17} /><div><strong>{active.order.device}</strong><span>{active.order.issue}</span></div></div>
-          <div className="station-job-meta"><span><Clock3 size={13} /> {completed ? "00:00" : formatClock(remaining)}</span><strong>{formatMoney(active.order.reward)}</strong></div>
+          <div className="station-job-meta"><span><Clock3 size={13} /> {completed ? "00:00" : formatClock(remaining)}</span><strong>Gewinn {formatMoney(projectedProfit)}</strong></div>
           <div className="station-progress"><span style={{ width: `${progress}%` }} /></div>
           <div className="station-modifiers"><span>{active.speedMultiplier.toFixed(2)}x Speed</span><span>Qualität {active.qualityRating}</span>{active.specializationBonus && <span className="bonus">Spezialbonus</span>}</div>
           {!workstation.automationEnabled && (

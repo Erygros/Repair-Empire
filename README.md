@@ -12,6 +12,10 @@ Ein spielbarer Werkstatt-Tycoon mit Next.js, TypeScript und Tailwind CSS.
 - generierter Mitarbeitermarkt mit fünf Klassen, Skills, Qualität und Spezialisierungen
 - Mitarbeiter-XP, Level-Ups und flexible Arbeitsplatzzuweisung
 - Auto Repair mit vier Prioritäten und begrenzter Offline-Fertigstellung
+- ereignisbasierter Offline-Fortschritt mit 8-Stunden-Kapazität und Offline-Job-Pipeline
+- dringende, Premium- und komplexe Auftragsvarianten mit gespeichertem dynamischem Job Board
+- zentrale Economy-Transaktionen für Umsatz, Material-, Betriebs- und Investitionskosten
+- Tageskennzahlen, Lifetime-Statistiken und kompaktes Unternehmens-Dashboard
 - versionierter, lokal gespeicherter Spielstand mit Migration älterer Saves
 
 ## Lokal starten

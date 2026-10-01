@@ -29,7 +29,7 @@ export function RepairLog({ repairs }: { repairs: CompletedRepair[] }) {
                 <span>{repair.issue} · {formatTime(repair.completedAt)}</span>
               </div>
               <div className="log-value">
-                <strong>+{formatMoney(repair.reward)}</strong>
+                <strong>+{formatMoney(repair.profit)}</strong>
                 <span><ShieldPlus size={12} /> +{repair.reputationReward}</span>
               </div>
             </article>

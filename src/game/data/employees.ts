@@ -17,6 +17,18 @@ export const EMPLOYEE_CLASSES: EmployeeClassTemplate[] = [
   { class: "Specialist", baseCost: 8_800, speed: 1.36, skill: 72, quality: 97, requiredReputation: 72 },
 ];
 
+const OPERATING_COSTS: Record<EmployeeClass, number> = {
+  Apprentice: 6,
+  "Junior Technician": 10,
+  Technician: 17,
+  "Senior Technician": 27,
+  Specialist: 40,
+};
+
+export function getEmployeeOperatingCost(employeeClass: EmployeeClass) {
+  return OPERATING_COSTS[employeeClass];
+}
+
 export const EMPLOYEE_XP_THRESHOLDS = [0, 70, 175, 320, 520, 780, 1_100];
 export const MARKET_REFRESH_COST = 180;
 export const SPECIALIZATIONS: RepairCategory[] = ["Mobile Devices", "Consoles", "Computers", "Electronics"];

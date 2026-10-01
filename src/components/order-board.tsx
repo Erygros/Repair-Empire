@@ -4,16 +4,18 @@ import {
   Clock3,
   Gamepad2,
   LockKeyhole,
+  Laptop,
   MonitorSmartphone,
   Radio,
   Smartphone,
   Tablet,
   WalletCards,
 } from "lucide-react";
+import { DIFFICULTY_LABELS } from "@/game/data/orders";
 import { getTool } from "@/game/data/progression";
-import { canAccessOrder } from "@/game/logic/game";
+import { canAccessOrder, getJobEconomy } from "@/game/logic/game";
 import type { DeviceKind, RepairOrder, ToolId, UpgradeLevels } from "@/game/types";
-import { formatMoney } from "@/utils/format";
+import { formatClock, formatMoney } from "@/utils/format";
 
 const DEVICE_ICONS: Record<DeviceKind, typeof Smartphone> = {
   Smartphone,
@@ -21,6 +23,7 @@ const DEVICE_ICONS: Record<DeviceKind, typeof Smartphone> = {
   Handheld: MonitorSmartphone,
   "Game Console": CircuitBoard,
   Tablet,
+  Laptop,
   "Audio Deck": Radio,
 };
 
@@ -30,10 +33,11 @@ interface OrderBoardProps {
   reputation: number;
   ownedTools: ToolId[];
   upgrades: UpgradeLevels;
+  now: number;
   onAccept: (orderId: string) => void;
 }
 
-export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, onAccept }: OrderBoardProps) {
+export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, now, onAccept }: OrderBoardProps) {
   return (
     <section className="panel orders-panel">
       <div className="panel-header">
@@ -52,6 +56,7 @@ export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, on
           const missingTool = !ownedTools.includes(order.requiredTool);
           const locked = !accessible;
           const disabled = locked || !enoughMoney;
+          const economy = getJobEconomy(order, upgrades);
           const title = missingTool
               ? `${getTool(order.requiredTool).name} fehlt`
               : reputation < order.requiredReputation
@@ -61,22 +66,25 @@ export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, on
                   : "Auftrag annehmen";
 
           return (
-            <article className={`order-row ${locked ? "is-locked" : ""}`} key={order.id}>
+            <article className={`order-row variant-${order.variant} ${locked ? "is-locked" : ""}`} key={order.id}>
               <div className="device-icon" aria-hidden="true">{locked ? <LockKeyhole size={19} /> : <DeviceIcon size={21} />}</div>
               <div className="order-main">
                 <div className="order-meta">
                   <span>{order.id}</span>
-                  {order.urgency === "express" && <em>Express</em>}
+                  {order.variant === "urgent" && <em className="urgent-tag">Dringend · {formatClock((order.expiresAt ?? now) - now)}</em>}
+                  {order.variant === "premium" && <em className="premium-tag">Premium</em>}
+                  {order.variant === "complex" && <em>Komplex</em>}
                   {locked && <em className="locked-tag">Gesperrt</em>}
                 </div>
                 <h4>{order.device}</h4>
                 <p>{order.issue}</p>
                 <div className="order-specs">
-                  <span><Clock3 size={13} /> {order.durationSeconds} Sek.</span>
-                  <span>Stufe {order.difficulty}</span>
-                  <span><WalletCards size={13} /> {formatMoney(order.materialCost)}</span>
-                  <strong>{formatMoney(order.reward)}</strong>
+                  <span><Clock3 size={13} /> {economy.durationSeconds} Sek.</span>
+                  <span>{DIFFICULTY_LABELS[order.difficulty]}</span>
+                  <span><WalletCards size={13} /> Kosten {formatMoney(order.materialCost)}</span>
+                  <strong>Gewinn {formatMoney(economy.estimatedProfit)}</strong>
                 </div>
+                <div className="order-economy"><span>Umsatz {formatMoney(order.reward)}</span><span>{formatMoney(economy.profitPerMinute)}/Min.</span><span>Skill {order.skillRequirement}</span></div>
                 {locked && (
                   <div className="lock-reason">
                     {missingTool ? `${getTool(order.requiredTool).name} fehlt` : `Reputation ${order.requiredReputation} benötigt`}

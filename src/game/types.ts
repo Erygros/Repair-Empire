@@ -4,9 +4,13 @@ export type DeviceKind =
   | "Handheld"
   | "Game Console"
   | "Tablet"
+  | "Laptop"
   | "Audio Deck";
 
 export type Urgency = "standard" | "express";
+export type OrderVariant = "normal" | "urgent" | "premium" | "complex";
+export type RepairSource = "manual" | "automated" | "offline";
+export type TransactionType = "REPAIR_REWARD" | "MATERIAL_COST" | "OPERATING_COST" | "TOOL_PURCHASE" | "UPGRADE_PURCHASE" | "EMPLOYEE_HIRE" | "WORKSTATION_PURCHASE" | "MARKET_REFRESH";
 export type ToolId = "basic-kit" | "multimeter" | "soldering-station" | "hot-air-station" | "microscope";
 export type UpgradeId = "efficient-workflow" | "better-diagnostics" | "customer-network" | "workshop-organization" | "job-board-expansion";
 export type UpgradeLevels = Record<UpgradeId, number>;
@@ -56,7 +60,9 @@ export interface RepairOrder extends OrderTemplate {
   id: string;
   customer: string;
   urgency: Urgency;
+  variant: OrderVariant;
   createdAt: number;
+  expiresAt: number | null;
 }
 
 export interface ActiveRepair {
@@ -87,6 +93,8 @@ export interface Employee extends EmployeeCandidate {
   xp: number;
   level: number;
   assignedWorkstationId: string | null;
+  repairsCompleted: number;
+  revenueGenerated: number;
 }
 
 export interface Workstation {
@@ -103,10 +111,16 @@ export interface Workstation {
 
 export interface OfflineSummary {
   durationMs: number;
+  productiveDurationMs: number;
+  capacityReached: boolean;
   completedRepairs: number;
-  earnings: number;
+  revenue: number;
+  materialCosts: number;
+  operatingCosts: number;
+  profit: number;
   reputation: number;
   employeeXp: number;
+  levelUps: string[];
 }
 
 export interface CompletedRepair {
@@ -114,8 +128,48 @@ export interface CompletedRepair {
   device: DeviceKind;
   issue: string;
   reward: number;
+  materialCost: number;
+  operatingCost: number;
+  profit: number;
+  category: RepairCategory;
+  source: RepairSource;
   reputationReward: number;
   completedAt: number;
+}
+
+export interface EconomyStats {
+  totalRevenue: number;
+  totalMaterialCosts: number;
+  totalOperatingCosts: number;
+  totalProfit: number;
+  repairsCompleted: number;
+  manualRepairs: number;
+  automatedRepairs: number;
+  offlineRepairs: number;
+  moneySpentOnTools: number;
+  moneySpentOnUpgrades: number;
+  moneySpentOnEmployees: number;
+  moneySpentOnWorkstations: number;
+  highestSingleRepairProfit: number;
+  totalReputationEarned: number;
+  categoryProfit: Record<RepairCategory, number>;
+}
+
+export interface DailyStats {
+  dayKey: string;
+  revenue: number;
+  materialCosts: number;
+  operatingCosts: number;
+  profit: number;
+  repairsCompleted: number;
+}
+
+export interface EconomyTransaction {
+  id: string;
+  type: TransactionType;
+  amount: number;
+  createdAt: number;
+  reference: string;
 }
 
 export interface GameState {
@@ -132,7 +186,13 @@ export interface GameState {
   nextCandidateNumber: number;
   completedRepairs: CompletedRepair[];
   nextOrderNumber: number;
+  nextBoardRefreshAt: number;
+  offlineCapacityMs: number;
+  lastActiveAt: number;
   lastSavedAt: number;
+  lifetimeStats: EconomyStats;
+  dailyStats: DailyStats;
+  transactions: EconomyTransaction[];
 }
 
 export interface ProgressionContext {

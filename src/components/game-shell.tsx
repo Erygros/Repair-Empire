@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Activity, Banknote, Bolt, PackageOpen, ShieldCheck, SlidersHorizontal, UsersRound, Wrench } from "lucide-react";
+import { Activity, Banknote, Bolt, ChartNoAxesCombined, PackageOpen, ShieldCheck, SlidersHorizontal, UsersRound, Wrench } from "lucide-react";
 import { AssignmentDock } from "@/components/assignment-dock";
+import { EconomyDashboard } from "@/components/economy-dashboard";
 import { OfflineReport } from "@/components/offline-report";
 import { OrderBoard } from "@/components/order-board";
 import { RepairLog } from "@/components/repair-log";
@@ -14,7 +15,7 @@ import { getRepairLevel, getRepairLevelProgress } from "@/game/logic/game";
 import { useGame } from "@/game/state/use-game";
 import { formatMoney } from "@/utils/format";
 
-type GameView = "workshop" | "team" | "tools" | "upgrades";
+type GameView = "workshop" | "team" | "economy" | "tools" | "upgrades";
 
 export function GameShell() {
   const game = useGame();
@@ -45,13 +46,14 @@ export function GameShell() {
       </header>
 
       <section className="workshop-heading">
-        <div><p className="section-code">WERKSTATT // SEKTOR A</p><h2>{view === "workshop" ? "Die Werkhalle wächst." : view === "team" ? "Teamzentrale" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
+        <div><p className="section-code">WERKSTATT // SEKTOR A</p><h2>{view === "workshop" ? "Die Werkhalle wächst." : view === "team" ? "Teamzentrale" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
         <div className="tool-readout"><Bolt size={17} /><span>Betrieb</span><strong>{unlockedStations}/4 Stationen · {state.employees.length} Techniker</strong></div>
       </section>
 
       <nav className="game-nav" aria-label="Spielbereiche">
         <button className={view === "workshop" ? "active" : ""} onClick={() => setView("workshop")}><Wrench size={17} />Werkstatt</button>
         <button className={view === "team" ? "active" : ""} onClick={() => setView("team")}><UsersRound size={17} />Team</button>
+        <button className={view === "economy" ? "active" : ""} onClick={() => setView("economy")}><ChartNoAxesCombined size={17} />Finanzen</button>
         <button className={view === "tools" ? "active" : ""} onClick={() => setView("tools")}><PackageOpen size={17} />Werkzeuge</button>
         <button className={view === "upgrades" ? "active" : ""} onClick={() => setView("upgrades")}><SlidersHorizontal size={17} />Upgrades</button>
       </nav>
@@ -62,10 +64,11 @@ export function GameShell() {
             <WorkstationDeck state={state} now={game.now} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} />
             <RepairLog repairs={state.completedRepairs} />
           </div>
-          <OrderBoard orders={state.availableOrders} money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} upgrades={state.upgrades} onAccept={setSelectedOrderId} />
+          <OrderBoard orders={state.availableOrders} money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} upgrades={state.upgrades} now={game.now} onAccept={setSelectedOrderId} />
         </div>
       )}
       {view === "team" && <TeamHub state={state} onHire={game.hireCandidate} onRefresh={game.refreshCandidates} />}
+      {view === "economy" && <EconomyDashboard state={state} />}
       {view === "tools" && <ToolStore money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} onPurchase={game.purchaseTool} />}
       {view === "upgrades" && <UpgradeBay money={state.money} reputation={state.reputation} upgrades={state.upgrades} onPurchase={game.purchaseUpgrade} />}
 
