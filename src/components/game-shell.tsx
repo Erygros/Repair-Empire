@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Activity, Banknote, Bolt, BriefcaseBusiness, Building2, ChartNoAxesCombined, FlaskConical, PackageOpen, ShieldCheck, SlidersHorizontal, Target, UsersRound, Wrench } from "lucide-react";
+import { useCallback, useState } from "react";
+import { Activity, Banknote, Bolt, Building2, ShieldCheck, SlidersHorizontal, Target, Wrench } from "lucide-react";
 import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
-import { CompanyCampus } from "@/components/company-campus";
+import { CompanyMap } from "@/components/company-map";
+import { BuildingViewShell } from "@/components/building-view-shell";
 import { CustomerCenter } from "@/components/customer-center";
 import { EconomyDashboard } from "@/components/economy-dashboard";
 import { MilestoneReport } from "@/components/milestone-report";
@@ -20,8 +21,11 @@ import { WorkstationDeck } from "@/components/workstation-deck";
 import { getRepairLevel, getRepairLevelProgress } from "@/game/logic/game";
 import { useGame } from "@/game/state/use-game";
 import { formatMoney } from "@/utils/format";
+import type { BuildingType } from "@/game/types";
 
 type GameView = "company" | "workshop" | "customers" | "team" | "research" | "challenges" | "economy" | "tools" | "upgrades";
+const BUILDING_VIEWS: Record<BuildingType, GameView> = { WORKSHOP: "workshop", PERSONNEL: "team", FINANCE: "economy", TOOL_WAREHOUSE: "tools", RESEARCH: "research", BUSINESS_OFFICE: "customers" };
+const VIEW_BUILDINGS: Partial<Record<GameView, BuildingType>> = { workshop: "WORKSHOP", team: "PERSONNEL", economy: "FINANCE", tools: "TOOL_WAREHOUSE", research: "RESEARCH", customers: "BUSINESS_OFFICE" };
 
 export function GameShell() {
   const game = useGame();
@@ -32,6 +36,8 @@ export function GameShell() {
   const levelProgress = getRepairLevelProgress(state.repairXp);
   const selectedOrder = state.availableOrders.find((order) => order.id === selectedOrderId) ?? null;
   const unlockedStations = state.workstations.filter((station) => station.status !== "locked").length;
+  const activeBuilding = VIEW_BUILDINGS[view] ?? null;
+  const openBuilding = useCallback((buildingId: BuildingType) => setView(BUILDING_VIEWS[buildingId]), []);
 
   if (!game.hydrated) {
     return <main className="boot-screen"><div className="boot-mark"><Wrench size={24} /></div><p>Werkstatt wird hochgefahren</p></main>;
@@ -51,41 +57,29 @@ export function GameShell() {
         </div>
       </header>
 
-      <ProgressionStrip state={state} />
+      {view !== "company" && <ProgressionStrip state={state} />}
 
-      <section className="workshop-heading">
-        <div><p className="section-code">COMPANY // CAMPUS</p><h2>{view === "company" ? "Unternehmensausbau" : view === "workshop" ? "Die Werkhalle wächst." : view === "customers" ? "Kunden & Verträge" : view === "team" ? "Teamzentrale" : view === "research" ? "Forschungszentrum" : view === "challenges" ? "Auftragsziele" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
+      {view !== "company" && <section className="workshop-heading">
+        <div><p className="section-code">COMPANY // CAMPUS</p><h2>{view === "workshop" ? "Die Werkhalle wächst." : view === "customers" ? "Kunden & Verträge" : view === "team" ? "Teamzentrale" : view === "research" ? "Forschungszentrum" : view === "challenges" ? "Auftragsziele" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
         <div className="tool-readout"><Bolt size={17} /><span>Betrieb</span><strong>{unlockedStations}/4 Stationen · {state.employees.length} Techniker</strong></div>
-      </section>
+      </section>}
 
-      <nav className="game-nav" aria-label="Spielbereiche">
-        <button className={view === "company" ? "active" : ""} onClick={() => setView("company")}><Building2 size={17} />Company</button>
-        <button className={view === "workshop" ? "active" : ""} onClick={() => setView("workshop")}><Wrench size={17} />Werkstatt</button>
-        <button className={view === "customers" ? "active" : ""} onClick={() => setView("customers")}><BriefcaseBusiness size={17} />Kunden</button>
-        <button className={view === "team" ? "active" : ""} onClick={() => setView("team")}><UsersRound size={17} />Team</button>
-        <button className={view === "research" ? "active" : ""} onClick={() => setView("research")}><FlaskConical size={17} />Forschung</button>
+      {view !== "company" && <nav className="game-nav secondary-game-nav" aria-label="Spielbereiche">
+        <button onClick={() => setView("company")}><Building2 size={17} />Campus</button>
         <button className={view === "challenges" ? "active" : ""} onClick={() => setView("challenges")}><Target size={17} />Aufgaben</button>
-        <button className={view === "economy" ? "active" : ""} onClick={() => setView("economy")}><ChartNoAxesCombined size={17} />Finanzen</button>
-        <button className={view === "tools" ? "active" : ""} onClick={() => setView("tools")}><PackageOpen size={17} />Werkzeuge</button>
         <button className={view === "upgrades" ? "active" : ""} onClick={() => setView("upgrades")}><SlidersHorizontal size={17} />Upgrades</button>
-      </nav>
+      </nav>}
 
-      {view === "company" && <CompanyCampus state={state} onUpgrade={game.purchaseBuildingUpgrade} />}
-      {view === "workshop" && (
-        <div className="workshop-main-grid">
-          <div className="workshop-production">
-            <WorkstationDeck state={state} now={game.now} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} />
-            <RepairLog repairs={state.completedRepairs} />
-          </div>
-          <OrderBoard orders={state.availableOrders} money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} upgrades={state.upgrades} researchedNodes={state.researchedNodes} now={game.now} onAccept={setSelectedOrderId} />
-        </div>
-      )}
-      {view === "team" && <TeamHub state={state} onHire={game.hireCandidate} onRefresh={game.refreshCandidates} />}
-      {view === "customers" && <CustomerCenter state={state} now={game.now} onAcceptContract={game.takeContract} onClaimContract={game.collectContractReward} onCreateMultiOrder={game.startMultiDeviceOrder} />}
-      {view === "research" && <ResearchLab state={state} onResearch={game.purchaseResearch} />}
+      {view === "company" && <CompanyMap state={state} onOpenBuilding={openBuilding} />}
+      {activeBuilding && <BuildingViewShell buildingId={activeBuilding} state={state} onClose={() => setView("company")} onUpgrade={game.purchaseBuildingUpgrade}>
+        {view === "workshop" && <div className="workshop-main-grid"><div className="workshop-production"><WorkstationDeck state={state} now={game.now} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} /><RepairLog repairs={state.completedRepairs} /></div><OrderBoard orders={state.availableOrders} money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} upgrades={state.upgrades} researchedNodes={state.researchedNodes} now={game.now} onAccept={setSelectedOrderId} /></div>}
+        {view === "team" && <TeamHub state={state} onHire={game.hireCandidate} onRefresh={game.refreshCandidates} />}
+        {view === "customers" && <CustomerCenter state={state} now={game.now} onAcceptContract={game.takeContract} onClaimContract={game.collectContractReward} onCreateMultiOrder={game.startMultiDeviceOrder} />}
+        {view === "research" && <ResearchLab state={state} onResearch={game.purchaseResearch} />}
+        {view === "economy" && <EconomyDashboard state={state} />}
+        {view === "tools" && <ToolStore money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} onPurchase={game.purchaseTool} />}
+      </BuildingViewShell>}
       {view === "challenges" && <ChallengeCenter state={state} onClaim={game.claimChallenge} />}
-      {view === "economy" && <EconomyDashboard state={state} />}
-      {view === "tools" && <ToolStore money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} onPurchase={game.purchaseTool} />}
       {view === "upgrades" && <UpgradeBay money={state.money} reputation={state.reputation} upgrades={state.upgrades} onPurchase={game.purchaseUpgrade} />}
 
       {selectedOrder && <AssignmentDock order={selectedOrder} state={state} onClose={() => setSelectedOrderId(null)} onAssign={(workstationId) => { game.assignOrder(selectedOrder.id, workstationId); setSelectedOrderId(null); }} />}
