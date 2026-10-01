@@ -27,6 +27,7 @@ import { getCurrentTime, getDayKey } from "@/game/logic/time";
 import { getBuildingFeatureValue, getBuildingState } from "@/game/data/buildings";
 import { upgradeBuilding } from "@/game/logic/buildings";
 import { createPlayerCharacter, ensureDefaultCosmetics, equipCosmetic, grantCosmetic, unequipCosmetic } from "@/game/logic/cosmetics";
+import { isImportableSave } from "@/game/logic/health";
 import type { AutomationPriority, BuildingType, CharacterAppearance, CharacterCosmeticSlot, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
 
 const STORAGE_KEY = "repair-empire-save-v1";
@@ -327,6 +328,30 @@ export function useGame() {
 
   const updateFounderAppearance = useCallback((appearance: CharacterAppearance) => commit((current) => current.playerCharacter ? { state: { ...current, playerCharacter: { ...current.playerCharacter, appearance } }, notice: "Founder-Aussehen aktualisiert" } : { state: current, notice: "Founder Character fehlt" }), [commit]);
 
+  const importSave = useCallback((json: string) => {
+    try {
+      const parsed: unknown = JSON.parse(json);
+      if (!isImportableSave(parsed)) return "Save-Struktur ist ungültig";
+      const migrated = migrateSave(parsed);
+      if (!migrated) return "Save konnte nicht migriert werden";
+      applyState(migrated);
+      setNotice("Spielstand importiert");
+      return null;
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") console.error("Save import failed", error);
+      return "JSON konnte nicht gelesen werden";
+    }
+  }, [applyState]);
+
+  const runDevAction = useCallback((action: "MONEY" | "XP" | "REPUTATION" | "COMPLETE") => commit((current) => {
+    if (process.env.NODE_ENV !== "development") return { state: current, notice: "" };
+    if (action === "MONEY") return { state: { ...current, money: current.money + 50_000 }, notice: "DEV · 50.000 EUR hinzugefügt" };
+    if (action === "REPUTATION") return { state: { ...current, reputation: current.reputation + 50 }, notice: "DEV · 50 Reputation hinzugefügt" };
+    if (action === "XP") return { state: awardCompanyXp(current, 5_000, getCurrentTime()).state, notice: "DEV · Company XP hinzugefügt" };
+    const now = getCurrentTime();
+    return { state: { ...current, workstations: current.workstations.map((station) => station.activeRepair ? { ...station, status: "completed" as const, activeRepair: { ...station.activeRepair, endsAt: now - 1 } } : station) }, notice: "DEV · Aktive Reparaturen abgeschlossen" };
+  }), [commit]);
+
   return {
     state,
     hydrated,
@@ -352,6 +377,8 @@ export function useGame() {
     equipCharacterCosmetic,
     unequipCharacterCosmetic,
     updateFounderAppearance,
+    importSave,
+    runDevAction,
     dismissCosmeticUnlock: () => commit((current) => ({ state: { ...current, cosmeticUnlockNotice: null }, notice: "" })),
     dismissOfflineSummary: () => setOfflineSummary(null),
     purchaseTool,

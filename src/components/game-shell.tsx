@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Activity, Banknote, Bolt, Building2, ShieldCheck, SlidersHorizontal, Target, Wrench } from "lucide-react";
 import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
@@ -13,14 +13,15 @@ import { CustomerCenter } from "@/components/customer-center";
 import { EconomyDashboard } from "@/components/economy-dashboard";
 import { MilestoneReport } from "@/components/milestone-report";
 import { OfflineReport } from "@/components/offline-report";
-import { OrderBoard } from "@/components/order-board";
-import { RepairLog } from "@/components/repair-log";
 import { ProgressionStrip } from "@/components/progression-strip";
 import { ResearchLab } from "@/components/research-lab";
 import { TeamHub } from "@/components/team-hub";
 import { ToolStore } from "@/components/tool-store";
 import { UpgradeBay } from "@/components/upgrade-bay";
-import { WorkstationDeck } from "@/components/workstation-deck";
+import { WorkshopExperience } from "@/components/workshop-experience";
+import { PrototypeSettings, usePrototypeSettings } from "@/components/prototype-settings";
+import { PrototypeDevPanel } from "@/components/prototype-dev-panel";
+import { playPrototypeSound } from "@/game/audio/prototype-audio";
 import { getRepairLevel, getRepairLevelProgress } from "@/game/logic/game";
 import { useGame } from "@/game/state/use-game";
 import { formatMoney } from "@/utils/format";
@@ -35,6 +36,9 @@ export function GameShell() {
   const { state } = game;
   const [view, setView] = useState<GameView>("company");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [levelFeedback, setLevelFeedback] = useState<string | null>(null);
+  const previousLevel = useRef(state.companyLevel);
+  const { settings, setSettings } = usePrototypeSettings();
   const repairLevel = getRepairLevel(state.repairXp);
   const levelProgress = getRepairLevelProgress(state.repairXp);
   const selectedOrder = state.availableOrders.find((order) => order.id === selectedOrderId) ?? null;
@@ -43,12 +47,30 @@ export function GameShell() {
   const openBuilding = useCallback((buildingId: BuildingType) => setView(BUILDING_VIEWS[buildingId]), []);
   const openProfile = useCallback(() => setView("profile"), []);
 
+  useEffect(() => {
+    if (state.companyLevel > previousLevel.current) {
+      setLevelFeedback(state.companyLevel >= 60 && previousLevel.current < 60 ? "WORKSHOP EXPANSION AVAILABLE · WORKSTATION 2 CAN NOW BE PURCHASED" : `COMPANY LEVEL ${state.companyLevel}`);
+      playPrototypeSound("level-up", settings);
+      const timer = window.setTimeout(() => setLevelFeedback(null), 3200);
+      previousLevel.current = state.companyLevel;
+      return () => window.clearTimeout(timer);
+    }
+    previousLevel.current = state.companyLevel;
+  }, [settings, state.companyLevel]);
+
+  useEffect(() => {
+    if (!game.notice) return;
+    if (game.notice.includes("Reparatur abgenommen")) playPrototypeSound("repair-complete", settings);
+    else if (game.notice.includes("übergeben")) playPrototypeSound("repair-start", settings);
+    else if (game.notice.includes("Level") || game.notice.includes("ausgebaut")) playPrototypeSound("building-upgrade", settings);
+  }, [game.notice, settings]);
+
   if (!game.hydrated) {
     return <main className="boot-screen"><div className="boot-mark"><Wrench size={24} /></div><p>Werkstatt wird hochgefahren</p></main>;
   }
 
   return (
-    <main className="game-shell">
+    <main className="game-shell" onPointerDown={() => playPrototypeSound("click", settings)}>
       <header className="topbar">
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true"><Wrench size={22} /></div>
@@ -59,12 +81,13 @@ export function GameShell() {
           <div className="status-item"><ShieldCheck size={17} /><span>Reputation</span><strong>{state.reputation}</strong></div>
           <div className="status-item level-status"><Activity size={17} /><span>Company-Level {repairLevel}</span><strong>{levelProgress.current}/{levelProgress.required} XP</strong><i><b style={{ width: `${levelProgress.percent}%` }} /></i></div>
         </div>
+        <PrototypeSettings settings={settings} onChange={setSettings} onReset={() => { if (window.confirm("Spielstand wirklich vollständig zurücksetzen?")) { localStorage.removeItem("repair-empire-save-v1"); window.location.reload(); } }} />
       </header>
 
-      {view !== "company" && view !== "profile" && <ProgressionStrip state={state} />}
+      {view !== "company" && view !== "profile" && view !== "workshop" && <ProgressionStrip state={state} />}
 
-      {view !== "company" && view !== "profile" && <section className="workshop-heading">
-        <div><p className="section-code">COMPANY // CAMPUS</p><h2>{view === "workshop" ? "Die Werkhalle wächst." : view === "customers" ? "Kunden & Verträge" : view === "team" ? "Teamzentrale" : view === "research" ? "Forschungszentrum" : view === "challenges" ? "Auftragsziele" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
+      {view !== "company" && view !== "profile" && view !== "workshop" && <section className="workshop-heading">
+        <div><p className="section-code">COMPANY // CAMPUS</p><h2>{view === "customers" ? "Kunden & Verträge" : view === "team" ? "Teamzentrale" : view === "research" ? "Forschungszentrum" : view === "challenges" ? "Auftragsziele" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
         <div className="tool-readout"><Bolt size={17} /><span>Betrieb</span><strong>{unlockedStations}/4 Stationen · {state.employees.length} Techniker</strong></div>
       </section>}
 
@@ -77,7 +100,7 @@ export function GameShell() {
       {view === "company" && <CompanyMap state={state} onOpenBuilding={openBuilding} onOpenProfile={openProfile} />}
       {view === "profile" && state.playerCharacter && <CharacterProfile state={state} onBack={() => setView("company")} onEquip={game.equipCharacterCosmetic} onUnequip={game.unequipCharacterCosmetic} onAppearance={game.updateFounderAppearance} />}
       {activeBuilding && <BuildingViewShell buildingId={activeBuilding} state={state} onClose={() => setView("company")} onUpgrade={game.purchaseBuildingUpgrade}>
-        {view === "workshop" && <div className="workshop-main-grid"><div className="workshop-production"><WorkstationDeck state={state} now={game.now} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} /><RepairLog repairs={state.completedRepairs} /></div><OrderBoard orders={state.availableOrders} money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} upgrades={state.upgrades} researchedNodes={state.researchedNodes} now={game.now} onAccept={setSelectedOrderId} /></div>}
+        {view === "workshop" && <WorkshopExperience state={state} now={game.now} onAccept={setSelectedOrderId} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} />}
         {view === "team" && <TeamHub state={state} onHire={game.hireCandidate} onRefresh={game.refreshCandidates} />}
         {view === "customers" && <CustomerCenter state={state} now={game.now} onAcceptContract={game.takeContract} onClaimContract={game.collectContractReward} onCreateMultiOrder={game.startMultiDeviceOrder} />}
         {view === "research" && <ResearchLab state={state} onResearch={game.purchaseResearch} />}
@@ -93,6 +116,8 @@ export function GameShell() {
       {!state.playerCharacter && <CharacterCreator onCreate={game.createFounder} />}
       {state.cosmeticUnlockNotice && state.playerCharacter && <CosmeticUnlock cosmeticId={state.cosmeticUnlockNotice} character={state.playerCharacter} onClose={game.dismissCosmeticUnlock} />}
       {game.notice && <div className="toast" role="status"><span className="toast-light" />{game.notice}</div>}
+      {levelFeedback && <div className="level-feedback" role="status"><span>PROGRESSION UPDATE</span><strong>{levelFeedback}</strong><button onClick={() => setLevelFeedback(null)}>OK</button></div>}
+      <PrototypeDevPanel state={state} onImport={game.importSave} onAction={game.runDevAction} />
     </main>
   );
 }

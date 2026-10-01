@@ -8,6 +8,7 @@ import { createDailyStats, createEconomyStats } from "@/game/logic/economy";
 import { migrateBuildings } from "@/game/logic/buildings";
 import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, getCurrentTime, getDayKey } from "@/game/logic/time";
 import { ensureDefaultCosmetics } from "@/game/logic/cosmetics";
+import { COSMETICS } from "@/game/data/cosmetics";
 import type { ActiveRepair, CompletedRepair, Employee, EmployeeCandidate, GameState, RepairOrder, UpgradeId, Workstation } from "@/game/types";
 
 type LegacySave = Partial<GameState> & { activeRepair?: unknown };
@@ -113,6 +114,10 @@ export function migrateSave(value: unknown): GameState | null {
     ? value.candidates as EmployeeCandidate[]
     : generateCandidateMarket(1, value.reputation);
   const workstations = migrateWorkstations(value.workstations, value.activeRepair);
+  const validEmployeeIds = new Set(employees.map((employee) => employee.id));
+  const validatedWorkstations = workstations.map((workstation) => workstation.assignedEmployeeId && !validEmployeeIds.has(workstation.assignedEmployeeId)
+    ? { ...workstation, assignedEmployeeId: null, automationEnabled: false, activeRepair: workstation.activeRepair ? { ...workstation.activeRepair, assignedEmployeeId: null } : null }
+    : workstation);
 
   const now = getCurrentTime();
   const savedStats = value.lifetimeStats;
@@ -139,6 +144,8 @@ export function migrateSave(value: unknown): GameState | null {
     ...base,
     ...value,
     saveVersion: SAVE_VERSION,
+    money: Number.isFinite(value.money) ? Math.max(0, value.money) : base.money,
+    reputation: Number.isFinite(value.reputation) ? Math.max(0, value.reputation) : base.reputation,
     identity: {
       ...base.identity,
       ...(value.identity ?? {}),
@@ -160,10 +167,10 @@ export function migrateSave(value: unknown): GameState | null {
     ownedTools: Array.isArray(value.ownedTools) && value.ownedTools.length > 0 ? value.ownedTools : ["basic-kit"],
     upgrades,
     availableOrders: value.availableOrders.map(migrateOrder),
-    workstations,
+    workstations: validatedWorkstations,
     employees,
     candidates,
-    nextCandidateNumber: typeof value.nextCandidateNumber === "number" ? value.nextCandidateNumber : candidates.length + 1,
+    nextCandidateNumber: Number.isFinite(value.nextCandidateNumber) ? Math.max(1, value.nextCandidateNumber!) : candidates.length + 1,
     completedRepairs,
     nextBoardRefreshAt: Number.isFinite(value.nextBoardRefreshAt) ? value.nextBoardRefreshAt! : now + JOB_BOARD_REFRESH_MS,
     offlineCapacityMs: Number.isFinite(value.offlineCapacityMs) ? Math.max(0, Math.min(value.offlineCapacityMs!, 24 * 60 * 60 * 1000)) : OFFLINE_CAPACITY_MS,
@@ -180,10 +187,10 @@ export function migrateSave(value: unknown): GameState | null {
     nextCustomerNumber: Number.isFinite(value.nextCustomerNumber) ? Math.max(1, value.nextCustomerNumber!) : base.nextCustomerNumber,
     nextMultiDeviceNumber: Number.isFinite(value.nextMultiDeviceNumber) ? Math.max(1, value.nextMultiDeviceNumber!) : 1,
     nextContractNumber: Number.isFinite(value.nextContractNumber) ? Math.max(1, value.nextContractNumber!) : 1,
-    buildings: migrateBuildings(value.buildings, { workstations, employees, ownedTools: Array.isArray(value.ownedTools) && value.ownedTools.length > 0 ? value.ownedTools : ["basic-kit"], researchedNodes: Array.isArray(value.researchedNodes) ? value.researchedNodes : [], contracts: Array.isArray(value.contracts) ? value.contracts : [] }),
+    buildings: migrateBuildings(value.buildings, { workstations: validatedWorkstations, employees, ownedTools: Array.isArray(value.ownedTools) && value.ownedTools.length > 0 ? value.ownedTools : ["basic-kit"], researchedNodes: Array.isArray(value.researchedNodes) ? value.researchedNodes : [], contracts: Array.isArray(value.contracts) ? value.contracts : [] }),
     lastBuildingUpgrade: value.lastBuildingUpgrade && typeof value.lastBuildingUpgrade === "object" ? value.lastBuildingUpgrade : null,
     playerCharacter: value.playerCharacter && typeof value.playerCharacter === "object" ? value.playerCharacter : null,
-    cosmeticEntitlements: Array.isArray(value.cosmeticEntitlements) ? value.cosmeticEntitlements : [],
+    cosmeticEntitlements: Array.isArray(value.cosmeticEntitlements) ? value.cosmeticEntitlements.filter((entry) => COSMETICS.some((cosmetic) => cosmetic.cosmeticId === entry.cosmeticId)) : [],
     cosmeticUnlockNotice: typeof value.cosmeticUnlockNotice === "string" ? value.cosmeticUnlockNotice : null,
   };
   return ensureChallenges(ensureDefaultCosmetics(migrated, now), now, getDayKey(now));
