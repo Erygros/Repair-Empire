@@ -24,7 +24,9 @@ import { applyTransaction } from "@/game/logic/economy";
 import { ensureChallenges } from "@/game/logic/challenges";
 import { awardCompanyXp } from "@/game/logic/progression";
 import { getCurrentTime, getDayKey } from "@/game/logic/time";
-import type { AutomationPriority, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
+import { getBuildingFeatureValue, getBuildingState } from "@/game/data/buildings";
+import { upgradeBuilding } from "@/game/logic/buildings";
+import type { AutomationPriority, BuildingType, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
 
 const STORAGE_KEY = "repair-empire-save-v1";
 
@@ -134,6 +136,8 @@ export function useGame() {
     if (!workstation || workstation.status !== "locked") return { state: current, notice: "Arbeitsplatz ist bereits freigeschaltet" };
     if (current.companyLevel < workstation.requiredLevel) return { state: current, notice: `Unternehmenslevel ${workstation.requiredLevel} benötigt` };
     if (current.reputation < workstation.requiredReputation) return { state: current, notice: `Reputation ${workstation.requiredReputation} benötigt` };
+    const workshopCapacity = getBuildingFeatureValue(current, "WORKSHOP", "workstation-capacity");
+    if (workstation.index > workshopCapacity) return { state: current, notice: `Workshop Level ${workstation.index} benötigt` };
     if (current.money < workstation.purchasePrice) return { state: current, notice: `Für Arbeitsplatz ${workstation.index} fehlen ${workstation.purchasePrice - current.money} €` };
     const previous = current.workstations.find((item) => item.index === workstation.index - 1);
     if (previous?.status === "locked") return { state: current, notice: `Zuerst Arbeitsplatz ${workstation.index - 1} freischalten` };
@@ -147,6 +151,8 @@ export function useGame() {
   const hireCandidate = useCallback((candidateId: string) => commit((current) => {
     const candidate = current.candidates.find((item) => item.id === candidateId);
     if (!candidate) return { state: current, notice: "Kandidat ist nicht mehr verfügbar" };
+    const employeeCapacity = getBuildingFeatureValue(current, "PERSONNEL", "employee-capacity");
+    if (current.employees.length >= employeeCapacity) return { state: current, notice: `Personalzentrum ausgelastet · Kapazität ${employeeCapacity}` };
     if (current.money < candidate.hiringCost) return { state: current, notice: `Für ${candidate.name} fehlen ${candidate.hiringCost - current.money} €` };
     const charged = applyTransaction(current, "EMPLOYEE_HIRE", -candidate.hiringCost, candidate.id, getCurrentTime());
     return {
@@ -208,6 +214,8 @@ export function useGame() {
   const purchaseTool = useCallback((toolId: ToolId) => commit((current) => {
     const tool = getTool(toolId);
     if (current.ownedTools.includes(toolId)) return { state: current, notice: `${tool.name} ist bereits vorhanden` };
+    const toolTier = (["basic-kit", "multimeter", "soldering-station", "hot-air-station", "microscope"] as ToolId[]).indexOf(toolId) + 1;
+    if (toolTier > getBuildingFeatureValue(current, "TOOL_WAREHOUSE", "tool-tier")) return { state: current, notice: `Werkzeuglager-Ausbau für Equipment Tier ${toolTier} benötigt` };
     if (current.reputation < tool.requiredReputation) return { state: current, notice: `Noch ${tool.requiredReputation - current.reputation} Reputation bis ${tool.name}` };
     if (tool.requiredTool && !current.ownedTools.includes(tool.requiredTool)) return { state: current, notice: `Zuerst ${getTool(tool.requiredTool).name} anschaffen` };
     if (current.money < tool.price) return { state: current, notice: `Für ${tool.name} fehlen ${tool.price - current.money} €` };
@@ -242,6 +250,8 @@ export function useGame() {
   const purchaseResearch = useCallback((researchId: ResearchId) => commit((current) => {
     const node = RESEARCH_NODES.find((item) => item.id === researchId);
     if (!node || current.researchedNodes.includes(researchId)) return { state: current, notice: "Forschung bereits abgeschlossen" };
+    const researchTier = node.requiredLevel >= 70 ? 3 : node.requiredLevel >= 20 ? 2 : 1;
+    if (researchTier > getBuildingFeatureValue(current, "RESEARCH", "research-tier")) return { state: current, notice: `Forschungszentrum Tier ${researchTier} benötigt` };
     if (current.companyLevel < node.requiredLevel) return { state: current, notice: `Unternehmenslevel ${node.requiredLevel} benötigt` };
     if (node.requires.some((required) => !current.researchedNodes.includes(required))) return { state: current, notice: "Vorausgehende Forschung fehlt" };
     if (current.researchPoints < node.cost) return { state: current, notice: `${node.cost - current.researchPoints} Forschungspunkte fehlen` };
@@ -289,6 +299,15 @@ export function useGame() {
     return { state: result.state, notice: result.error ?? "Vertrag erfüllt · Bonus verbucht" };
   }), [commit]);
 
+  const purchaseBuildingUpgrade = useCallback((buildingId: BuildingType) => commit((current) => {
+    const before = getBuildingState(current, buildingId);
+    const result = upgradeBuilding(current, buildingId, getCurrentTime());
+    if (result.error) return { state: current, notice: result.error };
+    const event = result.state.lastBuildingUpgrade!;
+    const visual = event.newVisualTier > event.oldVisualTier ? ` · Visual Tier ${event.newVisualTier}` : "";
+    return { state: result.state, notice: `${before.buildingId.replaceAll("_", " ")} Level ${event.newLevel}${visual} · ${event.unlockedFeatures.join(" · ")}` };
+  }), [commit]);
+
   return {
     state,
     hydrated,
@@ -309,6 +328,7 @@ export function useGame() {
     startMultiDeviceOrder,
     takeContract,
     collectContractReward,
+    purchaseBuildingUpgrade,
     dismissOfflineSummary: () => setOfflineSummary(null),
     purchaseTool,
     purchaseUpgrade,

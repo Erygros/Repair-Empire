@@ -10,7 +10,7 @@ export type DeviceKind =
 export type Urgency = "standard" | "express";
 export type OrderVariant = "normal" | "urgent" | "premium" | "complex";
 export type RepairSource = "manual" | "automated" | "offline";
-export type TransactionType = "REPAIR_REWARD" | "MATERIAL_COST" | "OPERATING_COST" | "TOOL_PURCHASE" | "UPGRADE_PURCHASE" | "EMPLOYEE_HIRE" | "WORKSTATION_PURCHASE" | "MARKET_REFRESH" | "CHALLENGE_REWARD" | "MILESTONE_REWARD" | "CONTRACT_REWARD";
+export type TransactionType = "REPAIR_REWARD" | "MATERIAL_COST" | "OPERATING_COST" | "TOOL_PURCHASE" | "UPGRADE_PURCHASE" | "EMPLOYEE_HIRE" | "WORKSTATION_PURCHASE" | "MARKET_REFRESH" | "CHALLENGE_REWARD" | "MILESTONE_REWARD" | "CONTRACT_REWARD" | "BUILDING_UPGRADE";
 export type ToolId = "basic-kit" | "multimeter" | "soldering-station" | "hot-air-station" | "microscope";
 export type UpgradeId = "efficient-workflow" | "better-diagnostics" | "customer-network" | "workshop-organization" | "job-board-expansion";
 export type UpgradeLevels = Record<UpgradeId, number>;
@@ -26,6 +26,53 @@ export type RelationshipState = "NEW" | "KNOWN" | "REGULAR" | "TRUSTED" | "PARTN
 export type MultiDeviceStatus = "active" | "completed" | "expired";
 export type ContractType = "SERVICE" | "BULK_REPAIR" | "SPECIALIZED_SERVICE" | "PRIORITY_SERVICE";
 export type ContractStatus = "offered" | "active" | "completed" | "failed" | "claimed";
+export type BuildingType = "WORKSHOP" | "PERSONNEL" | "FINANCE" | "TOOL_WAREHOUSE" | "RESEARCH" | "BUSINESS_OFFICE";
+export type BuildingStatus = "LOCKED" | "AVAILABLE" | "OWNED" | "UPGRADE_AVAILABLE";
+export type BuildingFeatureId = "workstation-capacity" | "employee-capacity" | "tool-tier" | "research-tier" | "contract-capacity" | "finance-reports" | "workshop-grade";
+export type BuildingRequirement =
+  | { type: "companyLevel"; value: number }
+  | { type: "reputation"; value: number }
+  | { type: "research"; value: ResearchId }
+  | { type: "buildingLevel"; buildingId: BuildingType; value: number };
+
+export interface BuildingLevelDefinition {
+  level: number;
+  name: string;
+  description: string;
+  cost: number;
+  visualTier: number;
+  requirements: BuildingRequirement[];
+  features: Partial<Record<BuildingFeatureId, number>>;
+  unlocks: string[];
+}
+
+export interface BuildingDefinition {
+  buildingId: BuildingType;
+  name: string;
+  description: string;
+  maxHandcraftedTier: number;
+  mapSlot: string;
+  levels: BuildingLevelDefinition[];
+}
+
+export interface BuildingState {
+  buildingId: BuildingType;
+  level: number;
+  unlocked: boolean;
+  visualTier: number;
+  upgradeState: BuildingStatus;
+  cosmeticTheme: string | null;
+}
+
+export interface BuildingUpgradeEvent {
+  buildingId: BuildingType;
+  oldLevel: number;
+  newLevel: number;
+  oldVisualTier: number;
+  newVisualTier: number;
+  unlockedFeatures: string[];
+  createdAt: number;
+}
 
 export interface ToolDefinition {
   id: ToolId;
@@ -265,6 +312,10 @@ export interface EconomyStats {
   contractsFailed: number;
   contractRevenue: number;
   highestContractBonus: number;
+  buildingsOwned: number;
+  buildingUpgradesPurchased: number;
+  moneyInvestedInBuildings: number;
+  highestWorkshopLevel: number;
   categoryProfit: Record<RepairCategory, number>;
 }
 
@@ -343,6 +394,8 @@ export interface GameState {
   nextCustomerNumber: number;
   nextMultiDeviceNumber: number;
   nextContractNumber: number;
+  buildings: BuildingState[];
+  lastBuildingUpgrade: BuildingUpgradeEvent | null;
 }
 
 export interface ProgressionContext {

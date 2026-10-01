@@ -7,6 +7,7 @@ import { awardCompanyXp } from "@/game/logic/progression";
 import { chooseCustomer, generateCustomer, preferredTemplates, recordCustomerRepair } from "@/game/logic/customers";
 import { expireContracts, maybeCreateContractOffer, recordContractProgress } from "@/game/logic/contracts";
 import { CUSTOMER_TYPE_CONFIG } from "@/game/data/customers";
+import { createInitialBuildings } from "@/game/data/buildings";
 import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, URGENT_JOB_LIFETIME_MS, getCurrentTime, getDayKey, getOfflineWindow } from "@/game/logic/time";
 import type { ActiveRepair, Customer, Employee, GameState, OfflineSummary, OrderVariant, ProgressionContext, RepairOrder, RepairSource, ToolId, UpgradeId, UpgradeLevels, Workstation } from "@/game/types";
 
@@ -251,6 +252,8 @@ export function createInitialState(): GameState {
     nextCustomerNumber: INITIAL_ORDER_COUNT + 1,
     nextMultiDeviceNumber: 1,
     nextContractNumber: 1,
+    buildings: createInitialBuildings(),
+    lastBuildingUpgrade: null,
   };
   return ensureChallenges(initial, now, getDayKey(now));
 }

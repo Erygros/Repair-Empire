@@ -5,6 +5,7 @@ import { INITIAL_UPGRADES, SAVE_VERSION, getCompanyLevelProgress } from "@/game/
 import { createInitialState } from "@/game/logic/game";
 import { ensureChallenges } from "@/game/logic/challenges";
 import { createDailyStats, createEconomyStats } from "@/game/logic/economy";
+import { migrateBuildings } from "@/game/logic/buildings";
 import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, getCurrentTime, getDayKey } from "@/game/logic/time";
 import type { ActiveRepair, CompletedRepair, Employee, EmployeeCandidate, GameState, RepairOrder, UpgradeId, Workstation } from "@/game/types";
 
@@ -110,6 +111,7 @@ export function migrateSave(value: unknown): GameState | null {
   const candidates = Array.isArray(value.candidates)
     ? value.candidates as EmployeeCandidate[]
     : generateCandidateMarket(1, value.reputation);
+  const workstations = migrateWorkstations(value.workstations, value.activeRepair);
 
   const now = getCurrentTime();
   const savedStats = value.lifetimeStats;
@@ -157,7 +159,7 @@ export function migrateSave(value: unknown): GameState | null {
     ownedTools: Array.isArray(value.ownedTools) && value.ownedTools.length > 0 ? value.ownedTools : ["basic-kit"],
     upgrades,
     availableOrders: value.availableOrders.map(migrateOrder),
-    workstations: migrateWorkstations(value.workstations, value.activeRepair),
+    workstations,
     employees,
     candidates,
     nextCandidateNumber: typeof value.nextCandidateNumber === "number" ? value.nextCandidateNumber : candidates.length + 1,
@@ -177,6 +179,8 @@ export function migrateSave(value: unknown): GameState | null {
     nextCustomerNumber: Number.isFinite(value.nextCustomerNumber) ? Math.max(1, value.nextCustomerNumber!) : base.nextCustomerNumber,
     nextMultiDeviceNumber: Number.isFinite(value.nextMultiDeviceNumber) ? Math.max(1, value.nextMultiDeviceNumber!) : 1,
     nextContractNumber: Number.isFinite(value.nextContractNumber) ? Math.max(1, value.nextContractNumber!) : 1,
+    buildings: migrateBuildings(value.buildings, { workstations, employees, ownedTools: Array.isArray(value.ownedTools) && value.ownedTools.length > 0 ? value.ownedTools : ["basic-kit"], researchedNodes: Array.isArray(value.researchedNodes) ? value.researchedNodes : [], contracts: Array.isArray(value.contracts) ? value.contracts : [] }),
+    lastBuildingUpgrade: value.lastBuildingUpgrade && typeof value.lastBuildingUpgrade === "object" ? value.lastBuildingUpgrade : null,
   };
   return ensureChallenges(migrated, now, getDayKey(now));
 }

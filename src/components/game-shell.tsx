@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Activity, Banknote, Bolt, BriefcaseBusiness, ChartNoAxesCombined, FlaskConical, PackageOpen, ShieldCheck, SlidersHorizontal, Target, UsersRound, Wrench } from "lucide-react";
+import { Activity, Banknote, Bolt, BriefcaseBusiness, Building2, ChartNoAxesCombined, FlaskConical, PackageOpen, ShieldCheck, SlidersHorizontal, Target, UsersRound, Wrench } from "lucide-react";
 import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
+import { CompanyCampus } from "@/components/company-campus";
 import { CustomerCenter } from "@/components/customer-center";
 import { EconomyDashboard } from "@/components/economy-dashboard";
 import { MilestoneReport } from "@/components/milestone-report";
@@ -20,12 +21,12 @@ import { getRepairLevel, getRepairLevelProgress } from "@/game/logic/game";
 import { useGame } from "@/game/state/use-game";
 import { formatMoney } from "@/utils/format";
 
-type GameView = "workshop" | "customers" | "team" | "research" | "challenges" | "economy" | "tools" | "upgrades";
+type GameView = "company" | "workshop" | "customers" | "team" | "research" | "challenges" | "economy" | "tools" | "upgrades";
 
 export function GameShell() {
   const game = useGame();
   const { state } = game;
-  const [view, setView] = useState<GameView>("workshop");
+  const [view, setView] = useState<GameView>("company");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const repairLevel = getRepairLevel(state.repairXp);
   const levelProgress = getRepairLevelProgress(state.repairXp);
@@ -53,11 +54,12 @@ export function GameShell() {
       <ProgressionStrip state={state} />
 
       <section className="workshop-heading">
-        <div><p className="section-code">WERKSTATT // SEKTOR A</p><h2>{view === "workshop" ? "Die Werkhalle wächst." : view === "customers" ? "Kunden & Verträge" : view === "team" ? "Teamzentrale" : view === "research" ? "Forschungszentrum" : view === "challenges" ? "Auftragsziele" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
+        <div><p className="section-code">COMPANY // CAMPUS</p><h2>{view === "company" ? "Unternehmensausbau" : view === "workshop" ? "Die Werkhalle wächst." : view === "customers" ? "Kunden & Verträge" : view === "team" ? "Teamzentrale" : view === "research" ? "Forschungszentrum" : view === "challenges" ? "Auftragsziele" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
         <div className="tool-readout"><Bolt size={17} /><span>Betrieb</span><strong>{unlockedStations}/4 Stationen · {state.employees.length} Techniker</strong></div>
       </section>
 
       <nav className="game-nav" aria-label="Spielbereiche">
+        <button className={view === "company" ? "active" : ""} onClick={() => setView("company")}><Building2 size={17} />Company</button>
         <button className={view === "workshop" ? "active" : ""} onClick={() => setView("workshop")}><Wrench size={17} />Werkstatt</button>
         <button className={view === "customers" ? "active" : ""} onClick={() => setView("customers")}><BriefcaseBusiness size={17} />Kunden</button>
         <button className={view === "team" ? "active" : ""} onClick={() => setView("team")}><UsersRound size={17} />Team</button>
@@ -68,6 +70,7 @@ export function GameShell() {
         <button className={view === "upgrades" ? "active" : ""} onClick={() => setView("upgrades")}><SlidersHorizontal size={17} />Upgrades</button>
       </nav>
 
+      {view === "company" && <CompanyCampus state={state} onUpgrade={game.purchaseBuildingUpgrade} />}
       {view === "workshop" && (
         <div className="workshop-main-grid">
           <div className="workshop-production">

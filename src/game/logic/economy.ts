@@ -32,6 +32,10 @@ export function createEconomyStats(): EconomyStats {
     contractsFailed: 0,
     contractRevenue: 0,
     highestContractBonus: 0,
+    buildingsOwned: 6,
+    buildingUpgradesPurchased: 0,
+    moneyInvestedInBuildings: 0,
+    highestWorkshopLevel: 1,
     categoryProfit: { ...EMPTY_CATEGORY_PROFIT },
   };
 }

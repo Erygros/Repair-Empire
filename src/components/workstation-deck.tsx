@@ -2,6 +2,7 @@ import { Bot, Check, Clock3, LockKeyhole, Power, UserRound, Wrench } from "lucid
 import { getRepairOperatingCost, getRepairProgress } from "@/game/logic/game";
 import type { AutomationPriority, Employee, GameState, Workstation } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
+import { getBuildingFeatureValue } from "@/game/data/buildings";
 
 const PRIORITIES: { value: AutomationPriority; label: string }[] = [
   { value: "highest-profit", label: "Highest Profit" },
@@ -34,6 +35,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
     const affordable = state.money >= workstation.purchasePrice;
     const reputationReady = state.reputation >= workstation.requiredReputation;
     const levelReady = state.companyLevel >= workstation.requiredLevel;
+    const workshopReady = workstation.index <= getBuildingFeatureValue(state, "WORKSHOP", "workstation-capacity");
     const previousWorkstation = state.workstations.find((item) => item.index === workstation.index - 1);
     const previousUnlocked = !previousWorkstation || previousWorkstation.status !== "locked";
     return (
@@ -42,12 +44,14 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
         <LockKeyhole size={27} />
         <h4>Arbeitsplatz {workstation.index}</h4>
         <p>Zusätzliche Kapazität für einen eigenständigen Techniker.</p>
-        <div className="station-requirements"><span>Level {workstation.requiredLevel} · Rep. {workstation.requiredReputation}</span><strong>{formatMoney(workstation.purchasePrice)}</strong></div>
-        <button disabled={!previousUnlocked || !affordable || !reputationReady || !levelReady} onClick={() => onPurchase(workstation.id)}>
+        <div className="station-requirements"><span>Level {workstation.requiredLevel} · Rep. {workstation.requiredReputation} · Workshop {workstation.index}</span><strong>{formatMoney(workstation.purchasePrice)}</strong></div>
+        <button disabled={!previousUnlocked || !affordable || !reputationReady || !levelReady || !workshopReady} onClick={() => onPurchase(workstation.id)}>
           {!previousUnlocked
             ? `Arbeitsplatz ${workstation.index - 1} zuerst`
             : !levelReady
               ? `Level ${workstation.requiredLevel} benötigt`
+            : !workshopReady
+              ? `Workshop Level ${workstation.index} benötigt`
             : !reputationReady
               ? `Reputation ${workstation.requiredReputation}`
               : affordable

@@ -1,6 +1,6 @@
 import type { ResearchCategory, ResearchId, ToolDefinition, ToolId, UpgradeDefinition, UpgradeId, UpgradeLevels } from "@/game/types";
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 export const INITIAL_UPGRADES: UpgradeLevels = {
   "efficient-workflow": 0,
   "better-diagnostics": 0,

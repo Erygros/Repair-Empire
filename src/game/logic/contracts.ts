@@ -3,9 +3,11 @@ import { awardCompanyXp } from "@/game/logic/progression";
 import { applyTransaction } from "@/game/logic/economy";
 import { getRelationshipState } from "@/game/logic/customers";
 import type { Contract, ContractType, Customer, GameState, RepairOrder } from "@/game/types";
+import { getBuildingFeatureValue } from "@/game/data/buildings";
 
 export function getActiveContractLimit(state: GameState) {
-  return BASE_ACTIVE_CONTRACT_LIMIT + (state.researchedNodes.includes("contract-management") ? 1 : 0);
+  const officeCapacity = getBuildingFeatureValue(state, "BUSINESS_OFFICE", "contract-capacity");
+  return Math.max(BASE_ACTIVE_CONTRACT_LIMIT, officeCapacity) + (state.researchedNodes.includes("contract-management") ? 1 : 0);
 }
 
 export function canOfferContract(state: GameState, customer: Customer) {
