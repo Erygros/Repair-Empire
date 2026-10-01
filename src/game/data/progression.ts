@@ -1,6 +1,6 @@
 import type { ResearchCategory, ResearchId, ToolDefinition, ToolId, UpgradeDefinition, UpgradeId, UpgradeLevels } from "@/game/types";
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 export const INITIAL_UPGRADES: UpgradeLevels = {
   "efficient-workflow": 0,
   "better-diagnostics": 0,
@@ -83,6 +83,7 @@ export const RESEARCH_NODES: ResearchDefinition[] = [
   { id: "advanced-repair", category: "Repair Technology", name: "Advanced Repair Methods", description: "Neue Prozessfenster für Professional- und Expert-Jobs.", cost: 2, requiredLevel: 20, requires: [], effect: "Premium-Aufträge früher" },
   { id: "specialized-repair", category: "Repair Technology", name: "Specialized Repair", description: "Spezialisierte Techniker nutzen ihr Fachwissen effektiver.", cost: 3, requiredLevel: 28, requires: ["advanced-repair"], effect: "25 % Spezialisierungsbonus" },
   { id: "management-systems", category: "Management", name: "Management Systems", description: "Strukturierte Annahme schafft einen zusätzlichen Job-Slot.", cost: 2, requiredLevel: 18, requires: [], effect: "+1 Job-Board-Slot" },
+  { id: "contract-management", category: "Management", name: "Contract Management", description: "Ein eigenes Key-Account-Team betreut einen zweiten Vertrag.", cost: 4, requiredLevel: 70, requires: ["management-systems"], effect: "+1 aktiver Vertrag" },
   { id: "advanced-automation", category: "Automation", name: "Advanced Automation", description: "Auto Repair kann nach Gewinn pro Minute priorisieren.", cost: 3, requiredLevel: 25, requires: ["management-systems"], effect: "Priorität Fastest Jobs" },
   { id: "offline-operations", category: "Automation", name: "Offline Operations", description: "Schichtpläne erweitern den produktiven Offline-Betrieb.", cost: 4, requiredLevel: 35, requires: ["advanced-automation"], effect: "12 Stunden Offline-Kapazität" },
 ];

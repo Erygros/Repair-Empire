@@ -31,6 +31,12 @@ function migrateOrder(value: unknown): RepairOrder {
     category: order.category ?? template.category,
     variant: order.variant ?? "normal",
     expiresAt: typeof order.expiresAt === "number" ? order.expiresAt : null,
+    customer: order.customer ?? "Werkstattkunde",
+    customerId: order.customerId ?? `legacy-${order.id ?? "order"}`,
+    customerType: order.customerType ?? "PRIVATE",
+    customerRelationship: order.customerRelationship ?? "NEW",
+    returningCustomer: order.returningCustomer ?? false,
+    multiDeviceOrderId: order.multiDeviceOrderId ?? null,
   } as RepairOrder;
 }
 
@@ -163,6 +169,14 @@ export function migrateSave(value: unknown): GameState | null {
     lifetimeStats,
     dailyStats: value.dailyStats && typeof value.dailyStats === "object" ? { ...createDailyStats(now), ...value.dailyStats } : createDailyStats(now),
     transactions: Array.isArray(value.transactions) ? value.transactions.slice(0, 80) : [],
+    recentCustomers: Array.isArray(value.recentCustomers) ? value.recentCustomers.slice(0, 18) : [],
+    persistentCustomers: Array.isArray(value.persistentCustomers) ? value.persistentCustomers : [],
+    multiDeviceOrders: Array.isArray(value.multiDeviceOrders) ? value.multiDeviceOrders : [],
+    contractOffers: Array.isArray(value.contractOffers) ? value.contractOffers : [],
+    contracts: Array.isArray(value.contracts) ? value.contracts : [],
+    nextCustomerNumber: Number.isFinite(value.nextCustomerNumber) ? Math.max(1, value.nextCustomerNumber!) : base.nextCustomerNumber,
+    nextMultiDeviceNumber: Number.isFinite(value.nextMultiDeviceNumber) ? Math.max(1, value.nextMultiDeviceNumber!) : 1,
+    nextContractNumber: Number.isFinite(value.nextContractNumber) ? Math.max(1, value.nextContractNumber!) : 1,
   };
   return ensureChallenges(migrated, now, getDayKey(now));
 }

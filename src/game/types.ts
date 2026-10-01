@@ -10,7 +10,7 @@ export type DeviceKind =
 export type Urgency = "standard" | "express";
 export type OrderVariant = "normal" | "urgent" | "premium" | "complex";
 export type RepairSource = "manual" | "automated" | "offline";
-export type TransactionType = "REPAIR_REWARD" | "MATERIAL_COST" | "OPERATING_COST" | "TOOL_PURCHASE" | "UPGRADE_PURCHASE" | "EMPLOYEE_HIRE" | "WORKSTATION_PURCHASE" | "MARKET_REFRESH" | "CHALLENGE_REWARD" | "MILESTONE_REWARD";
+export type TransactionType = "REPAIR_REWARD" | "MATERIAL_COST" | "OPERATING_COST" | "TOOL_PURCHASE" | "UPGRADE_PURCHASE" | "EMPLOYEE_HIRE" | "WORKSTATION_PURCHASE" | "MARKET_REFRESH" | "CHALLENGE_REWARD" | "MILESTONE_REWARD" | "CONTRACT_REWARD";
 export type ToolId = "basic-kit" | "multimeter" | "soldering-station" | "hot-air-station" | "microscope";
 export type UpgradeId = "efficient-workflow" | "better-diagnostics" | "customer-network" | "workshop-organization" | "job-board-expansion";
 export type UpgradeLevels = Record<UpgradeId, number>;
@@ -18,9 +18,14 @@ export type RepairCategory = "Mobile Devices" | "Consoles" | "Computers" | "Elec
 export type EmployeeClass = "Apprentice" | "Junior Technician" | "Technician" | "Senior Technician" | "Specialist";
 export type AutomationPriority = "highest-profit" | "fastest-jobs" | "reputation" | "specialization";
 export type WorkstationStatus = "locked" | "available" | "repairing" | "completed";
-export type ResearchId = "basic-diagnostics" | "advanced-diagnostics" | "job-analysis" | "material-efficiency" | "advanced-repair" | "specialized-repair" | "management-systems" | "advanced-automation" | "offline-operations";
+export type ResearchId = "basic-diagnostics" | "advanced-diagnostics" | "job-analysis" | "material-efficiency" | "advanced-repair" | "specialized-repair" | "management-systems" | "contract-management" | "advanced-automation" | "offline-operations";
 export type ResearchCategory = "Diagnostics" | "Repair Technology" | "Management" | "Automation";
 export type ChallengeCategory = "repair" | "profit" | "reputation" | "specialist" | "automation" | "difficulty" | "urgent";
+export type CustomerType = "PRIVATE" | "GAMER" | "SMALL_BUSINESS" | "RETAILER" | "CORPORATE" | "PREMIUM";
+export type RelationshipState = "NEW" | "KNOWN" | "REGULAR" | "TRUSTED" | "PARTNER";
+export type MultiDeviceStatus = "active" | "completed" | "expired";
+export type ContractType = "SERVICE" | "BULK_REPAIR" | "SPECIALIZED_SERVICE" | "PRIORITY_SERVICE";
+export type ContractStatus = "offered" | "active" | "completed" | "failed" | "claimed";
 
 export interface ToolDefinition {
   id: ToolId;
@@ -62,10 +67,74 @@ export interface OrderTemplate {
 export interface RepairOrder extends OrderTemplate {
   id: string;
   customer: string;
+  customerId: string;
+  customerType: CustomerType;
+  customerRelationship: RelationshipState;
+  returningCustomer: boolean;
+  multiDeviceOrderId: string | null;
   urgency: Urgency;
   variant: OrderVariant;
   createdAt: number;
   expiresAt: number | null;
+}
+
+export interface Customer {
+  id: string;
+  displayName: string;
+  customerType: CustomerType;
+  preferredDeviceCategories: RepairCategory[];
+  loyalty: number;
+  relationshipState: RelationshipState;
+  totalJobs: number;
+  successfulJobs: number;
+  totalRevenueGenerated: number;
+  firstSeenAt: number;
+  lastSeenAt: number;
+  isPersistent: boolean;
+  activeContractId: string | null;
+  recentRepairs: { device: DeviceKind; completedAt: number }[];
+}
+
+export interface MultiDeviceOrder {
+  orderId: string;
+  customerId: string;
+  customerName: string;
+  items: string[];
+  totalItems: number;
+  completedItems: number;
+  totalRevenue: number;
+  estimatedTotalMaterialCost: number;
+  status: MultiDeviceStatus;
+  createdAt: number;
+  expiresAt: number | null;
+}
+
+export interface ContractReward {
+  money: number;
+  xp: number;
+  reputation: number;
+  researchPoints: number;
+  loyalty: number;
+}
+
+export interface Contract {
+  id: string;
+  customerId: string;
+  customerName: string;
+  type: ContractType;
+  title: string;
+  description: string;
+  target: number;
+  progress: number;
+  targetCategory: RepairCategory | null;
+  requiresUrgent: boolean;
+  reward: ContractReward;
+  status: ContractStatus;
+  createdAt: number;
+  acceptedAt: number | null;
+  expiresAt: number | null;
+  completedAt: number | null;
+  rewardedAt: number | null;
 }
 
 export interface ActiveRepair {
@@ -188,6 +257,14 @@ export interface EconomyStats {
   moneySpentOnWorkstations: number;
   highestSingleRepairProfit: number;
   totalReputationEarned: number;
+  customersServed: number;
+  returningCustomers: number;
+  multiDeviceOrdersCompleted: number;
+  contractsAccepted: number;
+  contractsCompleted: number;
+  contractsFailed: number;
+  contractRevenue: number;
+  highestContractBonus: number;
   categoryProfit: Record<RepairCategory, number>;
 }
 
@@ -258,6 +335,14 @@ export interface GameState {
   lifetimeStats: EconomyStats;
   dailyStats: DailyStats;
   transactions: EconomyTransaction[];
+  recentCustomers: Customer[];
+  persistentCustomers: Customer[];
+  multiDeviceOrders: MultiDeviceOrder[];
+  contractOffers: Contract[];
+  contracts: Contract[];
+  nextCustomerNumber: number;
+  nextMultiDeviceNumber: number;
+  nextContractNumber: number;
 }
 
 export interface ProgressionContext {

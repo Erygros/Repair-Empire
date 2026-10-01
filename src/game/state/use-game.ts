@@ -6,6 +6,7 @@ import { getMilestone } from "@/game/data/milestones";
 import { REPUTATION_MILESTONES, RESEARCH_NODES, SAVE_VERSION, getTool, getUpgrade } from "@/game/data/progression";
 import {
   createInitialState,
+  createMultiDeviceOrder,
   createOrderBoard,
   fillOrderBoard,
   getBoardSize,
@@ -17,6 +18,7 @@ import {
   settleWorkstation,
   startRepairAtWorkstation,
 } from "@/game/logic/game";
+import { acceptContract, claimContract } from "@/game/logic/contracts";
 import { migrateSave } from "@/game/logic/save";
 import { applyTransaction } from "@/game/logic/economy";
 import { ensureChallenges } from "@/game/logic/challenges";
@@ -214,7 +216,7 @@ export function useGame() {
     const count = getBoardSize(current.upgrades, current.researchedNodes);
     const orders = createOrderBoard(count, current.nextOrderNumber, context);
     const charged = applyTransaction(current, "TOOL_PURCHASE", -tool.price, tool.id, getCurrentTime());
-    return { state: { ...charged, ownedTools, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count }, notice: `${tool.name} gekauft · neue Reparaturen freigeschaltet` };
+    return { state: { ...charged, ownedTools, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count, nextCustomerNumber: Math.max(current.nextCustomerNumber, current.nextOrderNumber + count) }, notice: `${tool.name} gekauft · neue Reparaturen freigeschaltet` };
   }), [commit]);
 
   const purchaseUpgrade = useCallback((upgradeId: UpgradeId) => commit((current) => {
@@ -231,10 +233,10 @@ export function useGame() {
     if (upgradeId === "customer-network") {
       const count = getBoardSize(upgrades, current.researchedNodes);
       const orders = createOrderBoard(count, current.nextOrderNumber, context);
-      return { state: { ...partial, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count }, notice: `${upgrade.name} Level ${level + 1} · Aufträge aktualisiert` };
+      return { state: { ...partial, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count, nextCustomerNumber: Math.max(current.nextCustomerNumber, current.nextOrderNumber + count) }, notice: `${upgrade.name} Level ${level + 1} · Aufträge aktualisiert` };
     }
     const filled = fillOrderBoard(partial, context);
-    return { state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber }, notice: `${upgrade.name} auf Level ${level + 1} verbessert` };
+    return { state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber, nextCustomerNumber: filled.nextCustomerNumber }, notice: `${upgrade.name} auf Level ${level + 1} verbessert` };
   }), [commit]);
 
   const purchaseResearch = useCallback((researchId: ResearchId) => commit((current) => {
@@ -247,7 +249,7 @@ export function useGame() {
     const offlineCapacityMs = researchId === "offline-operations" ? 12 * 60 * 60 * 1000 : current.offlineCapacityMs;
     const partial = { ...current, researchPoints: current.researchPoints - node.cost, researchedNodes, offlineCapacityMs };
     const filled = fillOrderBoard(partial, getProgressionContext(partial));
-    return { state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber }, notice: `${node.name} erforscht · ${node.effect}` };
+    return { state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber, nextCustomerNumber: filled.nextCustomerNumber }, notice: `${node.name} erforscht · ${node.effect}` };
   }), [commit]);
 
   const claimMilestone = useCallback((milestoneId: string) => commit((current) => {
@@ -272,6 +274,21 @@ export function useGame() {
     return { state: rewarded, notice: `${challenge.title} abgeschlossen · Belohnung erhalten` };
   }), [commit]);
 
+  const startMultiDeviceOrder = useCallback((customerId: string) => commit((current) => {
+    const result = createMultiDeviceOrder(current, customerId);
+    return { state: result.state, notice: result.error ?? "Mehrgeräte-Auftrag angenommen · Einzelreparaturen liegen im Job Board" };
+  }), [commit]);
+
+  const takeContract = useCallback((contractId: string) => commit((current) => {
+    const result = acceptContract(current, contractId, getCurrentTime());
+    return { state: result.state, notice: result.error ?? "Vertrag angenommen" };
+  }), [commit]);
+
+  const collectContractReward = useCallback((contractId: string) => commit((current) => {
+    const result = claimContract(current, contractId, getCurrentTime());
+    return { state: result.state, notice: result.error ?? "Vertrag erfüllt · Bonus verbucht" };
+  }), [commit]);
+
   return {
     state,
     hydrated,
@@ -289,6 +306,9 @@ export function useGame() {
     purchaseResearch,
     claimMilestone,
     claimChallenge,
+    startMultiDeviceOrder,
+    takeContract,
+    collectContractReward,
     dismissOfflineSummary: () => setOfflineSummary(null),
     purchaseTool,
     purchaseUpgrade,

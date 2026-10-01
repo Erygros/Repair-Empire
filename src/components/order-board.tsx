@@ -16,6 +16,7 @@ import { getTool } from "@/game/data/progression";
 import { canAccessOrder, getJobEconomy } from "@/game/logic/game";
 import type { DeviceKind, RepairOrder, ResearchId, ToolId, UpgradeLevels } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
+import { CUSTOMER_TYPE_CONFIG } from "@/game/data/customers";
 
 const DEVICE_ICONS: Record<DeviceKind, typeof Smartphone> = {
   Smartphone,
@@ -79,6 +80,7 @@ export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, re
                 </div>
                 <h4>{order.device}</h4>
                 <p>{order.issue}</p>
+                <div className="order-customer"><span>{order.customer}</span><em>{CUSTOMER_TYPE_CONFIG[order.customerType].label}{order.returningCustomer ? " · Stammkunde" : ""}{order.multiDeviceOrderId ? ` · ${order.multiDeviceOrderId}` : ""}</em></div>
                 <div className="order-specs">
                   <span><Clock3 size={13} /> {economy.durationSeconds} Sek.</span>
                   <span>{DIFFICULTY_LABELS[order.difficulty]}</span>

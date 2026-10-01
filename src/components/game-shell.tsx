@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Activity, Banknote, Bolt, ChartNoAxesCombined, FlaskConical, PackageOpen, ShieldCheck, SlidersHorizontal, Target, UsersRound, Wrench } from "lucide-react";
+import { Activity, Banknote, Bolt, BriefcaseBusiness, ChartNoAxesCombined, FlaskConical, PackageOpen, ShieldCheck, SlidersHorizontal, Target, UsersRound, Wrench } from "lucide-react";
 import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
+import { CustomerCenter } from "@/components/customer-center";
 import { EconomyDashboard } from "@/components/economy-dashboard";
 import { MilestoneReport } from "@/components/milestone-report";
 import { OfflineReport } from "@/components/offline-report";
@@ -19,7 +20,7 @@ import { getRepairLevel, getRepairLevelProgress } from "@/game/logic/game";
 import { useGame } from "@/game/state/use-game";
 import { formatMoney } from "@/utils/format";
 
-type GameView = "workshop" | "team" | "research" | "challenges" | "economy" | "tools" | "upgrades";
+type GameView = "workshop" | "customers" | "team" | "research" | "challenges" | "economy" | "tools" | "upgrades";
 
 export function GameShell() {
   const game = useGame();
@@ -52,12 +53,13 @@ export function GameShell() {
       <ProgressionStrip state={state} />
 
       <section className="workshop-heading">
-        <div><p className="section-code">WERKSTATT // SEKTOR A</p><h2>{view === "workshop" ? "Die Werkhalle wächst." : view === "team" ? "Teamzentrale" : view === "research" ? "Forschungszentrum" : view === "challenges" ? "Auftragsziele" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
+        <div><p className="section-code">WERKSTATT // SEKTOR A</p><h2>{view === "workshop" ? "Die Werkhalle wächst." : view === "customers" ? "Kunden & Verträge" : view === "team" ? "Teamzentrale" : view === "research" ? "Forschungszentrum" : view === "challenges" ? "Auftragsziele" : view === "economy" ? "Unternehmenszahlen" : view === "tools" ? "Werkzeuglager" : "Upgrade-Bay"}</h2></div>
         <div className="tool-readout"><Bolt size={17} /><span>Betrieb</span><strong>{unlockedStations}/4 Stationen · {state.employees.length} Techniker</strong></div>
       </section>
 
       <nav className="game-nav" aria-label="Spielbereiche">
         <button className={view === "workshop" ? "active" : ""} onClick={() => setView("workshop")}><Wrench size={17} />Werkstatt</button>
+        <button className={view === "customers" ? "active" : ""} onClick={() => setView("customers")}><BriefcaseBusiness size={17} />Kunden</button>
         <button className={view === "team" ? "active" : ""} onClick={() => setView("team")}><UsersRound size={17} />Team</button>
         <button className={view === "research" ? "active" : ""} onClick={() => setView("research")}><FlaskConical size={17} />Forschung</button>
         <button className={view === "challenges" ? "active" : ""} onClick={() => setView("challenges")}><Target size={17} />Aufgaben</button>
@@ -76,6 +78,7 @@ export function GameShell() {
         </div>
       )}
       {view === "team" && <TeamHub state={state} onHire={game.hireCandidate} onRefresh={game.refreshCandidates} />}
+      {view === "customers" && <CustomerCenter state={state} now={game.now} onAcceptContract={game.takeContract} onClaimContract={game.collectContractReward} onCreateMultiOrder={game.startMultiDeviceOrder} />}
       {view === "research" && <ResearchLab state={state} onResearch={game.purchaseResearch} />}
       {view === "challenges" && <ChallengeCenter state={state} onClaim={game.claimChallenge} />}
       {view === "economy" && <EconomyDashboard state={state} />}

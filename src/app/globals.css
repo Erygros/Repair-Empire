@@ -635,6 +635,28 @@ button:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
 .order-meta .premium-tag { color: var(--copper); border-color: var(--copper-dim); }
 .order-economy { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 7px; color: var(--muted); font: 600 8px var(--font-data); }
 .order-economy span:first-child { color: var(--text); }
+.order-customer { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-top: 8px; font: 700 9px var(--font-data); }
+.order-customer span { color: var(--text); }
+.order-customer em { color: var(--copper); font-style: normal; }
+
+.customer-layout { display: grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items: start; }
+.customer-contracts { grid-row: span 2; }
+.contract-list, .customer-list { display: grid; }
+.contract-list article, .customer-list article { min-width: 0; display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--steel); }
+.contract-list article > svg, .customer-avatar { width: 36px; height: 36px; display: grid; place-items: center; color: var(--copper); border: 1px solid var(--steel); background: var(--carbon); }
+.contract-list article span, .customer-list article span, .multi-orders article span { color: var(--muted); font: 700 8px var(--font-data); text-transform: uppercase; }
+.contract-list h4, .customer-list h4 { margin: 3px 0; font: 650 16px var(--font-display); }
+.contract-list p, .customer-list p { margin: 0; color: var(--muted); font-size: 10px; }
+.contract-list small, .customer-list small, .multi-orders small { display: flex; align-items: center; gap: 5px; margin-top: 7px; color: var(--signal); font: 600 8px var(--font-data); }
+.contract-list button, .customer-list button { min-height: 32px; display: flex; align-items: center; gap: 5px; padding: 0 10px; color: var(--signal); border: 1px solid var(--signal-dim); background: transparent; font: 800 8px var(--font-data); cursor: pointer; }
+.contract-list button:disabled { color: var(--steel-light); border-color: var(--steel); cursor: not-allowed; }
+.contract-list i, .multi-orders i { display: block; height: 4px; margin-top: 8px; overflow: hidden; background: var(--carbon); border: 1px solid var(--steel); }
+.contract-list i b, .multi-orders i b { display: block; height: 100%; background: var(--signal); }
+.customer-avatar { color: var(--signal); }
+.empty-state { margin: 0; padding: 24px 16px; color: var(--muted); font-size: 10px; }
+.multi-orders article { padding: 13px 16px; border-top: 1px solid var(--steel); }
+.multi-orders article > div { display: flex; justify-content: space-between; gap: 10px; }
+.multi-orders strong { color: var(--text); font: 700 9px var(--font-data); }
 
 .economy-layout { display: grid; gap: 14px; }
 .economy-kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid var(--steel); background: var(--panel); }
@@ -682,6 +704,8 @@ button:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
 .offline-progress strong { color: var(--text); }
 
 @media (max-width: 800px) {
+  .customer-layout { grid-template-columns: 1fr; }
+  .customer-contracts { grid-row: auto; }
   .economy-kpis { grid-template-columns: repeat(2, 1fr); }
   .economy-kpis article { border-bottom: 1px solid var(--steel); }
   .economy-kpis article:nth-child(2n) { border-right: 0; }
@@ -697,4 +721,6 @@ button:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
   .offline-balance { grid-template-columns: repeat(2, 1fr); }
   .offline-balance span:nth-child(2) { border-right: 0; }
   .offline-balance span:nth-child(-n+2) { border-bottom: 1px solid var(--steel); }
+  .contract-list article, .customer-list article { grid-template-columns: 32px minmax(0, 1fr); }
+  .contract-list article > button, .customer-list article > button { grid-column: 2; justify-self: start; }
 }

@@ -24,6 +24,14 @@ export function createEconomyStats(): EconomyStats {
     moneySpentOnWorkstations: 0,
     highestSingleRepairProfit: 0,
     totalReputationEarned: 0,
+    customersServed: 0,
+    returningCustomers: 0,
+    multiDeviceOrdersCompleted: 0,
+    contractsAccepted: 0,
+    contractsCompleted: 0,
+    contractsFailed: 0,
+    contractRevenue: 0,
+    highestContractBonus: 0,
     categoryProfit: { ...EMPTY_CATEGORY_PROFIT },
   };
 }

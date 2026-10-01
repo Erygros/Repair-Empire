@@ -1,11 +1,14 @@
-import { CUSTOMER_NAMES, DIFFICULTY_BALANCE, ORDER_TEMPLATES, ORDER_VARIANTS } from "@/game/data/orders";
+import { DIFFICULTY_BALANCE, ORDER_TEMPLATES, ORDER_VARIANTS } from "@/game/data/orders";
 import { EMPLOYEE_XP_THRESHOLDS, createInitialWorkstations, generateCandidateMarket, getEmployeeOperatingCost } from "@/game/data/employees";
 import { INITIAL_UPGRADES, SAVE_VERSION, getCompanyLevelProgress, getUpgrade } from "@/game/data/progression";
 import { applyChallengeEvent, ensureChallenges } from "@/game/logic/challenges";
 import { applyTransaction, createDailyStats, createEconomyStats, recordRepairEconomy } from "@/game/logic/economy";
 import { awardCompanyXp } from "@/game/logic/progression";
+import { chooseCustomer, generateCustomer, preferredTemplates, recordCustomerRepair } from "@/game/logic/customers";
+import { expireContracts, maybeCreateContractOffer, recordContractProgress } from "@/game/logic/contracts";
+import { CUSTOMER_TYPE_CONFIG } from "@/game/data/customers";
 import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, URGENT_JOB_LIFETIME_MS, getCurrentTime, getDayKey, getOfflineWindow } from "@/game/logic/time";
-import type { ActiveRepair, Employee, GameState, OfflineSummary, OrderVariant, ProgressionContext, RepairOrder, RepairSource, ToolId, UpgradeId, UpgradeLevels, Workstation } from "@/game/types";
+import type { ActiveRepair, Customer, Employee, GameState, OfflineSummary, OrderVariant, ProgressionContext, RepairOrder, RepairSource, ToolId, UpgradeId, UpgradeLevels, Workstation } from "@/game/types";
 
 const INITIAL_ORDER_COUNT = 5;
 
@@ -35,10 +38,12 @@ function getTemplatePool(context: ProgressionContext, preference: "accessible" |
   return accessible.length > 0 ? accessible : locked;
 }
 
-function getOrderVariant(orderNumber: number, context: ProgressionContext): OrderVariant {
+function getOrderVariant(orderNumber: number, context: ProgressionContext, customer: Customer): OrderVariant {
   const roll = seededUnit(orderNumber * 7);
+  if (customer.customerType === "PREMIUM" && roll > 0.62) return "premium";
   if ((context.reputation >= 45 || context.researchedNodes.includes("advanced-repair")) && roll > 0.9) return "premium";
-  if (roll > 0.74) return "urgent";
+  if (roll > 0.84 - CUSTOMER_TYPE_CONFIG[customer.customerType].urgencyBias) return "urgent";
+  if (["CORPORATE", "RETAILER"].includes(customer.customerType) && roll > 0.48) return "complex";
   if (roll > 0.58) return "complex";
   return "normal";
 }
@@ -48,14 +53,18 @@ export function createOrder(
   context: ProgressionContext,
   now = getCurrentTime(),
   preference: "accessible" | "locked" | "mixed" = "mixed",
+  customer?: Customer,
+  returningCustomer = false,
+  multiDeviceOrderId: string | null = null,
 ): RepairOrder {
-  const pool = getTemplatePool(context, preference);
+  const generatedCustomer = customer ?? generateCustomer(orderNumber, context, now);
+  const pool = preferredTemplates(getTemplatePool(context, preference), generatedCustomer);
   const networkLevel = context.upgrades["customer-network"];
   const weightedPool = pool.flatMap((template) =>
     Array.from({ length: 1 + Math.max(0, template.difficulty - 1) * networkLevel }, () => template),
   );
   const template = pick(weightedPool, orderNumber * 3);
-  const variant = getOrderVariant(orderNumber, context);
+  const variant = getOrderVariant(orderNumber, context, generatedCustomer);
   const modifiers = ORDER_VARIANTS[variant];
   const difficulty = DIFFICULTY_BALANCE[template.difficulty];
   const urgency = variant === "urgent" ? "express" : "standard";
@@ -65,7 +74,12 @@ export function createOrder(
   return {
     ...template,
     id: `RE-${String(orderNumber).padStart(4, "0")}`,
-    customer: pick(CUSTOMER_NAMES, orderNumber * 11),
+    customer: generatedCustomer.displayName,
+    customerId: generatedCustomer.id,
+    customerType: generatedCustomer.customerType,
+    customerRelationship: generatedCustomer.relationshipState,
+    returningCustomer,
+    multiDeviceOrderId,
     urgency,
     variant,
     durationSeconds: Math.max(30, Math.round(template.durationSeconds * difficulty.duration * modifiers.duration)),
@@ -104,12 +118,16 @@ export function createOrderBoard(
 
 export function fillOrderBoard(state: GameState, context: ProgressionContext, now = getCurrentTime()) {
   const missing = Math.max(0, getBoardSize(context.upgrades, context.researchedNodes) - state.availableOrders.length);
-  const additions = Array.from({ length: missing }, (_, index) =>
-    createOrder(state.nextOrderNumber + index, context, now + index),
-  );
+  let nextCustomerNumber = state.nextCustomerNumber;
+  const additions = Array.from({ length: missing }, (_, index) => {
+    const selection = chooseCustomer({ ...state, nextCustomerNumber }, state.nextOrderNumber + index, now + index);
+    if (!selection.returning) nextCustomerNumber += 1;
+    return createOrder(state.nextOrderNumber + index, context, now + index, "mixed", selection.customer, selection.returning);
+  });
   return {
     orders: [...state.availableOrders, ...additions],
     nextOrderNumber: state.nextOrderNumber + missing,
+    nextCustomerNumber,
   };
 }
 
@@ -119,7 +137,28 @@ export function refreshOrderBoard(state: GameState, now = getCurrentTime()) {
   if (availableOrders.length === state.availableOrders.length && availableOrders.length >= getBoardSize(state.upgrades, state.researchedNodes) && now < state.nextBoardRefreshAt) return state;
   const partial = { ...state, availableOrders };
   const filled = fillOrderBoard(partial, getProgressionContext(partial), now);
-  return { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber, nextBoardRefreshAt: now + JOB_BOARD_REFRESH_MS };
+  return { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber, nextCustomerNumber: filled.nextCustomerNumber, nextBoardRefreshAt: now + JOB_BOARD_REFRESH_MS };
+}
+
+export function createMultiDeviceOrder(state: GameState, customerId: string, now = getCurrentTime()) {
+  const customer = state.persistentCustomers.find((item) => item.id === customerId);
+  if (!customer) return { state, error: "Kunde nicht gefunden" };
+  if (!["SMALL_BUSINESS", "RETAILER", "CORPORATE"].includes(customer.customerType)) return { state, error: "Dieser Kundentyp vergibt keine Serienaufträge" };
+  if (state.multiDeviceOrders.some((order) => order.customerId === customerId && order.status === "active")) return { state, error: "Für diesen Kunden läuft bereits ein Mehrgeräte-Auftrag" };
+  const capacity = state.workstations.filter((station) => station.status !== "locked").length;
+  const count = Math.max(2, Math.min(6, capacity + (customer.customerType === "CORPORATE" ? 2 : 1)));
+  const orderId = `MD-${String(state.nextMultiDeviceNumber).padStart(4, "0")}`;
+  const items = Array.from({ length: count }, (_, index) => createOrder(state.nextOrderNumber + index, getProgressionContext(state), now + index, "accessible", customer, true, orderId));
+  return {
+    state: {
+      ...state,
+      availableOrders: [...items, ...state.availableOrders],
+      multiDeviceOrders: [{ orderId, customerId, customerName: customer.displayName, items: items.map((item) => item.id), totalItems: count, completedItems: 0, totalRevenue: items.reduce((sum, item) => sum + item.reward, 0), estimatedTotalMaterialCost: items.reduce((sum, item) => sum + item.materialCost, 0), status: "active" as const, createdAt: now, expiresAt: now + 24 * 60 * 60 * 1000 }, ...state.multiDeviceOrders].slice(0, 20),
+      nextOrderNumber: state.nextOrderNumber + count,
+      nextMultiDeviceNumber: state.nextMultiDeviceNumber + 1,
+    },
+    error: null,
+  };
 }
 
 export function getJobEconomy(order: RepairOrder, upgrades: UpgradeLevels, speed = 1, specializationBonus = false, operatingCost = 0) {
@@ -204,6 +243,14 @@ export function createInitialState(): GameState {
     lifetimeStats: createEconomyStats(),
     dailyStats: createDailyStats(now),
     transactions: [],
+    recentCustomers: [],
+    persistentCustomers: [],
+    multiDeviceOrders: [],
+    contractOffers: [],
+    contracts: [],
+    nextCustomerNumber: INITIAL_ORDER_COUNT + 1,
+    nextMultiDeviceNumber: 1,
+    nextContractNumber: 1,
   };
   return ensureChallenges(initial, now, getDayKey(now));
 }
@@ -361,9 +408,21 @@ export function settleWorkstation(state: GameState, workstationId: string, now =
     source: repairSource,
     specializationMatched: activeRepair.specializationBonus,
   });
+  partial = recordCustomerRepair(partial, activeRepair.order, now);
+  partial = recordContractProgress(partial, activeRepair.order, now);
+  const multiId = activeRepair.order.multiDeviceOrderId;
+  if (multiId) {
+    const group = partial.multiDeviceOrders.find((order) => order.orderId === multiId);
+    if (group?.status === "active") {
+      const completedItems = Math.min(group.totalItems, group.completedItems + 1);
+      const groupCompleted = completedItems === group.totalItems;
+      partial = { ...partial, multiDeviceOrders: partial.multiDeviceOrders.map((order) => order.orderId === multiId ? { ...order, completedItems, status: groupCompleted ? "completed" as const : order.status } : order), lifetimeStats: groupCompleted ? { ...partial.lifetimeStats, multiDeviceOrdersCompleted: partial.lifetimeStats.multiDeviceOrdersCompleted + 1 } : partial.lifetimeStats };
+    }
+  }
+  partial = maybeCreateContractOffer(partial, activeRepair.order.customerId, now);
   const filled = fillOrderBoard(partial, getProgressionContext(partial), now);
   return {
-    state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber },
+    state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber, nextCustomerNumber: filled.nextCustomerNumber },
     error: null,
     earnings: activeRepair.order.reward,
     materialCost: activeRepair.chargedMaterialCost,
@@ -398,7 +457,7 @@ export function selectAutomationOrder(state: GameState, workstation: Workstation
 }
 
 export function runWorkstationTick(state: GameState, now = getCurrentTime()) {
-  let next = ensureChallenges(refreshOrderBoard(state, now), now, getDayKey(now));
+  let next = ensureChallenges(expireContracts(refreshOrderBoard(state, now), now), now, getDayKey(now));
   let changed = next !== state;
   const messages: string[] = [];
 
