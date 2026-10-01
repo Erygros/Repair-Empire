@@ -1,56 +1,78 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { MARKET_REFRESH_COST, generateCandidateMarket } from "@/game/data/employees";
 import { REPUTATION_MILESTONES, SAVE_VERSION, getTool, getUpgrade } from "@/game/data/progression";
 import {
-  canAccessOrder,
   createInitialState,
   createOrderBoard,
   fillOrderBoard,
   getBoardSize,
-  getEffectiveDuration,
   getProgressionContext,
   getRepairLevel,
-  getRepairProgress,
   getUpgradeCost,
+  processOfflineProgress,
+  runWorkstationTick,
+  settleWorkstation,
+  startRepairAtWorkstation,
 } from "@/game/logic/game";
 import { migrateSave } from "@/game/logic/save";
-import type { GameState, ToolId, UpgradeId } from "@/game/types";
+import type { AutomationPriority, GameState, OfflineSummary, ToolId, UpgradeId } from "@/game/types";
 
 const STORAGE_KEY = "repair-empire-save-v1";
 
-function loadGame(): GameState {
-  if (typeof window === "undefined") return createInitialState();
+function loadGameSession(): { state: GameState; offlineSummary: OfflineSummary | null } {
+  if (typeof window === "undefined") return { state: createInitialState(), offlineSummary: null };
   try {
     const rawSave = window.localStorage.getItem(STORAGE_KEY);
-    if (rawSave) return migrateSave(JSON.parse(rawSave)) ?? createInitialState();
+    if (rawSave) {
+      const migrated = migrateSave(JSON.parse(rawSave));
+      if (migrated) {
+        const offline = processOfflineProgress(migrated);
+        return { state: offline.state, offlineSummary: offline.summary };
+      }
+    }
   } catch {
     window.localStorage.removeItem(STORAGE_KEY);
   }
-  return createInitialState();
+  return { state: createInitialState(), offlineSummary: null };
 }
 
 const subscribeToHydration = () => () => undefined;
 type Transaction = { state: GameState; notice: string };
 
 export function useGame() {
-  const [state, setState] = useState<GameState>(loadGame);
+  const [initialSession] = useState(loadGameSession);
+  const [state, setState] = useState<GameState>(initialSession.state);
   const stateRef = useRef(state);
+  const [offlineSummary, setOfflineSummary] = useState<OfflineSummary | null>(initialSession.offlineSummary);
   const [now, setNow] = useState(() => Date.now());
   const [notice, setNotice] = useState<string | null>(null);
   const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
 
-  const commit = useCallback((transaction: (current: GameState) => Transaction) => {
-    const result = transaction(stateRef.current);
-    stateRef.current = result.state;
-    setState(result.state);
-    setNotice(result.notice);
+  const applyState = useCallback((next: GameState) => {
+    stateRef.current = next;
+    setState(next);
   }, []);
 
+  const commit = useCallback((transaction: (current: GameState) => Transaction) => {
+    const result = transaction(stateRef.current);
+    applyState(result.state);
+    setNotice(result.notice);
+  }, [applyState]);
+
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 200);
+    const timer = window.setInterval(() => {
+      const tickNow = Date.now();
+      setNow(tickNow);
+      const result = runWorkstationTick(stateRef.current, tickNow);
+      if (result.changed) {
+        applyState(result.state);
+        if (result.notice) setNotice(result.notice);
+      }
+    }, 500);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [applyState]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -58,54 +80,116 @@ export function useGame() {
   }, [state, hydrated]);
 
   useEffect(() => {
+    if (!hydrated) return;
+    const saveHeartbeat = () => window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...stateRef.current, saveVersion: SAVE_VERSION, lastSavedAt: Date.now() }));
+    const timer = window.setInterval(saveHeartbeat, 10_000);
+    const onVisibility = () => { if (document.visibilityState === "hidden") saveHeartbeat(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", onVisibility); };
+  }, [hydrated]);
+
+  useEffect(() => {
     if (!notice) return;
-    const timer = window.setTimeout(() => setNotice(null), 3200);
+    const timer = window.setTimeout(() => setNotice(null), 3600);
     return () => window.clearTimeout(timer);
   }, [notice]);
 
-  const progress = useMemo(() => getRepairProgress(state.activeRepair, now), [state.activeRepair, now]);
+  const assignOrder = useCallback((orderId: string, workstationId: string) => commit((current) => {
+    const started = startRepairAtWorkstation(current, orderId, workstationId);
+    if (started.error) return { state: current, notice: started.error };
+    const station = started.state.workstations.find((item) => item.id === workstationId)!;
+    return { state: started.state, notice: `Auftrag an Arbeitsplatz ${station.index} übergeben · Material gebucht` };
+  }), [commit]);
 
-  const acceptOrder = useCallback((orderId: string) => commit((current) => {
-    if (current.activeRepair) return { state: current, notice: "Werkbank 01 ist bereits belegt" };
-    const order = current.availableOrders.find((item) => item.id === orderId);
-    if (!order) return { state: current, notice: "Auftrag ist nicht mehr verfügbar" };
-    const context = getProgressionContext(current);
-    if (!canAccessOrder(order, context)) return { state: current, notice: `Voraussetzung fehlt: ${getTool(order.requiredTool).name} oder Reputation ${order.requiredReputation}` };
-    if (current.money < order.materialCost) return { state: current, notice: `Für das Material fehlen ${order.materialCost - current.money} €` };
-    const startedAt = Date.now();
-    const effectiveDurationSeconds = getEffectiveDuration(order.durationSeconds, current.upgrades);
+  const completeRepair = useCallback((workstationId: string) => commit((current) => {
+    const oldLevel = getRepairLevel(current.repairXp);
+    const oldReputation = current.reputation;
+    const settled = settleWorkstation(current, workstationId);
+    if (settled.error) return { state: current, notice: settled.error };
+    const newLevel = getRepairLevel(settled.state.repairXp);
+    const crossed = REPUTATION_MILESTONES.find((value) => oldReputation < value && settled.state.reputation >= value);
+    const progress = settled.leveledEmployee
+      ? ` · ${settled.leveledEmployee} ist aufgestiegen`
+      : newLevel > oldLevel
+        ? ` · Repair-Level ${newLevel} erreicht`
+        : crossed
+          ? ` · Reputation ${crossed} erreicht`
+          : "";
+    return { state: settled.state, notice: `Reparatur abgenommen · +${settled.earnings} €${progress}` };
+  }), [commit]);
+
+  const purchaseWorkstation = useCallback((workstationId: string) => commit((current) => {
+    const workstation = current.workstations.find((item) => item.id === workstationId);
+    if (!workstation || workstation.status !== "locked") return { state: current, notice: "Arbeitsplatz ist bereits freigeschaltet" };
+    if (current.reputation < workstation.requiredReputation) return { state: current, notice: `Reputation ${workstation.requiredReputation} benötigt` };
+    if (current.money < workstation.purchasePrice) return { state: current, notice: `Für Arbeitsplatz ${workstation.index} fehlen ${workstation.purchasePrice - current.money} €` };
+    const previous = current.workstations.find((item) => item.index === workstation.index - 1);
+    if (previous?.status === "locked") return { state: current, notice: `Zuerst Arbeitsplatz ${workstation.index - 1} freischalten` };
+    return {
+      state: { ...current, money: current.money - workstation.purchasePrice, workstations: current.workstations.map((item) => item.id === workstationId ? { ...item, status: "available" as const } : item) },
+      notice: `Arbeitsplatz ${workstation.index} freigeschaltet`,
+    };
+  }), [commit]);
+
+  const hireCandidate = useCallback((candidateId: string) => commit((current) => {
+    const candidate = current.candidates.find((item) => item.id === candidateId);
+    if (!candidate) return { state: current, notice: "Kandidat ist nicht mehr verfügbar" };
+    if (current.money < candidate.hiringCost) return { state: current, notice: `Für ${candidate.name} fehlen ${candidate.hiringCost - current.money} €` };
     return {
       state: {
         ...current,
-        money: current.money - order.materialCost,
-        availableOrders: current.availableOrders.filter((item) => item.id !== orderId),
-        activeRepair: { order, startedAt, endsAt: startedAt + effectiveDurationSeconds * 1000, effectiveDurationSeconds, chargedMaterialCost: order.materialCost },
+        money: current.money - candidate.hiringCost,
+        candidates: current.candidates.filter((item) => item.id !== candidateId),
+        employees: [...current.employees, { ...candidate, xp: 0, level: 1, assignedWorkstationId: null }],
       },
-      notice: `${order.device} eingespannt · ${order.materialCost} € Material gebucht`,
+      notice: `${candidate.name} wurde eingestellt`,
     };
   }), [commit]);
 
-  const completeRepair = useCallback(() => commit((current) => {
-    if (!current.activeRepair || Date.now() < current.activeRepair.endsAt) return { state: current, notice: "Reparatur ist noch nicht abgeschlossen" };
-    const { order } = current.activeRepair;
-    const oldLevel = getRepairLevel(current.repairXp);
-    const newReputation = current.reputation + order.reputationReward;
-    const newXp = current.repairXp + order.repairXp;
-    const newLevel = getRepairLevel(newXp);
-    const context = { ownedTools: current.ownedTools, reputation: newReputation, upgrades: current.upgrades };
-    const partial: GameState = {
-      ...current,
-      money: current.money + order.reward,
-      reputation: newReputation,
-      repairXp: newXp,
-      activeRepair: null,
-      completedRepairs: [{ id: order.id, device: order.device, issue: order.issue, reward: order.reward, reputationReward: order.reputationReward, completedAt: Date.now() }, ...current.completedRepairs].slice(0, 20),
+  const refreshCandidates = useCallback(() => commit((current) => {
+    if (current.money < MARKET_REFRESH_COST) return { state: current, notice: `Für neue Kandidaten fehlen ${MARKET_REFRESH_COST - current.money} €` };
+    const candidates = generateCandidateMarket(current.nextCandidateNumber, current.reputation);
+    return {
+      state: { ...current, money: current.money - MARKET_REFRESH_COST, candidates, nextCandidateNumber: current.nextCandidateNumber + candidates.length },
+      notice: "Kandidatenmarkt aktualisiert",
     };
-    const filled = fillOrderBoard(partial, context);
-    const crossed = REPUTATION_MILESTONES.find((value) => current.reputation < value && newReputation >= value);
-    const progressionNotice = newLevel > oldLevel ? ` · Repair-Level ${newLevel} erreicht` : crossed ? ` · Reputation ${crossed} erreicht` : "";
-    return { state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber }, notice: `Reparatur abgenommen · +${order.reward} €${progressionNotice}` };
   }), [commit]);
+
+  const assignEmployee = useCallback((workstationId: string, employeeId: string | null) => commit((current) => {
+    const target = current.workstations.find((item) => item.id === workstationId);
+    if (!target || target.index === 1 || target.status === "locked") return { state: current, notice: "Dieser Arbeitsplatz kann nicht besetzt werden" };
+    if (target.activeRepair) return { state: current, notice: "Zuweisung während einer Reparatur gesperrt" };
+    const employee = employeeId ? current.employees.find((item) => item.id === employeeId) : null;
+    if (employeeId && !employee) return { state: current, notice: "Mitarbeiter nicht gefunden" };
+    const previousStation = employee?.assignedWorkstationId
+      ? current.workstations.find((item) => item.id === employee.assignedWorkstationId)
+      : null;
+    if (previousStation?.activeRepair) return { state: current, notice: `${employee!.name} arbeitet noch an Arbeitsplatz ${previousStation.index}` };
+    const displacedId = target.assignedEmployeeId;
+    const workstations = current.workstations.map((item) => {
+      if (employee?.assignedWorkstationId === item.id) return { ...item, assignedEmployeeId: null, automationEnabled: false };
+      if (item.id === workstationId) return { ...item, assignedEmployeeId: employeeId, automationEnabled: employeeId ? item.automationEnabled : false };
+      return item;
+    });
+    const employees = current.employees.map((item) => {
+      if (item.id === employeeId) return { ...item, assignedWorkstationId: workstationId };
+      if (item.id === displacedId || item.assignedWorkstationId === workstationId) return { ...item, assignedWorkstationId: null };
+      return item;
+    });
+    return { state: { ...current, workstations, employees }, notice: employee ? `${employee.name} arbeitet jetzt an Arbeitsplatz ${target.index}` : `Arbeitsplatz ${target.index} ist nicht besetzt` };
+  }), [commit]);
+
+  const toggleAutomation = useCallback((workstationId: string) => commit((current) => {
+    const workstation = current.workstations.find((item) => item.id === workstationId);
+    if (!workstation || workstation.index === 1 || !workstation.assignedEmployeeId) return { state: current, notice: "Für Auto Repair wird ein Mitarbeiter benötigt" };
+    const enabled = !workstation.automationEnabled;
+    return { state: { ...current, workstations: current.workstations.map((item) => item.id === workstationId ? { ...item, automationEnabled: enabled } : item) }, notice: `Auto Repair an Arbeitsplatz ${workstation.index}: ${enabled ? "ON" : "OFF"}` };
+  }), [commit]);
+
+  const setAutomationPriority = useCallback((workstationId: string, priority: AutomationPriority) => commit((current) => ({
+    state: { ...current, workstations: current.workstations.map((item) => item.id === workstationId ? { ...item, automationPriority: priority } : item) },
+    notice: "Automationspriorität aktualisiert",
+  })), [commit]);
 
   const purchaseTool = useCallback((toolId: ToolId) => commit((current) => {
     const tool = getTool(toolId);
@@ -117,10 +201,7 @@ export function useGame() {
     const context = { ownedTools, reputation: current.reputation, upgrades: current.upgrades };
     const count = getBoardSize(current.upgrades);
     const orders = createOrderBoard(count, current.nextOrderNumber, context);
-    return {
-      state: { ...current, money: current.money - tool.price, ownedTools, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count },
-      notice: `${tool.name} gekauft · ${tool.unlocks.join(" & ")} freigeschaltet`,
-    };
+    return { state: { ...current, money: current.money - tool.price, ownedTools, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count }, notice: `${tool.name} gekauft · neue Reparaturen freigeschaltet` };
   }), [commit]);
 
   const purchaseUpgrade = useCallback((upgradeId: UpgradeId) => commit((current) => {
@@ -136,12 +217,29 @@ export function useGame() {
     if (upgradeId === "customer-network") {
       const count = getBoardSize(upgrades);
       const orders = createOrderBoard(count, current.nextOrderNumber, context);
-      return { state: { ...partial, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count }, notice: `${upgrade.name} auf Level ${level + 1} verbessert · Aufträge aktualisiert` };
+      return { state: { ...partial, availableOrders: orders, nextOrderNumber: current.nextOrderNumber + count }, notice: `${upgrade.name} Level ${level + 1} · Aufträge aktualisiert` };
     }
     const filled = fillOrderBoard(partial, context);
     return { state: { ...partial, availableOrders: filled.orders, nextOrderNumber: filled.nextOrderNumber }, notice: `${upgrade.name} auf Level ${level + 1} verbessert` };
   }), [commit]);
 
-  return { state, hydrated, now, notice, progress, acceptOrder, completeRepair, purchaseTool, purchaseUpgrade };
+  return {
+    state,
+    hydrated,
+    now,
+    notice,
+    offlineSummary,
+    assignOrder,
+    completeRepair,
+    purchaseWorkstation,
+    hireCandidate,
+    refreshCandidates,
+    assignEmployee,
+    toggleAutomation,
+    setAutomationPriority,
+    dismissOfflineSummary: () => setOfflineSummary(null),
+    purchaseTool,
+    purchaseUpgrade,
+  };
 }
 

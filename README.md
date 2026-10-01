@@ -8,6 +8,10 @@ Ein spielbarer Werkstatt-Tycoon mit Next.js, TypeScript und Tailwind CSS.
 - fünf Werkzeuge mit echten Reparatur- und Reputation-Freischaltungen
 - fünf permanente Werkstatt-Upgrades mit jeweils fünf Leveln
 - Repair-Level, Reputation und progressive Auftragsgenerierung
+- vier freischaltbare Arbeitsplätze mit parallelen Reparaturen
+- generierter Mitarbeitermarkt mit fünf Klassen, Skills, Qualität und Spezialisierungen
+- Mitarbeiter-XP, Level-Ups und flexible Arbeitsplatzzuweisung
+- Auto Repair mit vier Prioritäten und begrenzter Offline-Fertigstellung
 - versionierter, lokal gespeicherter Spielstand mit Migration älterer Saves
 
 ## Lokal starten

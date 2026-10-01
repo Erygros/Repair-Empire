@@ -26,7 +26,6 @@ const DEVICE_ICONS: Record<DeviceKind, typeof Smartphone> = {
 
 interface OrderBoardProps {
   orders: RepairOrder[];
-  benchOccupied: boolean;
   money: number;
   reputation: number;
   ownedTools: ToolId[];
@@ -34,7 +33,7 @@ interface OrderBoardProps {
   onAccept: (orderId: string) => void;
 }
 
-export function OrderBoard({ orders, benchOccupied, money, reputation, ownedTools, upgrades, onAccept }: OrderBoardProps) {
+export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, onAccept }: OrderBoardProps) {
   return (
     <section className="panel orders-panel">
       <div className="panel-header">
@@ -52,10 +51,8 @@ export function OrderBoard({ orders, benchOccupied, money, reputation, ownedTool
           const enoughMoney = money >= order.materialCost;
           const missingTool = !ownedTools.includes(order.requiredTool);
           const locked = !accessible;
-          const disabled = benchOccupied || locked || !enoughMoney;
-          const title = benchOccupied
-            ? "Arbeitsplatz ist belegt"
-            : missingTool
+          const disabled = locked || !enoughMoney;
+          const title = missingTool
               ? `${getTool(order.requiredTool).name} fehlt`
               : reputation < order.requiredReputation
                 ? `Reputation ${order.requiredReputation} benötigt`
@@ -100,7 +97,6 @@ export function OrderBoard({ orders, benchOccupied, money, reputation, ownedTool
           );
         })}
       </div>
-      {benchOccupied && <p className="board-note">Neue Annahme möglich, sobald Werkbank 01 frei ist.</p>}
     </section>
   );
 }

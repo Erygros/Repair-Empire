@@ -10,6 +10,10 @@ export type Urgency = "standard" | "express";
 export type ToolId = "basic-kit" | "multimeter" | "soldering-station" | "hot-air-station" | "microscope";
 export type UpgradeId = "efficient-workflow" | "better-diagnostics" | "customer-network" | "workshop-organization" | "job-board-expansion";
 export type UpgradeLevels = Record<UpgradeId, number>;
+export type RepairCategory = "Mobile Devices" | "Consoles" | "Computers" | "Electronics";
+export type EmployeeClass = "Apprentice" | "Junior Technician" | "Technician" | "Senior Technician" | "Specialist";
+export type AutomationPriority = "highest-profit" | "fastest-jobs" | "reputation" | "specialization";
+export type WorkstationStatus = "locked" | "available" | "repairing" | "completed";
 
 export interface ToolDefinition {
   id: ToolId;
@@ -43,6 +47,8 @@ export interface OrderTemplate {
   repairXp: number;
   requiredReputation: number;
   requiredTool: ToolId;
+  skillRequirement: number;
+  category: RepairCategory;
   difficulty: 1 | 2 | 3 | 4 | 5;
 }
 
@@ -59,6 +65,48 @@ export interface ActiveRepair {
   endsAt: number;
   effectiveDurationSeconds: number;
   chargedMaterialCost: number;
+  assignedEmployeeId: string | null;
+  speedMultiplier: number;
+  qualityRating: number;
+  specializationBonus: boolean;
+  usedTools: ToolId[];
+}
+
+export interface EmployeeCandidate {
+  id: string;
+  name: string;
+  class: EmployeeClass;
+  hiringCost: number;
+  speed: number;
+  skill: number;
+  quality: number;
+  specialization: RepairCategory;
+}
+
+export interface Employee extends EmployeeCandidate {
+  xp: number;
+  level: number;
+  assignedWorkstationId: string | null;
+}
+
+export interface Workstation {
+  id: string;
+  index: number;
+  status: WorkstationStatus;
+  purchasePrice: number;
+  requiredReputation: number;
+  assignedEmployeeId: string | null;
+  activeRepair: ActiveRepair | null;
+  automationEnabled: boolean;
+  automationPriority: AutomationPriority;
+}
+
+export interface OfflineSummary {
+  durationMs: number;
+  completedRepairs: number;
+  earnings: number;
+  reputation: number;
+  employeeXp: number;
 }
 
 export interface CompletedRepair {
@@ -78,7 +126,10 @@ export interface GameState {
   ownedTools: ToolId[];
   upgrades: UpgradeLevels;
   availableOrders: RepairOrder[];
-  activeRepair: ActiveRepair | null;
+  workstations: Workstation[];
+  employees: Employee[];
+  candidates: EmployeeCandidate[];
+  nextCandidateNumber: number;
   completedRepairs: CompletedRepair[];
   nextOrderNumber: number;
   lastSavedAt: number;
