@@ -1,7 +1,8 @@
 "use client";
 import { RepairEmpireIcon } from "@/components/repair-icons";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Save, Shirt } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
+import { WardrobeIcon as Shirt } from "@/components/repair-icons";
 import { ActiveIcon as Check, LockedIcon as LockKeyhole } from "@/components/repair-icons";
 import { Character3D, type Character3DAppearance } from "@/components/character-3d";
 import { FounderEditor, FounderEditorTools } from "@/components/founder-editor";

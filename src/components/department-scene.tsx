@@ -2,7 +2,8 @@
 import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, OrthographicCamera } from "@react-three/drei";
-import { Focus, Minus, Plus, UserRound } from "lucide-react";
+import { Focus, Minus, Plus } from "lucide-react";
+import { FounderIcon as UserRound } from "@/components/repair-icons";
 import type { Group, OrthographicCamera as Camera } from "three";
 import { ArtBox } from "@/components/campus-art";
 import { Glazing } from "@/components/campus-details";

@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react";
+import { CosmeticUnlockIcon as Sparkles } from "@/components/repair-icons";
 import { CharacterRenderer } from "@/components/character-renderer";
 import { getCosmetic } from "@/game/data/cosmetics";
 import type { PlayerCharacter } from "@/game/types";

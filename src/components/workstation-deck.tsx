@@ -1,6 +1,7 @@
-import { WorkingIcon, RepairStatusIcon, PausedIcon } from "@/components/repair-icons";
-import { Clock3, UserRound } from "lucide-react";
-import { AutomationIcon as Bot, ActiveIcon as Check, LockedIcon as LockKeyhole, ReadyIcon as Power, RepairsIcon as Wrench } from "@/components/repair-icons";
+import { WorkingIcon, RepairStatusIcon, PausedIcon, DeviceIcon } from "@/components/repair-icons";
+import { Clock3 } from "lucide-react";
+import { FounderIcon as UserRound } from "@/components/repair-icons";
+import { AutomationIcon as Bot, ActiveIcon as Check, LockedIcon as LockKeyhole, ReadyIcon as Power } from "@/components/repair-icons";
 import { getRepairOperatingCost, getRepairProgress } from "@/game/logic/game";
 import type { AutomationPriority, Employee, GameState, Workstation } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
@@ -87,7 +88,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
 
       {active ? (
         <div className="station-job">
-          <div className="station-device"><Wrench size={17} /><div><strong>{active.order.device}</strong><span>{active.order.issue}</span></div></div>
+          <div className="station-device"><DeviceIcon kind={active.order.device} size="sm"/><div><strong>{active.order.device}</strong><span>{active.order.issue}</span></div></div>
           <div className="station-job-meta"><span><Clock3 size={13} /> {completed ? "00:00" : formatClock(remaining)}</span><strong>Gewinn {formatMoney(projectedProfit)}</strong></div>
           <div className="station-progress"><span style={{ width: `${progress}%` }} /></div>
           <div className="station-modifiers"><span>{active.speedMultiplier.toFixed(2)}x Speed</span><span>Qualität {active.qualityRating}</span>{active.specializationBonus && <span className="bonus">Spezialbonus</span>}</div>

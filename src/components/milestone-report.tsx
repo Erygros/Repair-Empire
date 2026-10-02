@@ -1,4 +1,4 @@
-import { Flag, Trophy } from "lucide-react";
+import { MilestoneIcon as Flag, MilestoneAchievedIcon as Trophy } from "@/components/repair-icons";
 import { getMilestone } from "@/game/data/milestones";
 import type { GameState } from "@/game/types";
 import { formatMoney } from "@/utils/format";

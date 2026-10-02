@@ -1,4 +1,4 @@
-import { Gauge, ShoppingCart } from "lucide-react";
+import { EfficiencyIcon as Gauge, ShopIcon as ShoppingCart } from "@/components/repair-icons";
 import { ActiveIcon as Check, LockedIcon as LockKeyhole, ToolsIcon as Wrench } from "@/components/repair-icons";
 import { TOOLS, getTool } from "@/game/data/progression";
 import type { ToolId } from "@/game/types";

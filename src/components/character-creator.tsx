@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { UserRound } from "lucide-react";
+import { FounderIcon as UserRound } from "@/components/repair-icons";
 import { ActiveIcon as Check } from "@/components/repair-icons";
 import { CharacterRenderer } from "@/components/character-renderer";
 import { APPEARANCE_OPTIONS, DEFAULT_APPEARANCE } from "@/game/data/cosmetics";

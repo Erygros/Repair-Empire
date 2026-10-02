@@ -1,0 +1,721 @@
+{
+  "sources": [
+    {
+      "sheet": 1,
+      "width": 1983,
+      "height": 793
+    },
+    {
+      "sheet": 2,
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "sheet": 3,
+      "width": 1536,
+      "height": 1024
+    }
+  ],
+  "assets": [
+    {
+      "sheet": 1,
+      "category": "character",
+      "name": "founder-ceo",
+      "sourceRect": {
+        "left": 20,
+        "top": 24,
+        "width": 187,
+        "height": 202
+      },
+      "masterWidth": 181,
+      "masterHeight": 188,
+      "master": "/assets/masters/character/founder-ceo.png",
+      "ui": "/assets/icons/character/founder-ceo.png"
+    },
+    {
+      "sheet": 1,
+      "category": "character",
+      "name": "founder-ceo-active",
+      "sourceRect": {
+        "left": 207,
+        "top": 13,
+        "width": 199,
+        "height": 218
+      },
+      "masterWidth": 185,
+      "masterHeight": 192,
+      "master": "/assets/masters/character/founder-ceo-active.png",
+      "ui": "/assets/icons/character/founder-ceo-active.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "challenges",
+      "sourceRect": {
+        "left": 408,
+        "top": 23,
+        "width": 186,
+        "height": 212
+      },
+      "masterWidth": 169,
+      "masterHeight": 198,
+      "master": "/assets/masters/progression/challenges.png",
+      "ui": "/assets/icons/progression/challenges.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "challenges-active",
+      "sourceRect": {
+        "left": 594,
+        "top": 12,
+        "width": 199,
+        "height": 223
+      },
+      "masterWidth": 172,
+      "masterHeight": 201,
+      "master": "/assets/masters/progression/challenges-active.png",
+      "ui": "/assets/icons/progression/challenges-active.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "daily-tasks",
+      "sourceRect": {
+        "left": 800,
+        "top": 40,
+        "width": 177,
+        "height": 193
+      },
+      "masterWidth": 162,
+      "masterHeight": 184,
+      "master": "/assets/masters/progression/daily-tasks.png",
+      "ui": "/assets/icons/progression/daily-tasks.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "daily-tasks-active",
+      "sourceRect": {
+        "left": 982,
+        "top": 31,
+        "width": 171,
+        "height": 204
+      },
+      "masterWidth": 161,
+      "masterHeight": 184,
+      "master": "/assets/masters/progression/daily-tasks-active.png",
+      "ui": "/assets/icons/progression/daily-tasks-active.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "achievements",
+      "sourceRect": {
+        "left": 1155,
+        "top": 40,
+        "width": 179,
+        "height": 195
+      },
+      "masterWidth": 158,
+      "masterHeight": 183,
+      "master": "/assets/masters/progression/achievements.png",
+      "ui": "/assets/icons/progression/achievements.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "achievements-achieved",
+      "sourceRect": {
+        "left": 1335,
+        "top": 32,
+        "width": 193,
+        "height": 205
+      },
+      "masterWidth": 167,
+      "masterHeight": 186,
+      "master": "/assets/masters/progression/achievements-achieved.png",
+      "ui": "/assets/icons/progression/achievements-achieved.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "milestones",
+      "sourceRect": {
+        "left": 1538,
+        "top": 21,
+        "width": 220,
+        "height": 219
+      },
+      "masterWidth": 203,
+      "masterHeight": 206,
+      "master": "/assets/masters/progression/milestones.png",
+      "ui": "/assets/icons/progression/milestones.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "milestones-achieved",
+      "sourceRect": {
+        "left": 1758,
+        "top": 9,
+        "width": 223,
+        "height": 231
+      },
+      "masterWidth": 206,
+      "masterHeight": 214,
+      "master": "/assets/masters/progression/milestones-achieved.png",
+      "ui": "/assets/icons/progression/milestones-achieved.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "offline-progress",
+      "sourceRect": {
+        "left": 52,
+        "top": 295,
+        "width": 239,
+        "height": 192
+      },
+      "masterWidth": 230,
+      "masterHeight": 181,
+      "master": "/assets/masters/progression/offline-progress.png",
+      "ui": "/assets/icons/progression/offline-progress.png"
+    },
+    {
+      "sheet": 1,
+      "category": "progression",
+      "name": "offline-progress-results",
+      "sourceRect": {
+        "left": 291,
+        "top": 287,
+        "width": 223,
+        "height": 205
+      },
+      "masterWidth": 209,
+      "masterHeight": 181,
+      "master": "/assets/masters/progression/offline-progress-results.png",
+      "ui": "/assets/icons/progression/offline-progress-results.png"
+    },
+    {
+      "sheet": 1,
+      "category": "repair",
+      "name": "repair-history",
+      "sourceRect": {
+        "left": 542,
+        "top": 300,
+        "width": 180,
+        "height": 189
+      },
+      "masterWidth": 163,
+      "masterHeight": 180,
+      "master": "/assets/masters/repair/repair-history.png",
+      "ui": "/assets/icons/repair/repair-history.png"
+    },
+    {
+      "sheet": 1,
+      "category": "repair",
+      "name": "repair-history-active",
+      "sourceRect": {
+        "left": 744,
+        "top": 294,
+        "width": 179,
+        "height": 196
+      },
+      "masterWidth": 167,
+      "masterHeight": 182,
+      "master": "/assets/masters/repair/repair-history-active.png",
+      "ui": "/assets/icons/repair/repair-history-active.png"
+    },
+    {
+      "sheet": 1,
+      "category": "character",
+      "name": "wardrobe",
+      "sourceRect": {
+        "left": 951,
+        "top": 300,
+        "width": 221,
+        "height": 188
+      },
+      "masterWidth": 212,
+      "masterHeight": 181,
+      "master": "/assets/masters/character/wardrobe.png",
+      "ui": "/assets/icons/character/wardrobe.png"
+    },
+    {
+      "sheet": 1,
+      "category": "character",
+      "name": "wardrobe-selected",
+      "sourceRect": {
+        "left": 1172,
+        "top": 288,
+        "width": 239,
+        "height": 208
+      },
+      "masterWidth": 224,
+      "masterHeight": 183,
+      "master": "/assets/masters/character/wardrobe-selected.png",
+      "ui": "/assets/icons/character/wardrobe-selected.png"
+    },
+    {
+      "sheet": 1,
+      "category": "repair",
+      "name": "diagnostics-scanner",
+      "sourceRect": {
+        "left": 1440,
+        "top": 298,
+        "width": 222,
+        "height": 190
+      },
+      "masterWidth": 204,
+      "masterHeight": 178,
+      "master": "/assets/masters/repair/diagnostics-scanner.png",
+      "ui": "/assets/icons/repair/diagnostics-scanner.png"
+    },
+    {
+      "sheet": 1,
+      "category": "repair",
+      "name": "diagnostics-scanner-active",
+      "sourceRect": {
+        "left": 1662,
+        "top": 284,
+        "width": 257,
+        "height": 211
+      },
+      "masterWidth": 224,
+      "masterHeight": 178,
+      "master": "/assets/masters/repair/diagnostics-scanner-active.png",
+      "ui": "/assets/icons/repair/diagnostics-scanner-active.png"
+    },
+    {
+      "sheet": 1,
+      "category": "brand",
+      "name": "logo-full",
+      "sourceRect": {
+        "left": 152,
+        "top": 517,
+        "width": 1700,
+        "height": 276
+      },
+      "masterWidth": 1671,
+      "masterHeight": 262,
+      "master": "/assets/masters/brand/logo-full.png",
+      "ui": "/assets/brand/logo-full.png"
+    },
+    {
+      "sheet": 1,
+      "category": "brand",
+      "name": "mark",
+      "sourceRect": {
+        "left": 152,
+        "top": 517,
+        "width": 260,
+        "height": 276
+      },
+      "masterWidth": 249,
+      "masterHeight": 262,
+      "master": "/assets/masters/brand/mark.png",
+      "ui": "/assets/brand/mark.png"
+    },
+    {
+      "sheet": 2,
+      "category": "brand",
+      "name": "logo-compact",
+      "sourceRect": {
+        "left": 666,
+        "top": 809,
+        "width": 196,
+        "height": 180
+      },
+      "masterWidth": 184,
+      "masterHeight": 175,
+      "master": "/assets/masters/brand/logo-compact.png",
+      "ui": "/assets/brand/logo-compact.png"
+    },
+    {
+      "sheet": 2,
+      "category": "devices",
+      "name": "device-smartphone",
+      "sourceRect": {
+        "left": 54,
+        "top": 21,
+        "width": 126,
+        "height": 224
+      },
+      "masterWidth": 109,
+      "masterHeight": 214,
+      "master": "/assets/masters/devices/device-smartphone.png",
+      "ui": "/assets/icons/devices/device-smartphone.png"
+    },
+    {
+      "sheet": 2,
+      "category": "devices",
+      "name": "device-controller",
+      "sourceRect": {
+        "left": 182,
+        "top": 89,
+        "width": 218,
+        "height": 156
+      },
+      "masterWidth": 206,
+      "masterHeight": 144,
+      "master": "/assets/masters/devices/device-controller.png",
+      "ui": "/assets/icons/devices/device-controller.png"
+    },
+    {
+      "sheet": 2,
+      "category": "devices",
+      "name": "device-handheld",
+      "sourceRect": {
+        "left": 402,
+        "top": 98,
+        "width": 237,
+        "height": 151
+      },
+      "masterWidth": 221,
+      "masterHeight": 138,
+      "master": "/assets/masters/devices/device-handheld.png",
+      "ui": "/assets/icons/devices/device-handheld.png"
+    },
+    {
+      "sheet": 2,
+      "category": "devices",
+      "name": "device-console",
+      "sourceRect": {
+        "left": 641,
+        "top": 20,
+        "width": 218,
+        "height": 230
+      },
+      "masterWidth": 207,
+      "masterHeight": 221,
+      "master": "/assets/masters/devices/device-console.png",
+      "ui": "/assets/icons/devices/device-console.png"
+    },
+    {
+      "sheet": 2,
+      "category": "devices",
+      "name": "device-tablet",
+      "sourceRect": {
+        "left": 862,
+        "top": 36,
+        "width": 170,
+        "height": 212
+      },
+      "masterWidth": 157,
+      "masterHeight": 195,
+      "master": "/assets/masters/devices/device-tablet.png",
+      "ui": "/assets/icons/devices/device-tablet.png"
+    },
+    {
+      "sheet": 2,
+      "category": "devices",
+      "name": "device-laptop",
+      "sourceRect": {
+        "left": 1030,
+        "top": 47,
+        "width": 244,
+        "height": 207
+      },
+      "masterWidth": 233,
+      "masterHeight": 195,
+      "master": "/assets/masters/devices/device-laptop.png",
+      "ui": "/assets/icons/devices/device-laptop.png"
+    },
+    {
+      "sheet": 2,
+      "category": "devices",
+      "name": "device-audio",
+      "sourceRect": {
+        "left": 1280,
+        "top": 88,
+        "width": 247,
+        "height": 158
+      },
+      "masterWidth": 226,
+      "masterHeight": 141,
+      "master": "/assets/masters/devices/device-audio.png",
+      "ui": "/assets/icons/devices/device-audio.png"
+    },
+    {
+      "sheet": 2,
+      "category": "character",
+      "name": "cosmetic-unlock",
+      "sourceRect": {
+        "left": 232,
+        "top": 475,
+        "width": 212,
+        "height": 204
+      },
+      "masterWidth": 212,
+      "masterHeight": 194,
+      "master": "/assets/masters/character/cosmetic-unlock.png",
+      "ui": "/assets/icons/character/cosmetic-unlock.png"
+    },
+    {
+      "sheet": 2,
+      "category": "repair",
+      "name": "repair-speed",
+      "sourceRect": {
+        "left": 450,
+        "top": 487,
+        "width": 192,
+        "height": 194
+      },
+      "masterWidth": 180,
+      "masterHeight": 189,
+      "master": "/assets/masters/repair/repair-speed.png",
+      "ui": "/assets/icons/repair/repair-speed.png"
+    },
+    {
+      "sheet": 2,
+      "category": "employees",
+      "name": "technician-performance",
+      "sourceRect": {
+        "left": 648,
+        "top": 488,
+        "width": 208,
+        "height": 195
+      },
+      "masterWidth": 192,
+      "masterHeight": 187,
+      "master": "/assets/masters/employees/technician-performance.png",
+      "ui": "/assets/icons/employees/technician-performance.png"
+    },
+    {
+      "sheet": 2,
+      "category": "employees",
+      "name": "employee-specialization",
+      "sourceRect": {
+        "left": 861,
+        "top": 478,
+        "width": 214,
+        "height": 214
+      },
+      "masterWidth": 201,
+      "masterHeight": 204,
+      "master": "/assets/masters/employees/employee-specialization.png",
+      "ui": "/assets/icons/employees/employee-specialization.png"
+    },
+    {
+      "sheet": 2,
+      "category": "customers",
+      "name": "customer-loyalty",
+      "sourceRect": {
+        "left": 1077,
+        "top": 485,
+        "width": 210,
+        "height": 200
+      },
+      "masterWidth": 204,
+      "masterHeight": 186,
+      "master": "/assets/masters/customers/customer-loyalty.png",
+      "ui": "/assets/icons/customers/customer-loyalty.png"
+    },
+    {
+      "sheet": 2,
+      "category": "customers",
+      "name": "multi-device-order",
+      "sourceRect": {
+        "left": 1290,
+        "top": 476,
+        "width": 239,
+        "height": 211
+      },
+      "masterWidth": 219,
+      "masterHeight": 199,
+      "master": "/assets/masters/customers/multi-device-order.png",
+      "ui": "/assets/icons/customers/multi-device-order.png"
+    },
+    {
+      "sheet": 2,
+      "category": "finance",
+      "name": "transaction-receipt",
+      "sourceRect": {
+        "left": 25,
+        "top": 670,
+        "width": 202,
+        "height": 163
+      },
+      "masterWidth": 185,
+      "masterHeight": 154,
+      "master": "/assets/masters/finance/transaction-receipt.png",
+      "ui": "/assets/icons/finance/transaction-receipt.png"
+    },
+    {
+      "sheet": 3,
+      "category": "customers",
+      "name": "multi-device-order-completed",
+      "sourceRect": {
+        "left": 1322,
+        "top": 489,
+        "width": 213,
+        "height": 192
+      },
+      "masterWidth": 198,
+      "masterHeight": 183,
+      "master": "/assets/masters/customers/multi-device-order-completed.png",
+      "ui": "/assets/icons/customers/multi-device-order-completed.png"
+    },
+    {
+      "sheet": 3,
+      "category": "progression",
+      "name": "offline-progress-capacity",
+      "sourceRect": {
+        "left": 1300,
+        "top": 278,
+        "width": 235,
+        "height": 207
+      },
+      "masterWidth": 224,
+      "masterHeight": 202,
+      "master": "/assets/masters/progression/offline-progress-capacity.png",
+      "ui": "/assets/icons/progression/offline-progress-capacity.png"
+    },
+    {
+      "sheet": 3,
+      "category": "world",
+      "name": "location",
+      "sourceRect": {
+        "left": 203,
+        "top": 855,
+        "width": 164,
+        "height": 162
+      },
+      "masterWidth": 155,
+      "masterHeight": 140,
+      "master": "/assets/masters/world/location.png",
+      "ui": "/assets/icons/world/location.png"
+    },
+    {
+      "sheet": 3,
+      "category": "world",
+      "name": "world",
+      "sourceRect": {
+        "left": 372,
+        "top": 851,
+        "width": 164,
+        "height": 166
+      },
+      "masterWidth": 143,
+      "masterHeight": 147,
+      "master": "/assets/masters/world/world.png",
+      "ui": "/assets/icons/world/world.png"
+    },
+    {
+      "sheet": 3,
+      "category": "ui",
+      "name": "shop",
+      "sourceRect": {
+        "left": 536,
+        "top": 856,
+        "width": 160,
+        "height": 160
+      },
+      "masterWidth": 142,
+      "masterHeight": 125,
+      "master": "/assets/masters/ui/shop.png",
+      "ui": "/assets/icons/ui/shop.png"
+    },
+    {
+      "sheet": 3,
+      "category": "world",
+      "name": "winter-season",
+      "sourceRect": {
+        "left": 700,
+        "top": 850,
+        "width": 161,
+        "height": 166
+      },
+      "masterWidth": 128,
+      "masterHeight": 149,
+      "master": "/assets/masters/world/winter-season.png",
+      "ui": "/assets/icons/world/winter-season.png"
+    },
+    {
+      "sheet": 3,
+      "category": "ui",
+      "name": "events",
+      "sourceRect": {
+        "left": 866,
+        "top": 851,
+        "width": 185,
+        "height": 163
+      },
+      "masterWidth": 175,
+      "masterHeight": 135,
+      "master": "/assets/masters/ui/events.png",
+      "ui": "/assets/icons/ui/events.png"
+    },
+    {
+      "sheet": 3,
+      "category": "ui",
+      "name": "news",
+      "sourceRect": {
+        "left": 1051,
+        "top": 853,
+        "width": 182,
+        "height": 161
+      },
+      "masterWidth": 163,
+      "masterHeight": 139,
+      "master": "/assets/masters/ui/news.png",
+      "ui": "/assets/icons/ui/news.png"
+    },
+    {
+      "sheet": 3,
+      "category": "ui",
+      "name": "settings",
+      "sourceRect": {
+        "left": 1235,
+        "top": 852,
+        "width": 144,
+        "height": 163
+      },
+      "masterWidth": 131,
+      "masterHeight": 134,
+      "master": "/assets/masters/ui/settings.png",
+      "ui": "/assets/icons/ui/settings.png"
+    },
+    {
+      "sheet": 3,
+      "category": "ui",
+      "name": "info",
+      "sourceRect": {
+        "left": 1382,
+        "top": 852,
+        "width": 153,
+        "height": 161
+      },
+      "masterWidth": 128,
+      "masterHeight": 127,
+      "master": "/assets/masters/ui/info.png",
+      "ui": "/assets/icons/ui/info.png"
+    },
+    {
+      "sheet": 3,
+      "category": "ui",
+      "name": "warehouse",
+      "sourceRect": {
+        "left": 10,
+        "top": 866,
+        "width": 185,
+        "height": 145
+      },
+      "masterWidth": 172,
+      "masterHeight": 125,
+      "master": "/assets/masters/ui/warehouse.png",
+      "ui": "/assets/icons/ui/warehouse.png"
+    }
+  ],
+  "appResamples": {
+    "source": "mark",
+    "nativeSize": [
+      260,
+      276
+    ],
+    "upscaled": [
+      512
+    ]
+  }
+}

@@ -1,4 +1,5 @@
-import { History } from "lucide-react";
+import { HistoryIcon as History } from "@/components/repair-icons";
+import { DeviceIcon } from "@/components/repair-icons";
 import { ActiveIcon as CheckCircle2, ReputationIcon as ShieldPlus } from "@/components/repair-icons";
 import type { CompletedRepair } from "@/game/types";
 import { formatMoney, formatTime } from "@/utils/format";
@@ -24,7 +25,7 @@ export function RepairLog({ repairs }: { repairs: CompletedRepair[] }) {
         <div className="log-list">
           {repairs.slice(0, 6).map((repair) => (
             <article className="log-entry" key={`${repair.id}-${repair.completedAt}`}>
-              <CheckCircle2 size={18} />
+              <DeviceIcon kind={repair.device} size="sm"/>
               <div>
                 <strong>{repair.device}</strong>
                 <span>{repair.issue} · {formatTime(repair.completedAt)}</span>

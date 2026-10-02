@@ -9,10 +9,11 @@
 .game-rail button[aria-current=page] .repair-icon{outline:1px solid #dc8743;outline-offset:3px;border-radius:3px}
 .repair-icon-navigation{max-width:32px;max-height:32px}
 .campus-label>.repair-icon{margin-right:4px}.settings-trigger .repair-icon{width:24px!important;height:24px!important}.hall-status{display:inline-flex;align-items:center;gap:6px}.reset-save-button .repair-icon{margin-right:8px}
+.device-icon>.repair-icon{object-fit:contain}.challenge-icon{min-width:40px;min-height:40px;display:grid;place-items:center}.hall-progress ol>li>span{flex-shrink:0;min-width:24px}.effect-comparison>.repair-icon{flex-shrink:0;transform:rotate(90deg)}.founder-wardrobe h3>.repair-icon{width:32px!important;height:32px!important}
 .skill-select>button:not(.create3d){display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:12px;align-items:center}.skill-select>button>.repair-icon{grid-column:1;grid-row:1/4}.skill-select>button>strong,.skill-select>button>span,.skill-select>button>p{grid-column:2}.skill-select>button:hover{border-color:#ef8f3f}.skill-select>button.active{border-color:#f69e50;box-shadow:inset 3px 0 #ef8f3f}
 .founder-skill>.repair-icon{float:left;margin:0 12px 8px 0}
 .creator-brand{padding:16px 25px 0}.creator-brand .repair-brand-logo{width:174px;height:84px}
-.re-hero-content h1 .repair-brand-logo{width:min(100%,490px);height:auto;aspect-ratio:552/176}.re-hero-content h1{line-height:1;margin-bottom:18px}
+.re-hero-content h1 .repair-brand-logo{width:min(100%,650px);height:auto;aspect-ratio:1700/276}.re-hero-content h1{line-height:1;margin-bottom:18px}
 .website-mobile-menu .repair-icon,.website-v2 .public-header nav .repair-icon{margin-right:7px}.website-v2 .public-header nav a{display:inline-flex;align-items:center}
 .website-v2 footer .repair-brand-logo{width:180px;height:58px}
 .resource-readout{display:inline-flex;align-items:center;gap:6px}.resource-readout .repair-icon{vertical-align:middle}.company-level .repair-icon{margin-right:6px}.level-xp .repair-icon{margin-right:6px}

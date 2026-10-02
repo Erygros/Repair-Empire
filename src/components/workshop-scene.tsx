@@ -1,7 +1,7 @@
 "use client";
 import { memo, useEffect, useState } from "react";
 import { Focus, Minus, Plus } from "lucide-react";
-import { WorkingIcon, ActiveIcon, ReadyIcon } from "@/components/repair-icons";
+import { WorkingIcon, ActiveIcon, ReadyIcon, DiagnosticsIcon, DiagnosticsActiveIcon } from "@/components/repair-icons";
 import { ActiveIcon as Check, WorkshopNavIcon as Wrench } from "@/components/repair-icons";
 import { WorkshopFloor3D } from "@/components/workshop-floor-3d";
 import { getWorkshopStep, getWorkshopIdleSpeech, WORKSHOP_STEPS } from "@/components/workshop-animation";
@@ -21,7 +21,7 @@ function WorkshopSceneComponent({ state, now, selectedId, onSelect, motion = "AU
     <header><div><p className="panel-label">REPAIR EMPIRE / {working} AKTIV</p><h3>Produktionshalle</h3></div><span className="hall-status">{working ? <WorkingIcon/> : pending ? <ActiveIcon/> : <ReadyIcon/>}{working ? "In Arbeit" : pending ? "Abnahme bereit" : "Bereit"}</span></header>
     <div className="hall-station-tabs" role="group" aria-label="Arbeitsplätze">{stations.map(s=><button key={s.id} aria-pressed={s.id===selectedId} onClick={()=>onSelect(s.id)}><Wrench size={14}/><span>WS-{String(s.index).padStart(2,"0")}</span><small>{s.status==="completed"?"Fertig":s.activeRepair?"In Arbeit":"Bereit"}</small></button>)}</div>
     <div className="hall-stage"><WorkshopFloor3D state={state} now={now} selectedId={selectedId} onSelect={onSelect} reduced={motion==="REDUCED"||(motion==="AUTO"&&systemReduced)} mobile={mobile} reset={reset} zoom={zoom} speech={working ? null : speech}/><div className="hall-camera" role="group" aria-label="Werkstattkamera"><button title="Vergrößern" aria-label="Werkstatt vergrößern" onClick={()=>setZoom(v=>Math.min(2,v+1))}><Plus size={17}/></button><button title="Verkleinern" aria-label="Werkstatt verkleinern" onClick={()=>setZoom(v=>Math.max(-1,v-1))}><Minus size={17}/></button><button title="Ansicht zurücksetzen" aria-label="Werkstatt zentrieren" onClick={()=>{setZoom(0);setReset(v=>v+1)}}><Focus size={17}/></button></div></div>
-    <footer className="hall-progress"><div className="hall-job"><span>{selected?.activeRepair?.order.device??"Kein Auftrag"}</span><strong>{selected?.activeRepair ? `${Math.floor(progress)} %` : "Wartet auf Arbeit"}</strong></div><ol aria-label="Reparaturfortschritt">{WORKSHOP_STEPS.map((label,i)=><li key={label} className={step===i?"current":progress>=(i+1)*25?"done":""} aria-current={step===i?"step":undefined}><span>{progress>=(i+1)*25?<Check size={13}/>:String(i+1).padStart(2,"0")}</span><div><strong>{label}</strong><small>{(i+1)*25} %</small></div></li>)}</ol></footer>
+    <footer className="hall-progress"><div className="hall-job"><span>{selected?.activeRepair?.order.device??"Kein Auftrag"}</span><strong>{selected?.activeRepair ? `${Math.floor(progress)} %` : "Wartet auf Arbeit"}</strong></div><ol aria-label="Reparaturfortschritt">{WORKSHOP_STEPS.map((label,i)=><li key={label} className={step===i?"current":progress>=(i+1)*25?"done":""} aria-current={step===i?"step":undefined}><span>{i===0 ? step===0 ? <DiagnosticsActiveIcon size="sm"/> : <DiagnosticsIcon size="sm"/> : progress>=(i+1)*25?<Check size={13}/>:String(i+1).padStart(2,"0")}</span><div><strong>{label}</strong><small>{(i+1)*25} %</small></div></li>)}</ol></footer>
   </section>;
 }
 export const WorkshopScene = memo(WorkshopSceneComponent);

@@ -1,4 +1,4 @@
-import { Flag } from "lucide-react";
+import { MilestoneIcon as Flag } from "@/components/repair-icons";
 import { ResearchIcon as FlaskConical, XpIcon, CompanyLevelIcon } from "@/components/repair-icons";
 import { getNextMilestone } from "@/game/data/milestones";
 import { getCompanyLevelProgress } from "@/game/data/progression";

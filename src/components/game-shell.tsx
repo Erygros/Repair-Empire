@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
-import { BrandLogo, InfoIcon, LevelUpIcon } from "@/components/repair-icons";
-import { Target, UserRound } from "lucide-react";
+import { BrandLogo, InfoIcon, LevelUpIcon, FounderActiveIcon, ChallengeActiveIcon } from "@/components/repair-icons";
+import { ChallengeIcon as Target, FounderIcon as UserRound } from "@/components/repair-icons";
 import { CompanyLevelIcon as Activity, CapitalIcon as Banknote, CompanyNavIcon as Building2, ResearchNavIcon as FlaskConical, ToolsNavIcon as PackageOpen, ReputationIcon as ShieldCheck, UpgradeIcon as SlidersHorizontal, TeamNavIcon as UsersRound, FinanceNavIcon as Wallet, WorkshopNavIcon as Wrench, CustomersNavIcon as Handshake } from "@/components/repair-icons";
 import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
@@ -109,7 +109,7 @@ export function GameShell() {
       </header>
 
       <div className="game-workspace">
-      <nav className="game-rail" aria-label="Spielbereiche">{NAV_ITEMS.map(item => { const Icon = item.icon; return <button key={item.view} aria-current={view === item.view ? "page" : undefined} onClick={() => navigate(item.view)}><Icon size={19}/><span>{item.label}</span></button>; })}</nav>
+      <nav className="game-rail" aria-label="Spielbereiche">{NAV_ITEMS.map(item => { const Icon = view===item.view&&item.view==="profile"?FounderActiveIcon:view===item.view&&item.view==="challenges"?ChallengeActiveIcon:item.icon; return <button key={item.view} aria-current={view === item.view ? "page" : undefined} onClick={() => navigate(item.view)}><Icon size={24}/><span>{item.label}</span></button>; })}</nav>
       <div className="game-content">
       {(view === "challenges" || view === "upgrades") && <header className="game-view-title"><p className="panel-label">DEIN UNTERNEHMEN</p><h2>{view === "challenges" ? "Aufgaben" : "Upgrades"}</h2></header>}
       {view === "company" && <CompanyMap state={state} onOpenBuilding={openBuilding} onOpenProfile={openProfile} motion={settings.motion} />}

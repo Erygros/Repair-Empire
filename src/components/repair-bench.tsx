@@ -1,5 +1,6 @@
-import { Clock3, Gauge } from "lucide-react";
-import { ActiveIcon as Check, TechnologyIcon as CircuitBoard, TechnologyIcon as Cpu, RepairsIcon as Wrench } from "@/components/repair-icons";
+import { Clock3 } from "lucide-react";
+import { EfficiencyIcon as Gauge } from "@/components/repair-icons";
+import { ActiveIcon as Check, TechnologyIcon as CircuitBoard, DiagnosticsIcon, DiagnosticsActiveIcon, DeviceIcon, RepairsIcon as Wrench } from "@/components/repair-icons";
 import type { ActiveRepair } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
 
@@ -30,7 +31,7 @@ export function RepairBench({ activeRepair, now, progress, onComplete }: RepairB
         <div className="scanner-corners" aria-hidden="true" />
         <div className="scope" style={{ "--progress": `${progress * 3.6}deg` } as React.CSSProperties}>
           <div className="scope-inner">
-            {activeRepair ? <Cpu size={38} strokeWidth={1.4} /> : <Wrench size={34} strokeWidth={1.4} />}
+            {activeRepair ? <DeviceIcon kind={activeRepair.order.device} size="lg"/> : <Wrench size={34} strokeWidth={1.4} />}
             <strong>{activeRepair ? `${Math.floor(progress)}%` : "01"}</strong>
             <span>{activeRepair ? (isReady ? "FERTIG" : "PROZESS") : "BEREIT"}</span>
           </div>
@@ -53,7 +54,7 @@ export function RepairBench({ activeRepair, now, progress, onComplete }: RepairB
           </div>
 
           <div className="diagnostic-row">
-            <span><CircuitBoard size={15} /> {activeRepair.order.diagnostic}</span>
+            <span>{isReady ? <DiagnosticsIcon size="sm"/> : <DiagnosticsActiveIcon size="sm"/>} {activeRepair.order.diagnostic}</span>
             <span><Clock3 size={15} /> {isReady ? "00:00" : formatClock(remaining)}</span>
           </div>
 

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { ScanLine } from "lucide-react";
+import { DiagnosticsIcon as ScanLine } from "@/components/repair-icons";
 import { ActiveIcon as Check, TechnologyIcon as CircuitBoard, ResearchIcon as FlaskConical, AutomationIcon as Workflow } from "@/components/repair-icons";
 
 const ART = {

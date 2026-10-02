@@ -1,5 +1,9 @@
 # Prompt 11.7: Brand- und Icon-Inventur
 
+Historischer Stand. Die damals fehlenden zentralen Motive wurden in Prompt 11.8
+erganzt; aktueller Bestand und Aufloesungsgrenzen: [extended-assets.md](extended-assets.md).
+Auch extraction.json dokumentiert nur die erste Extraktion, nicht die ersetzten Logos.
+
 ## Integration
 
 Das bereitgestellte 1536 x 1024 Raster-Sheet ist die einzige neue Bildquelle.

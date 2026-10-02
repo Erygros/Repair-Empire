@@ -1,4 +1,4 @@
-import { ReceiptText } from "lucide-react";
+import { ReceiptIcon as ReceiptText } from "@/components/repair-icons";
 import { CapitalIcon, RepairsIcon } from "@/components/repair-icons";
 import type { GameState, RepairCategory } from "@/game/types";
 import { formatMoney, formatTime } from "@/utils/format";

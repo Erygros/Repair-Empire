@@ -1,4 +1,4 @@
-import { ActiveIcon as Check, ResearchIcon as FlaskConical, ResearchStatusIcon, LockedIcon as LockKeyhole } from "@/components/repair-icons";
+import { ActiveIcon as Check, ResearchIcon as FlaskConical, ResearchStatusIcon, DiagnosticsIcon, LockedIcon as LockKeyhole } from "@/components/repair-icons";
 import { RESEARCH_NODES } from "@/game/data/progression";
 import type { GameState, ResearchCategory, ResearchId } from "@/game/types";
 
@@ -19,7 +19,7 @@ export function ResearchLab({ state, onResearch }: { state: GameState; onResearc
               const affordable = state.researchPoints >= node.cost;
               return (
                 <article className={`research-node ${researched ? "researched" : prerequisites && levelReady ? "available" : "locked"}`} key={node.id}>
-                  <div className="research-node-icon">{researched ? <Check size={18} /> : prerequisites && levelReady ? <ResearchStatusIcon size="sm" /> : <LockKeyhole size={17} />}</div>
+                  <div className="research-node-icon">{researched ? <Check size={18} /> : prerequisites && levelReady ? category==="Diagnostics" ? <DiagnosticsIcon size="sm"/> : <ResearchStatusIcon size="sm" /> : <LockKeyhole size={17} />}</div>
                   <span className="research-cost">{node.cost} FP</span>
                   <h5>{node.name}</h5><p>{node.description}</p><strong>{node.effect}</strong>
                   <small>Level {node.requiredLevel}{node.requires.length > 0 ? ` · ${node.requires.map((id) => RESEARCH_NODES.find((item) => item.id === id)?.name).join(", ")}` : ""}</small>

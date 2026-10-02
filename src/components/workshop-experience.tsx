@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Clock3, UserRound } from "lucide-react";
-import { AutomationIcon as Bot, ActiveIcon as Check, ContractsIcon as ListChecks, SettingsIcon as Settings2 } from "@/components/repair-icons";
+import { Clock3 } from "lucide-react";
+import { FounderIcon as UserRound } from "@/components/repair-icons";
+import { AutomationIcon as Bot, HistoryIcon, HistoryActiveIcon, ContractsIcon as ListChecks, SettingsIcon as Settings2 } from "@/components/repair-icons";
 import { OrderBoard } from "@/components/order-board";
 import { RepairLog } from "@/components/repair-log";
 import { WorkshopScene } from "@/components/workshop-scene";
@@ -25,7 +26,7 @@ export function WorkshopExperience({ state, now, onAccept, onPurchase, onComplet
   return <div className="workshop-experience workshop-industrial">
     <WorkshopScene state={state} now={now} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); setPanel("STATION"); }} motion={motion} />
     <aside className="workshop-control-panel">
-      <nav aria-label="Werkstattsteuerung"><button className={panel === "JOBS" ? "active" : ""} onClick={() => setPanel("JOBS")}><ListChecks size={16} />Aufträge</button><button className={panel === "STATION" ? "active" : ""} onClick={() => setPanel("STATION")}><Settings2 size={16} />Station</button><button className={panel === "LOG" ? "active" : ""} onClick={() => setPanel("LOG")}><Check size={16} />Verlauf</button></nav>
+      <nav aria-label="Werkstattsteuerung"><button className={panel === "JOBS" ? "active" : ""} onClick={() => setPanel("JOBS")}><ListChecks size={16} />Aufträge</button><button className={panel === "STATION" ? "active" : ""} onClick={() => setPanel("STATION")}><Settings2 size={16} />Station</button><button className={panel === "LOG" ? "active" : ""} onClick={() => setPanel("LOG")}>{panel==="LOG"?<HistoryActiveIcon size="sm"/>:<HistoryIcon size="sm"/>}Verlauf</button></nav>
       {panel === "JOBS" && <OrderBoard orders={state.availableOrders} money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} upgrades={state.upgrades} researchedNodes={state.researchedNodes} now={now} onAccept={id => { const assigned = onAccept(id); if (assigned) { setSelectedId(assigned); setPanel("STATION"); } }} />}
       {panel === "STATION" && station && <section className="station-focus panel"><div className="panel-header"><div><p className="panel-label">ARBEITSPLATZ {String(station.index).padStart(2, "0")}</p><h3>{active?.order.device ?? (station.status === "locked" ? "Ausbaufläche" : "Bereit")}</h3></div><span className={`state-chip ${station.status}`}>{station.status}</span></div>
         {active ? <><h4>{active.order.issue}</h4><p>{active.order.customer} · {active.order.id}</p><div className="focus-metrics"><span><Clock3 size={14} />{formatClock(active.endsAt - now)}</span><span><UserRound size={14} />{employee?.name ?? state.playerCharacter?.displayName ?? "Founder"}</span><span><Bot size={14} />{station.automationEnabled ? "Auto" : "Manuell"}</span><strong>{formatMoney(profit)} Gewinn</strong></div><div className="station-progress"><span style={{ width: `${progress}%` }} /></div>{!station.automationEnabled && <button className="station-complete" disabled={progress < 100} onClick={() => onComplete(station.id)}>{progress >= 100 ? "Reparatur abnehmen" : `${Math.floor(progress)} % abgeschlossen`}</button>}</> : <p className="focus-empty">{station.status === "locked" ? "Voraussetzungen und Kaufoptionen findest du in der Stationsverwaltung." : "Wähle einen passenden Auftrag. Das Gerät erscheint danach direkt an dieser Werkbank."}</p>}

@@ -1,5 +1,5 @@
-import { PackageCheck, Repeat2 } from "lucide-react";
-import { ContractsIcon as BriefcaseBusiness, BuildingsIcon as Building2, ActiveIcon as Check, EmployeesIcon as UsersRound } from "@/components/repair-icons";
+import { MultiDeviceIcon as PackageCheck, LoyaltyIcon as Repeat2 } from "@/components/repair-icons";
+import { ContractsIcon as BriefcaseBusiness, LoyaltyIcon as Building2, ActiveIcon as Check, LoyaltyIcon as UsersRound, MultiDeviceCompletedIcon } from "@/components/repair-icons";
 import { CUSTOMER_TYPE_CONFIG } from "@/game/data/customers";
 import { getActiveContractLimit } from "@/game/logic/contracts";
 import type { GameState } from "@/game/types";
@@ -31,7 +31,7 @@ export function CustomerCenter({ state, now, onAcceptContract, onClaimContract, 
 
       <section className="panel multi-orders">
         <div className="panel-header"><div><p className="panel-label">SERIENAUFTRÄGE // PIPELINE</p><h3>Mehrgeräte-Aufträge</h3></div><PackageCheck size={19} /></div>
-        {state.multiDeviceOrders.slice(0, 8).map((order) => <article key={order.orderId}><div><span>{order.orderId} · {order.customerName}</span><strong>{order.completedItems}/{order.totalItems} Geräte</strong></div><i><b style={{ width: `${order.completedItems / order.totalItems * 100}%` }} /></i><small>{formatMoney(order.totalRevenue)} Umsatz · {formatMoney(order.estimatedTotalMaterialCost)} Material</small></article>)}
+        {state.multiDeviceOrders.slice(0, 8).map((order) => <article key={order.orderId}><div><span className="resource-readout">{order.status==="completed"?<MultiDeviceCompletedIcon size="sm"/>:<PackageCheck size="sm"/>}{order.orderId} · {order.customerName}</span><strong>{order.completedItems}/{order.totalItems} Geräte</strong></div><i><b style={{ width: `${order.completedItems / order.totalItems * 100}%` }} /></i><small>{formatMoney(order.totalRevenue)} Umsatz · {formatMoney(order.estimatedTotalMaterialCost)} Material</small></article>)}
         {state.multiDeviceOrders.length === 0 && <p className="empty-state">Serienaufträge werden bei geeigneten Geschäftskunden gestartet.</p>}
       </section>
     </div>

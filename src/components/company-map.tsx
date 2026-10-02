@@ -1,6 +1,7 @@
 "use client";
 import { memo, useEffect, useRef, useState } from "react";
-import { ArrowRight, Focus, LocateFixed, Minus, Plus, UserRound, X } from "lucide-react";
+import { ArrowRight, Focus, LocateFixed, Minus, Plus, X } from "lucide-react";
+import { FounderIcon as UserRound } from "@/components/repair-icons";
 import { CampusScene3D, CAMPUS_NAMES } from "@/components/campus-scene-3d";
 import { getBuildingLevelDefinition, getBuildingState } from "@/game/data/buildings";
 import { getBuildingUpgradeCheck } from "@/game/logic/buildings";

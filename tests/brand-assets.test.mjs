@@ -9,8 +9,8 @@ const loaded={exports:{}};runInThisContext(`(function(exports){${compiled}})`)(l
 const {BRAND_ASSETS,ICON_SIZES}=loaded.exports;
 test("all registered assets exist locally and raster exports decode",async()=>{
   for(const group of Object.values(BRAND_ASSETS))for(const value of Object.values(group)){
-    assert(value.startsWith("/assets/"));const file="public"+value;assert(statSync(file).size<300000);
-    if(value.endsWith(".png")){const metadata=await sharp(file).metadata();assert.equal(metadata.format,"png");assert(metadata.hasAlpha);assert(metadata.width<=552);assert(metadata.height<=512);}
+    assert(value.startsWith("/assets/"));const file="public"+value;assert(statSync(file).size<1000000);
+    if(value.endsWith(".png")){const metadata=await sharp(file).metadata();assert.equal(metadata.format,"png");assert(metadata.hasAlpha);assert(metadata.width<=1700);assert(metadata.height<=512);}
   }
 });
 test("founder skills match the five existing choices only",()=>{
@@ -23,5 +23,10 @@ test("favicon contains two correctly sized PNG entries",async()=>{
 });
 test("app sizes are valid exports with disclosed resampling",async()=>{
   for(const size of [16,32,180,192,512]){const meta=await sharp(`public/assets/brand/icon-${size}.png`).metadata();assert.equal(meta.width,size);assert.equal(meta.height,size);}
-  const inventory=JSON.parse(readFileSync("public/assets/brand/extraction.json","utf8"));assert.equal(inventory.assets.length,53);assert.deepEqual(inventory.resampledAppSizes,[16,32,180,192,512]);
+  const inventory=JSON.parse(readFileSync("public/assets/extended-inventory.json","utf8"));assert.equal(inventory.assets.length,46);assert.deepEqual(inventory.appResamples.upscaled,[512]);
+});
+test("extended assets cover all sheets, retain native masters and have transparent margins",async()=>{
+ const inventory=JSON.parse(readFileSync("public/assets/extended-inventory.json","utf8"));assert.deepEqual([...new Set(inventory.assets.map(a=>a.sheet))].sort(),[1,2,3]);
+ for(const a of inventory.assets){const m=await sharp("public"+a.master).metadata(),ui=await sharp("public"+a.ui).metadata();assert.equal(m.width,a.masterWidth);assert.equal(m.height,a.masterHeight);assert(ui.width<=m.width&&ui.height<=m.height);if(a.category!=="brand"){assert(ui.width<=128&&ui.height<=128);assert(statSync("public"+a.ui).size<70000);}const {data}=await sharp("public"+a.ui).ensureAlpha().raw().toBuffer({resolveWithObject:true});assert(data.some((v,i)=>i%4===3&&v===0),a.name+" transparent background");}
+ assert.equal(Object.keys(BRAND_ASSETS.devices).length,7);
 });

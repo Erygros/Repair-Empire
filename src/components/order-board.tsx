@@ -1,22 +1,12 @@
-import { PremiumIcon } from "@/components/repair-icons";
-import { ArrowRight, CircuitBoard, Clock3, Gamepad2, Laptop, MonitorSmartphone, Radio, Smartphone, Tablet } from "lucide-react";
+import { PremiumIcon, DeviceIcon } from "@/components/repair-icons";
+import { ArrowRight, Clock3 } from "lucide-react";
 import { LockedIcon as LockKeyhole, CapitalIcon as WalletCards } from "@/components/repair-icons";
 import { DIFFICULTY_LABELS } from "@/game/data/orders";
 import { getTool } from "@/game/data/progression";
 import { canAccessOrder, getJobEconomy } from "@/game/logic/game";
-import type { DeviceKind, RepairOrder, ResearchId, ToolId, UpgradeLevels } from "@/game/types";
+import type { RepairOrder, ResearchId, ToolId, UpgradeLevels } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
 import { CUSTOMER_TYPE_CONFIG } from "@/game/data/customers";
-
-const DEVICE_ICONS: Record<DeviceKind, typeof Smartphone> = {
-  Smartphone,
-  Controller: Gamepad2,
-  Handheld: MonitorSmartphone,
-  "Game Console": CircuitBoard,
-  Tablet,
-  Laptop,
-  "Audio Deck": Radio,
-};
 
 interface OrderBoardProps {
   orders: RepairOrder[];
@@ -42,7 +32,6 @@ export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, re
 
       <div className="order-list">
         {orders.map((order) => {
-          const DeviceIcon = DEVICE_ICONS[order.device];
           const accessible = canAccessOrder(order, { ownedTools, reputation, upgrades, companyLevel: 1, researchedNodes });
           const enoughMoney = money >= order.materialCost;
           const missingTool = !ownedTools.includes(order.requiredTool);
@@ -59,7 +48,7 @@ export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, re
 
           return (
             <article className={`order-row variant-${order.variant} ${locked ? "is-locked" : ""}`} key={order.id}>
-              <div className="device-icon" aria-hidden="true">{locked ? <LockKeyhole size={19} /> : <DeviceIcon size={21} />}</div>
+              <div className="device-icon" aria-hidden="true"><DeviceIcon kind={order.device} size="md"/></div>
               <div className="order-main">
                 <div className="order-meta">
                   <span>{order.id}</span>

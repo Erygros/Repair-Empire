@@ -1,4 +1,6 @@
-import { Clock3, X } from "lucide-react";
+import { X } from "lucide-react";
+import { OfflineIcon as Clock3 } from "@/components/repair-icons";
+import { OfflineResultsIcon, OfflineCapacityIcon } from "@/components/repair-icons";
 import { ErrorIcon as AlertTriangle, CapitalIcon as Coins, CapitalIcon as TrendingUp, ReputationIcon, XpIcon, CompanyLevelIcon, ResearchIcon, LevelUpIcon } from "@/components/repair-icons";
 import type { OfflineSummary } from "@/game/types";
 import { formatMoney } from "@/utils/format";
@@ -14,7 +16,7 @@ export function OfflineReport({ summary, onClose }: { summary: OfflineSummary; o
     <div className="dock-backdrop">
       <section className="offline-report" role="dialog" aria-modal="true" aria-labelledby="offline-title">
         <button className="offline-close" onClick={onClose} aria-label="Zusammenfassung schließen"><X size={18} /></button>
-        <Clock3 size={28} />
+        {summary.capacityReached?<OfflineCapacityIcon size="xl"/>:summary.completedRepairs>0?<OfflineResultsIcon size="xl"/>:<Clock3 size="xl"/>}
         <p className="panel-label">BETRIEBSPROTOKOLL</p>
         <h3 id="offline-title">Willkommen zurück</h3>
         <p>Dein automatisiertes Team hat während deiner Abwesenheit weitergearbeitet.</p>
