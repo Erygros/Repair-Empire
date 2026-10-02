@@ -26,6 +26,9 @@ Ein spielbarer Werkstatt-Tycoon mit Next.js, TypeScript und Tailwind CSS.
 
 ```bash
 npm install
+npm run db:local
+# In einem zweiten Terminal:
+npm run db:migrate
 npm run dev
 ```
 
@@ -39,5 +42,9 @@ npm run lint
 npm run build
 ```
 
-Der Spielstand wird lokal im Browser gespeichert. Eine Datenbank oder ein Account
-ist für diesen ersten Stand nicht erforderlich.
+Der Spielstand wird weiterhin lokal im Browser gespeichert. Accounts, Sessions,
+Character und Company-Metadaten liegen in PostgreSQL. Spielen und Character-Erstellung
+setzen eine gültige Session voraus; es gibt keinen Fake-Auth-Fallback.
+
+Die lokale DB läuft als eigener Prozess. Setup, Vercel-Variablen, Migrationen
+und Auth-Tests sind in [docs/account-service.md](docs/account-service.md) dokumentiert.

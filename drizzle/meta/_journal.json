@@ -8,6 +8,13 @@
       "when": 1790873955553,
       "tag": "0000_spooky_red_wolf",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790927261187,
+      "tag": "0001_sloppy_magdalene",
+      "breakpoints": true
     }
   ]
 }

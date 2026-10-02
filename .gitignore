@@ -8,6 +8,7 @@ out
 !.env.example
 .DS_Store
 Thumbs.db
+.local/
 next-env.d.ts
 
 
