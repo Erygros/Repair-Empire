@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useMemo } from "react";
-import { DataTexture, RepeatWrapping, RGBAFormat, SRGBColorSpace } from "three";
+import { useEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { DataTexture, RepeatWrapping, RGBAFormat, SRGBColorSpace, type Group, type Object3D } from "three";
+import { getCampusWalkPose } from "@/components/campus-walk";
 import { FounderAvatar, type Character3DAppearance } from "@/components/character-3d";
 import type { BuildingType, PlayerCharacter } from "@/game/types";
 
@@ -93,7 +95,12 @@ export function BuildingArt({ id, w, d, tier, selected, hovered }: { id: Buildin
   </group>;
 }
 function Lamp({ x, z }: { x: number; z: number }) {
-  return <group position={[x, .12, z]}><ArtBox position={[0, 1.35, 0]} size={[.055, 2.7, .055]} color="#7c8b8c" metal={.6}/><ArtBox position={[.2, 2.67, 0]} size={[.45, .08, .16]} color="#59676a"/><ArtBox position={[.2, 2.62, 0]} size={[.32, .025, .13]} color="#f2c38b" glow={.6}/></group>;
+  const pool = useMemo(() => { const pixels = new Uint8Array(32 * 32 * 4); for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) { const radius = Math.hypot((x - 15.5) / 15.5, (y - 15.5) / 15.5); pixels.set([255, 207, 133, Math.round(Math.max(0, 1 - radius) ** 2 * 255)], (y * 32 + x) * 4); } const texture = new DataTexture(pixels, 32, 32, RGBAFormat); texture.colorSpace = SRGBColorSpace; texture.needsUpdate = true; return texture; }, []);
+  useEffect(() => () => pool.dispose(), [pool]);
+  return <group name="campus-streetlamp" position={[x, .12, z]}><ArtBox position={[0, 1.35, 0]} size={[.055, 2.7, .055]} color="#7c8b8c" metal={.6}/><ArtBox position={[.2, 2.67, 0]} size={[.45, .08, .16]} color="#59676a"/><ArtBox position={[.2, 2.62, 0]} size={[.32, .025, .13]} color="#ffe0a3" glow={2}/>
+    <pointLight position={[.2, 2.55, 0]} color="#ffd295" intensity={12} distance={5} decay={2}/>
+    <mesh position={[.2, .025, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[3, 3]}/><meshBasicMaterial map={pool} transparent opacity={.28} depthWrite={false}/></mesh>
+  </group>;
 }
 function Vehicle({ x, z, van = false }: { x: number; z: number; van?: boolean }) {
   return <group name={van ? "company-van" : "visitor-car"} position={[x, .14, z]}><ArtBox position={[0, .48, 0]} size={[van ? 1.65 : 1.45, van ? .72 : .4, .75]} color={van ? "#9aa49e" : "#57707c"} metal={.45}/><ArtBox position={[.3, .77, 0]} size={[.6, .28, .65]} color="#263e47"/><ArtBox position={[0, .52, .38]} size={[.6, .1, .02]} color="#c98143"/>{[-1, 1].flatMap(side => [-.5, .5].map(x => <mesh key={`${side}-${x}`} position={[x, .19, side * .4]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[.2, .2, .09, 12]}/><meshStandardMaterial color="#20272b"/></mesh>))}</group>;
@@ -105,8 +112,6 @@ export function CampusGround({ mobile }: { mobile: boolean }) {
     <ArtBox position={[0, -.2, 0]} size={[29, .5, 18]} color="#353d40"/>
     <mesh position={[0, .065, 0]} receiveShadow><boxGeometry args={[26.7, .05, 15.3]}/><meshStandardMaterial color="#677171" map={grain} roughness={.95}/></mesh>
     <ArtBox position={[0, .1, 7.6]} size={[29, .04, 1.5]} color="#282f33"/>
-    <ArtBox position={[-3.8, .11, 2.65]} size={[14, .04, 1.15]} color="#394348"/><ArtBox position={[3.8, .11, 0]} size={[1.1, .04, 14.5]} color="#394348"/>
-    <ArtBox position={[0, .135, 6.62]} size={[28.5, .08, .32]} color="#8b918c"/>
     {Array.from({ length: 15 }, (_, i) => <ArtBox key={i} position={[-13 + i * 1.8, .135, 7.6]} size={[.7, .025, .045]} color="#afb8b4"/>)}
     {Array.from({ length: 6 }, (_, i) => <ArtBox key={i} position={[-10.5 + i * 1.3, .14, 4.6]} size={[.035, .025, 1.65]} color="#959e99"/>)}
     <ArtBox position={[-6.6, .11, -.35]} size={[3.4, .04, 1.5]} color="#3d474b"/>
@@ -126,12 +131,34 @@ export function CampusGround({ mobile }: { mobile: boolean }) {
     {[-2.2, 2.2].map(x => <ArtBox key={x} position={[x, .36, 1.95]} size={[.09, .6, .09]} color="#b5864e"/>)}
   </group>;
 }
-export function MapFounder({ character, onOpen }: { character: PlayerCharacter; onOpen: () => void }) {
+export function MapFounder({ character, onOpen, reduced }: { character: PlayerCharacter; onOpen: () => void; reduced: boolean }) {
+  const walker = useRef<Group>(null), body = useRef<Group>(null), elapsed = useRef(0);
+  const limbs = useRef<{ leftArm?: Object3D; rightArm?: Object3D; leftLeg?: Object3D; rightLeg?: Object3D }>({});
+  useEffect(() => {
+    const model = body.current; if (!model) return;
+    limbs.current = { leftArm: model.getObjectByName("arm--1"), rightArm: model.getObjectByName("arm-1"), leftLeg: model.getObjectByName("trouser-leg--1")?.parent ?? undefined, rightLeg: model.getObjectByName("trouser-leg-1")?.parent ?? undefined };
+    // Pivot the map instance's legs at the hips without changing the creator model.
+    const legs = [limbs.current.leftLeg, limbs.current.rightLeg].filter((leg): leg is Object3D => !!leg);
+    for (const leg of legs) { leg.position.y += 1.35; for (const child of leg.children) child.position.y -= 1.35; }
+    return () => { for (const leg of legs) { leg.position.y -= 1.35; for (const child of leg.children) child.position.y += 1.35; } };
+  }, []);
+  useFrame((_, delta) => {
+    if (!walker.current || !body.current) return;
+    if (!reduced) elapsed.current += Math.min(delta, .05);
+    const pose = getCampusWalkPose(reduced ? 0 : elapsed.current), stride = reduced ? 0 : pose.stride * .34;
+    walker.current.position.x = pose.x;
+    body.current.rotation.y = pose.direction * Math.PI / 2;
+    body.current.position.y = .6 + Math.abs(stride) * .035;
+    if (limbs.current.leftArm) limbs.current.leftArm.rotation.x = -stride;
+    if (limbs.current.rightArm) limbs.current.rightArm.rotation.x = stride;
+    if (limbs.current.leftLeg) limbs.current.leftLeg.rotation.x = stride;
+    if (limbs.current.rightLeg) limbs.current.rightLeg.rotation.x = -stride;
+  });
   const saved = character.model3d && typeof character.model3d === "object" ? character.model3d as Partial<Character3DAppearance> : {};
   const a: Character3DAppearance = { presentation: "FEMALE", height: 50, build: 50, shoulders: 50, arms: 50, chest: 50, torso: 50, waist: 50, hips: 50, legs: 50, skinTone: character.appearance.skinTone === "LIGHT" ? "PORCELAIN" : character.appearance.skinTone, headShape: "OVAL", eyeShape: "CALM", eyeColor: "BROWN", eyebrows: "NORMAL", nose: "STRAIGHT", mouth: "NEUTRAL", hair: "SHORT", hairColor: character.appearance.hairColor, outfit: "ORANGE", ...saved };
   for (const key of ["height", "build", "shoulders", "arms", "chest", "torso", "waist", "hips", "legs"] as const) a[key] = typeof a[key] === "number" && Number.isFinite(a[key]) ? Math.min(100, Math.max(0, a[key])) : 50;
-  return <group name="campus-founder" position={[2.7, .15, 2.25]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onOpen(); }}>
+  return <group ref={walker} name="campus-founder" position={[0, .125, 7.6]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onOpen(); }}>
     <mesh position={[0, .008, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[.3, 24]}/><meshBasicMaterial color="#141b1e" transparent opacity={.5}/></mesh>
-    <group position={[0, .6, 0]} scale={.37} rotation={[0, -.3, 0]}><FounderAvatar a={a} reduced/></group>
+    <group ref={body} position={[0, .6, 0]} scale={.37}><FounderAvatar a={a} reduced/></group>
   </group>;
 }

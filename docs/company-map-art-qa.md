@@ -1,5 +1,23 @@
 # Company Map Art Rework (Prompt 11.5)
 
+## Follow-Up: Labels, Street Founder And Lamps
+
+- Fixed the icon-hidden grid column that forced building names into 13px.
+  Labels now size to content and clamp their full bounds inside the map.
+- Company heading wraps within a constrained width; ResizeObserver keeps
+  mobile camera controls clear of multiline titles.
+- Removed the pale pavement strip and intersecting internal walkway strips.
+- Founder patrols the front road from x=-9 to x=9, turns at both ends and
+  swings arms and legs about the correct joints. Reduced motion pauses it.
+- Lamps have warm point lights, brighter emissive fixtures and soft light pools.
+- Five unit regressions pass, including road bounds and continuous turns.
+- Playwright checks text bounds for all six badges, hover/selection, long
+  company names and desktop/tablet/390px/360px layouts. Canvas pixels verify
+  visible rendering, active movement and stability with reduced motion.
+
+The initial milestone's static Founder and demand-only rendering described
+below have been superseded by this requested walking animation.
+
 ## Scope
 
 Existing R3F Canvas, orthographic camera, OrbitControls, plot coordinates,

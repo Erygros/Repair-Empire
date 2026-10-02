@@ -34,20 +34,24 @@ function ProjectLabels({ state, labels }: { state: GameState; labels: RefObject<
       const tier = getBuildingState(state, plot.buildingId).visualTier;
       const height = plot.buildingId === "FINANCE" ? 3.1 + tier * .16 : 2.25 + tier * .25;
       point.current.set((plot.x + plot.width / 2 - 800) / 60, height, (plot.y + plot.depth / 2 - 460) / 60).project(camera);
-      element.style.setProperty("transform", `translate(${(point.current.x + 1) * size.width / 2}px, ${(1 - point.current.y) * size.height / 2}px)`);
+      const badge = element.firstElementChild as HTMLElement | null;
+      const halfWidth = (badge?.offsetWidth ?? 0) / 2, heightPx = badge?.offsetHeight ?? 0;
+      const x = Math.max(halfWidth + 8, Math.min(size.width - halfWidth - 8, (point.current.x + 1) * size.width / 2));
+      const y = Math.max(heightPx + 8, Math.min(size.height - 8, (1 - point.current.y) * size.height / 2));
+      element.style.setProperty("transform", `translate(${x}px, ${y}px)`);
       element.style.setProperty("visibility", Math.abs(point.current.x) > 1 || Math.abs(point.current.y) > 1 ? "hidden" : "visible");
     }
   });
   return null;
 }
-export function CampusScene3D({ state, selected, onSelect, onClear, onOpenProfile, resetKey, zoomStep, focus, mobile }: { state: GameState; selected: BuildingType | null; onSelect: (id: BuildingType) => void; onClear: () => void; onOpenProfile: () => void; resetKey: number; zoomStep: number; focus: BuildingType | null; mobile: boolean }) {
+export function CampusScene3D({ state, selected, onSelect, onClear, onOpenProfile, resetKey, zoomStep, focus, mobile, reduced }: { state: GameState; selected: BuildingType | null; onSelect: (id: BuildingType) => void; onClear: () => void; onOpenProfile: () => void; resetKey: number; zoomStep: number; focus: BuildingType | null; mobile: boolean; reduced: boolean }) {
   const labels = useRef<LabelRefs>({}), [hovered, setHovered] = useState<BuildingType | null>(null);
-  return <div className="campus-render"><SceneBoundary><Canvas aria-label="Interaktive 3D-Firmenkarte" shadows dpr={[1, mobile ? 1 : 1.4]} frameloop="demand" gl={{ antialias: true, preserveDrawingBuffer: true }} onPointerMissed={event => { if (event.type === "click") onClear(); }}>
+  return <div className="campus-render"><SceneBoundary><Canvas aria-label="Interaktive 3D-Firmenkarte" shadows dpr={[1, mobile ? 1 : 1.4]} frameloop={reduced ? "demand" : "always"} gl={{ antialias: true, preserveDrawingBuffer: true }} onPointerMissed={event => { if (event.type === "click") onClear(); }}>
     <color attach="background" args={["#172126"]}/><CameraRig resetKey={resetKey} zoomStep={zoomStep} focus={focus} mobile={mobile}/>
     <ambientLight intensity={.85}/><hemisphereLight args={["#c5dbe0", "#55534b", 1.3]}/><directionalLight position={[-10, 25, 12]} intensity={2.6} castShadow shadow-mapSize={mobile ? [1024, 1024] : [2048, 2048]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={22} shadow-camera-bottom={-22} shadow-normalBias={.04}/>
     <CampusGround mobile={mobile}/>
     {CAMPUS_PLOTS.map(plot => <group key={plot.buildingId} name={`building-${plot.buildingId}`} position={[(plot.x + plot.width / 2 - 800) / 60, .12, (plot.y + plot.depth / 2 - 460) / 60]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onSelect(plot.buildingId); }} onPointerOver={event => { event.stopPropagation(); setHovered(plot.buildingId); }} onPointerOut={() => setHovered(null)}><BuildingArt id={plot.buildingId} w={plot.width / 60} d={plot.depth / 60} tier={getBuildingState(state, plot.buildingId).visualTier} selected={selected === plot.buildingId} hovered={hovered === plot.buildingId}/></group>)}
-    {state.playerCharacter && <MapFounder character={state.playerCharacter} onOpen={onOpenProfile}/>}
+    {state.playerCharacter && <MapFounder character={state.playerCharacter} onOpen={onOpenProfile} reduced={reduced}/>}
     <ProjectLabels state={state} labels={labels}/>
   </Canvas></SceneBoundary><div className="campus-labels">{CAMPUS_PLOTS.map(plot => { const building = getBuildingState(state, plot.buildingId), upgrade = getBuildingUpgradeCheck(state, plot.buildingId); return <div key={plot.buildingId} ref={element => { if (element) labels.current[plot.buildingId] = element; else delete labels.current[plot.buildingId]; }}><button className={`campus-label ${selected === plot.buildingId ? "selected" : ""} ${hovered === plot.buildingId ? "hovered" : ""}`} title={CAMPUS_NAMES[plot.buildingId]} aria-label={`${CAMPUS_NAMES[plot.buildingId]} auswählen`} aria-pressed={selected === plot.buildingId} onMouseEnter={() => setHovered(plot.buildingId)} onMouseLeave={() => setHovered(null)} onClick={() => onSelect(plot.buildingId)}><Building2 size={13}/><span>{CAMPUS_NAMES[plot.buildingId]}</span><small>Lv. {building.level} · {building.unlocked ? "In Betrieb" : "Gesperrt"}<br/>{upgrade.available ? "Ausbau möglich" : upgrade.reason}</small></button></div>; })}</div></div>;
 }
