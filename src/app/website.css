@@ -49,3 +49,78 @@
 @container(min-width:280px){.website-campus .preview-campus-world{transform:translate(-50%,-50%) scale(.27)}}
 @container(min-width:440px){.website-campus .preview-campus-world{transform:translate(-50%,-50%) scale(.36)}}
 @container(min-width:580px){.website-campus .preview-campus-world{transform:translate(-50%,-50%) scale(.42)}}
+
+/* Landing illustrations are independent of the playable workshop renderer. */
+.marketing-workshop,.marketing-campus,.marketing-research,.re-season-art { position:relative;isolation:isolate;overflow:hidden;background:#111819;min-width:0;width:100%; }
+.marketing-workshop > img,.marketing-campus > img,.marketing-research > img,.re-season-art > img { object-fit:cover;transition:transform .7s ease; }
+.marketing-workshop:hover > img,.marketing-campus:hover > img,.marketing-research:hover > img { transform:scale(1.025); }
+.marketing-art-shade { position:absolute;inset:0;background:linear-gradient(180deg,#08101145,transparent 40%,#08101122 60%,#081011ef);pointer-events:none; }
+.scene-kicker,.campus-art-label { position:absolute;top:22px;left:22px;display:flex;align-items:center;gap:8px;font-size:10px;color:#d9e4df; }
+.scene-kicker i,.campus-art-label i { width:6px;height:6px;background:#6ce3bd;box-shadow:0 0 12px #6ce3bd88; }
+.marketing-workshop { aspect-ratio:3/2;min-height:420px; }
+.marketing-workshop > img { object-position:center top; }
+.marketing-stations { position:absolute;bottom:30px;left:24px;right:24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px; }
+.marketing-station { position:relative;min-height:85px;border-top:1px solid #ffffff45;padding-top:12px; }
+.marketing-station > span { font-size:9px;color:#b8c9c6;display:block; }
+.marketing-station strong { display:flex;align-items:center;gap:7px;font-size:15px;color:#f1f5f2;margin:7px 0 13px; }
+.station-meter { height:3px;background:#70827b40;overflow:hidden; }
+.station-meter i { display:block;height:100%;background:#ff9b55;transform-origin:left;transition:transform .65s,background .65s; }
+.is-complete .station-meter i { background:#6ce3bd; }
+.marketing-station .station-completion { position:absolute;bottom:-19px;color:#6ce3bd;font-size:9px;animation:completion-arrive .5s both; }
+.station-light { position:absolute;width:18%;height:2px;top:40%;background:#ffd8a5;filter:blur(2px);opacity:.35;animation:workshop-light 4s infinite;animation-play-state:paused;pointer-events:none; }
+.light-repair { left:8%; }.light-test { left:43%;background:#6ce3bd;animation-delay:1.5s; }
+.repair-scan { position:absolute;left:40%;top:26%;width:20%;height:1px;background:#6ce3bd80;animation:scene-scan 4s ease-in-out infinite;animation-play-state:paused;pointer-events:none; }
+.scene-active .station-light,.scene-active .repair-scan { animation-play-state:running; }
+.marketing-workshop.is-closeup > img { object-fit:cover;object-position:center 40%; }
+.marketing-workshop.is-closeup:hover > img { transform:scale(1.025); }
+.is-closeup .marketing-stations { grid-template-columns:1fr;max-width:250px; }
+.is-closeup .light-test,.is-closeup .repair-scan { display:none; }
+.marketing-campus { min-height:370px;aspect-ratio:1; }
+.campus-art-label { top:auto;bottom:22px; }
+.campus-ambient-light { position:absolute;bottom:18%;left:27%;width:40%;height:1px;background:#ffab6b70;box-shadow:0 0 20px 5px #ffab6b20;pointer-events:none; }
+.re-story .marketing-campus { min-height:300px;aspect-ratio:1; }
+.re-story .campus-starter > img { object-fit:contain; }
+.re-story article > .marketing-campus { padding:0; }
+.campus-evolution { min-width:0; }
+.evolution-choices { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid #53605a; }
+.evolution-choices button { min-height:58px;background:none;border:0;border-top:2px solid transparent;color:#b2c0bc;cursor:pointer;font-size:12px; }
+.evolution-choices button span { color:#8d9c97;margin-right:7px;font-size:10px; }
+.evolution-choices button[aria-pressed=true] { color:#fff;border-top-color:#ff9b55;background:#ff9b550a; }
+.marketing-research { min-height:450px;aspect-ratio:3/2; }
+.research-selection { position:absolute;bottom:95px;left:24px;right:24px; }
+.research-selection > span { font-size:9px;color:#8fcdbc; }
+.research-selection strong { display:block;font-size:24px;color:#fff;margin:8px 0; }
+.research-selection p { color:#becbc6;font-size:12px;margin:0; }
+.research-options { position:absolute;bottom:20px;left:24px;right:24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
+.research-options button { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;height:58px;background:#0a141ac9;border:1px solid #71857b66;color:#c4d3cd;font-size:10px;cursor:pointer; }
+.research-options button[aria-pressed=true] { color:#86f0cb;border-color:#86f0cb;background:#122c27e0; }
+.research-options button:hover,.evolution-choices button:hover { background:#294039; }
+.research-options button:focus-visible,.evolution-choices button:focus-visible { outline:2px solid #ffb57a;outline-offset:-4px; }
+.re-live-floor .marketing-workshop { min-height:580px; }
+.re-live-floor .marketing-stations { left:40px;right:40px;bottom:38px;gap:35px; }
+.re-live-floor .marketing-station strong { font-size:21px; }
+.re-season-art { min-height:340px;aspect-ratio:4/3; }
+.re-season-art > img { object-position:left center; }
+.re-season-art .marketing-art-shade { background:#06141270; }
+.re-season-art .re-season-emblem { min-height:340px; }
+.re-season-art .re-season-emblem > svg:first-child { color:#79c9b4;filter:drop-shadow(0 0 16px #79c9b433); }
+.re-season-art .re-season-emblem > svg:nth-child(2) { color:#dcece4; }
+.re-season-art .re-season-emblem span { bottom:38px;color:#c3d9ce; }
+.re-news-visual > img { object-fit:cover;transition:transform .65s,filter .65s; }
+.re-news-item:hover .re-news-visual > img { transform:scale(1.045);filter:brightness(1.08); }
+.re-news-item:hover .re-news-copy b svg { transform:translate(3px,-3px); }
+.re-news-copy b svg { transition:transform .3s; }
+.re-final > img { object-position:center 35%; }
+@keyframes completion-arrive { from { opacity:0;transform:translateY(5px); } to { opacity:1;transform:none; } }
+@keyframes scene-scan { 0%,100% { opacity:0;transform:translateY(0); } 30% { opacity:.8; } 80% { opacity:0;transform:translateY(65px); } }
+@media(max-width:1100px) { .marketing-stations { gap:10px;left:18px;right:18px; }.marketing-station strong { font-size:13px; }.marketing-station .station-completion { font-size:8px; }.research-options { left:16px;right:16px;gap:5px; }.research-options button { font-size:9px; } }
+@media(min-width:761px) and (max-width:900px) { .re-gameplay-row,.re-gameplay-row.reversed { grid-template-columns:1fr;gap:28px; }.reversed .re-feature-copy { order:0; }.marketing-workshop.is-closeup { aspect-ratio:3/2; }.marketing-workshop.is-closeup > img { object-fit:contain; }.marketing-campus { aspect-ratio:4/3; } }
+@media(max-width:760px) {
+  .re-story article { grid-template-columns:1fr;gap:15px; }.re-story .marketing-campus { min-height:280px;aspect-ratio:4/3; }.re-story .campus-starter > img { object-fit:contain; }.re-story article > div:last-of-type:not(.marketing-campus) { padding:0 0 12px; }
+  .marketing-workshop { min-height:360px;aspect-ratio:1; }.marketing-workshop > img { object-fit:contain;object-position:center top; }.marketing-workshop.is-closeup > img { object-fit:cover;object-position:center 35%; }
+  .marketing-stations { bottom:28px;left:16px;right:16px;gap:12px; }.marketing-station strong { font-size:12px;gap:4px; }.marketing-station strong svg { width:13px; }.marketing-station > span { font-size:8px; }.marketing-station .station-completion { bottom:-18px;font-size:8px;max-width:90px;line-height:1.3; }
+  .marketing-campus { min-height:330px;aspect-ratio:1; }.marketing-research { min-height:390px;aspect-ratio:1; }.marketing-research > img { object-position:center top; }.research-selection { bottom:106px; }.research-options { bottom:22px; }.research-options button { height:62px; }
+  .re-live-floor .marketing-workshop { min-height:380px; }.re-live-floor .marketing-stations { left:16px;right:16px;bottom:32px;gap:12px; }.re-live-floor .marketing-station strong { font-size:12px; }
+  .re-season-art,.re-season-art .re-season-emblem { min-height:270px; }.re-season-art .re-season-emblem span { bottom:30px; }.scene-kicker { left:16px;top:16px; }.campus-art-label { left:16px;font-size:9px; }
+  .re-final > img { object-position:33% center; }
+}
