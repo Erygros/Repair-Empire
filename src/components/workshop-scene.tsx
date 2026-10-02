@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, type CSSProperties } from "react";
 import { Bot, Check, LockKeyhole, Radio, Wrench } from "lucide-react";
 import { DeviceVisual } from "@/components/device-visual";
 import { TechnicianVisual } from "@/components/technician-visual";
@@ -25,10 +25,11 @@ function WorkshopStation({ station, state, now, selected, onSelect }: { station:
 
 function WorkshopSceneComponent({ state, now, selectedId, onSelect }: { state: GameState; now: number; selectedId: string; onSelect: (id: string) => void }) {
   const working = state.workstations.filter((station) => station.activeRepair).length;
+  const visibleStations = state.workstations.filter(station => station.status !== "locked");
   return <section className="workshop-scene" aria-label="Visuelle Werkstatt">
     <header><div><p className="panel-label">LIVE FLOOR // {working} AKTIV</p><h3>Produktionshalle</h3></div><span className="scene-live"><i /> Echtzeit</span></header>
     <div className="workshop-room"><div className="workshop-ceiling"><i /><i /><i /></div><div className="diagnostic-bus" aria-hidden="true" />
-      <div className="workshop-stations">{state.workstations.map((station) => <WorkshopStation key={station.id} station={station} state={state} now={now} selected={selectedId === station.id} onSelect={() => onSelect(station.id)} />)}</div>
+      <div className="workshop-stations" style={{ "--station-count": visibleStations.length } as CSSProperties}>{visibleStations.map((station) => <WorkshopStation key={station.id} station={station} state={state} now={now} selected={selectedId === station.id} onSelect={() => onSelect(station.id)} />)}</div>
       <div className="workshop-floor-lines" aria-hidden="true" />
     </div>
   </section>;

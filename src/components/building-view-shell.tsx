@@ -12,10 +12,10 @@ export function BuildingViewShell({ buildingId, state, onClose, onUpgrade, child
   return (
     <section className="building-view-shell">
       <header className="building-view-header">
-        <button className="back-to-map" onClick={onClose}><ArrowLeft size={17} /> Campus</button>
-        <div><span>{definition.mapSlot} · Visual Tier {building.visualTier}</span><h2>{definition.name}</h2></div>
+        <button className="back-to-map" onClick={onClose} title="Zur Firmenkarte" aria-label="Zur Firmenkarte"><ArrowLeft size={17} /></button>
+        <div><span>Level {building.level}</span><h2>{buildingId === "WORKSHOP" ? "Werkstatt" : definition.name}</h2></div>
         <div className="building-view-level"><Building2 size={16} /><span>Gebäudelevel</span><strong>{building.level}</strong></div>
-        {check.next && <button className="quick-building-upgrade" disabled={!check.available} onClick={() => onUpgrade(buildingId)} title={check.reason}><ChevronsUp size={16} />{check.available ? `${formatMoney(check.next.cost)} ausbauen` : check.reason}</button>}
+        {check.next && <details className="building-expansion"><summary><ChevronsUp size={16} />Ausbau</summary><div><strong>{check.next.name}</strong><p>{check.next.unlocks.filter(item => !item.startsWith("Visual Tier")).join(" · ")}</p>{!check.available && <p>{check.reason}</p>}<button className="quick-building-upgrade" disabled={!check.available} onClick={() => onUpgrade(buildingId)}>{formatMoney(check.next.cost)} investieren</button></div></details>}
       </header>
       <div className="building-view-content">{children}</div>
     </section>

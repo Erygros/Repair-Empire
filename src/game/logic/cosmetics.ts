@@ -14,7 +14,9 @@ export function grantCosmetic(state: GameState, cosmeticId: string, sourceType: 
 }
 
 export function ensureDefaultCosmetics(state: GameState, now: number) {
-  return DEFAULT_COSMETIC_IDS.reduce((current, cosmeticId) => grantCosmetic(current, cosmeticId, "DEFAULT", now).state, state);
+  const granted = DEFAULT_COSMETIC_IDS.reduce((current, cosmeticId) => grantCosmetic(current, cosmeticId, "DEFAULT", now).state, state);
+  // Starter equipment should not interrupt the first visit with a reward modal.
+  return { ...granted, cosmeticUnlockNotice: state.cosmeticUnlockNotice };
 }
 
 export function equipCosmetic(state: GameState, cosmeticId: string) {
