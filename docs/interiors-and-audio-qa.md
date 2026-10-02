@@ -50,3 +50,18 @@
 Local screenshots are ignored artifacts in `.local/interior-*.png`.
 These checks do not claim photorealism, exhaustive device compatibility, or
 subjective audio-quality verification on physical speakers.
+
+## Office seating and upgrade-panel corrections (2026-10-02)
+
+- Rear Team chair and Customers/Finance chairs now face their desks, not the
+  rear wall. Office monitors and keyboards face the operator's seating side.
+- Both Finance desks have a chair. Front Team chairs retain their orientation.
+- The embedded upgrade panel uses a single-column introduction/list and
+  two-column rows. Copy, effect comparisons, level markers and purchase buttons
+  no longer compete for narrow grid tracks. The introduction is not sticky.
+- Local browser checks covered Team, Customers, Finance and Upgrades at
+  1600, 1280, 820, 390 and 360px widths. All room canvases contain rendered
+  pixels; no document or upgrade-row overflow, no page errors. Upgrade copy
+  stays at least 246px wide in these viewports. Screenshots visually confirm
+  chair placement/orientation and readable text. Seven asset/immersion tests,
+  TypeScript, ESLint and production build pass. Gameplay rules are unchanged.
