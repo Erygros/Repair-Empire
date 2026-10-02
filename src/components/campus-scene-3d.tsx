@@ -1,8 +1,8 @@
 "use client";
 import { Component, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, OrthographicCamera } from "@react-three/drei";
-import { Vector3, type OrthographicCamera as Camera } from "three";
+import { Environment, Lightformer, OrbitControls, OrthographicCamera } from "@react-three/drei";
+import { BackSide, Vector3, type OrthographicCamera as Camera } from "three";
 import { Building2 } from "lucide-react";
 import type { OrbitControls as Controls } from "three-stdlib";
 import { CAMPUS_PLOTS } from "@/game/data/campus";
@@ -48,6 +48,11 @@ export function CampusScene3D({ state, selected, onSelect, onClear, onOpenProfil
   const labels = useRef<LabelRefs>({}), [hovered, setHovered] = useState<BuildingType | null>(null);
   return <div className="campus-render"><SceneBoundary><Canvas aria-label="Interaktive 3D-Firmenkarte" shadows dpr={[1, mobile ? 1 : 1.4]} frameloop={reduced ? "demand" : "always"} gl={{ antialias: true, preserveDrawingBuffer: true }} onPointerMissed={event => { if (event.type === "click") onClear(); }}>
     <color attach="background" args={["#172126"]}/><CameraRig resetKey={resetKey} zoomStep={zoomStep} focus={focus} mobile={mobile}/>
+    <Environment resolution={128} frames={1} environmentIntensity={.55}>
+      <mesh><sphereGeometry args={[40, 16, 16]}/><meshBasicMaterial color="#a9bec5" side={BackSide}/></mesh>
+      <Lightformer position={[-10, 20, 12]} rotation={[Math.PI / 2, 0, 0]} scale={[18, 18, 1]} intensity={2} color="#fff0d3"/>
+      <Lightformer position={[0, -10, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[40, 40, 1]} intensity={.3} color="#6a7567"/>
+    </Environment>
     <ambientLight intensity={.85}/><hemisphereLight args={["#c5dbe0", "#55534b", 1.3]}/><directionalLight position={[-10, 25, 12]} intensity={2.6} castShadow shadow-mapSize={mobile ? [1024, 1024] : [2048, 2048]} shadow-camera-left={-22} shadow-camera-right={22} shadow-camera-top={22} shadow-camera-bottom={-22} shadow-normalBias={.04}/>
     <CampusGround mobile={mobile}/>
     {CAMPUS_PLOTS.map(plot => <group key={plot.buildingId} name={`building-${plot.buildingId}`} position={[(plot.x + plot.width / 2 - 800) / 60, .12, (plot.y + plot.depth / 2 - 460) / 60]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onSelect(plot.buildingId); }} onPointerOver={event => { event.stopPropagation(); setHovered(plot.buildingId); }} onPointerOut={() => setHovered(null)}><BuildingArt id={plot.buildingId} w={plot.width / 60} d={plot.depth / 60} tier={getBuildingState(state, plot.buildingId).visualTier} selected={selected === plot.buildingId} hovered={hovered === plot.buildingId}/></group>)}
