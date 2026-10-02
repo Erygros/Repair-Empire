@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { ArrowLeft, Building2, ChevronsUp } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { BuildingsIcon as Building2, ExpandIcon as ChevronsUp } from "@/components/repair-icons";
 import { getBuildingDefinition, getBuildingState } from "@/game/data/buildings";
 import { getBuildingUpgradeCheck } from "@/game/logic/buildings";
 import type { BuildingType, GameState } from "@/game/types";

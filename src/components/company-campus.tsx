@@ -1,4 +1,4 @@
-import { Banknote, BriefcaseBusiness, Building2, Check, FlaskConical, Landmark, LockKeyhole, PackageOpen, UsersRound, Wrench } from "lucide-react";
+import { CapitalIcon as Banknote, ContractsIcon as BriefcaseBusiness, BuildingsIcon as Building2, ActiveIcon as Check, ResearchIcon as FlaskConical, FinanceNavIcon as Landmark, LockedIcon as LockKeyhole, ToolsNavIcon as PackageOpen, EmployeesIcon as UsersRound, WorkshopNavIcon as Wrench } from "@/components/repair-icons";
 import { BUILDING_DEFINITIONS, getBuildingLevelDefinition, getBuildingState } from "@/game/data/buildings";
 import { getBuildingRequirementLabel, getBuildingUpgradeCheck, isBuildingRequirementMet } from "@/game/logic/buildings";
 import type { BuildingType, GameState } from "@/game/types";

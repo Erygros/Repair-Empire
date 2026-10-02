@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Activity, Banknote, Building2, FlaskConical, PackageOpen, ShieldCheck, SlidersHorizontal, Target, UserRound, UsersRound, Wallet, Wrench, Handshake } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
+import { BrandLogo, InfoIcon, LevelUpIcon } from "@/components/repair-icons";
+import { Target, UserRound } from "lucide-react";
+import { CompanyLevelIcon as Activity, CapitalIcon as Banknote, CompanyNavIcon as Building2, ResearchNavIcon as FlaskConical, ToolsNavIcon as PackageOpen, ReputationIcon as ShieldCheck, UpgradeIcon as SlidersHorizontal, TeamNavIcon as UsersRound, FinanceNavIcon as Wallet, WorkshopNavIcon as Wrench, CustomersNavIcon as Handshake } from "@/components/repair-icons";
 import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
 import { CompanyMap } from "@/components/company-map";
@@ -42,7 +44,7 @@ const NAV_ITEMS = [
   { view: "challenges", label: "Aufgaben", icon: Target },
   { view: "upgrades", label: "Upgrades", icon: SlidersHorizontal },
   { view: "profile", label: "Charakter", icon: UserRound },
-] satisfies { view: GameView; label: string; icon: typeof Wrench }[];
+] satisfies { view: GameView; label: string; icon: ComponentType<{size?:number}> }[];
 
 export function GameShell() {
   const game = useGame();
@@ -88,15 +90,15 @@ export function GameShell() {
   }, [game.notice, settings]);
 
   if (!game.hydrated) {
-    return <main className="boot-screen"><div className="boot-mark"><Wrench size={24} /></div><p>Werkstatt wird hochgefahren</p></main>;
+    return <main className="boot-screen"><BrandLogo variant="mark"/><p>Werkstatt wird hochgefahren</p></main>;
   }
 
   return (
     <main className="game-shell game-v3" onPointerDown={() => playPrototypeSound("click", settings)}>
       <header className="topbar">
         <div className="brand-lockup">
-          <div className="brand-mark" aria-hidden="true"><Wrench size={22} /></div>
-          <div><p className="kicker">{state.identity.companyName}</p><h1>REPAIR <span>EMPIRE</span></h1></div>
+          <BrandLogo/>
+          <div><p className="kicker">{state.identity.companyName}</p><h1 className="brand-visually-hidden">Repair Empire</h1></div>
         </div>
         <div className="status-strip" aria-label="Werkstattstatus">
           <div className="status-item"><Banknote size={17} /><span>Kapital</span><strong>{formatMoney(state.money)}</strong></div>
@@ -129,8 +131,8 @@ export function GameShell() {
       {game.offlineSummary && <OfflineReport summary={game.offlineSummary} onClose={game.dismissOfflineSummary} />}
       <MilestoneReport state={state} onClaim={game.claimMilestone} />
       {state.cosmeticUnlockNotice && state.playerCharacter && <CosmeticUnlock cosmeticId={state.cosmeticUnlockNotice} character={state.playerCharacter} onClose={game.dismissCosmeticUnlock} />}
-      {game.notice && <div className="toast" role="status"><span className="toast-light" />{game.notice}</div>}
-      {levelFeedback && <div className="level-feedback" role="status"><span>PROGRESSION UPDATE</span><strong>{levelFeedback}</strong><button onClick={() => setLevelFeedback(null)}>OK</button></div>}
+      {game.notice && <div className="toast" role="status"><InfoIcon size="sm"/>{game.notice}</div>}
+      {levelFeedback && <div className="level-feedback" role="status"><LevelUpIcon size="md"/><span>PROGRESSION UPDATE</span><strong>{levelFeedback}</strong><button onClick={() => setLevelFeedback(null)}>OK</button></div>}
       <PrototypeDevPanel state={state} onImport={game.importSave} onAction={game.runDevAction} />
     </main>
   );

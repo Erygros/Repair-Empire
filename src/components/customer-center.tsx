@@ -1,4 +1,5 @@
-import { BriefcaseBusiness, Building2, Check, PackageCheck, Repeat2, UsersRound } from "lucide-react";
+import { PackageCheck, Repeat2 } from "lucide-react";
+import { ContractsIcon as BriefcaseBusiness, BuildingsIcon as Building2, ActiveIcon as Check, EmployeesIcon as UsersRound } from "@/components/repair-icons";
 import { CUSTOMER_TYPE_CONFIG } from "@/game/data/customers";
 import { getActiveContractLimit } from "@/game/logic/contracts";
 import type { GameState } from "@/game/types";

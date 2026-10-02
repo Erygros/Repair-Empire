@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Newspaper } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { NewsNavIcon as Newspaper } from "@/components/repair-icons";
 import type { NewsItem } from "@/content/news";
 import { NewsMeta, NewsVisual } from "@/components/news-visual";
 

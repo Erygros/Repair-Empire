@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, Check, Clock3, ListChecks, Settings2, UserRound } from "lucide-react";
+import { Clock3, UserRound } from "lucide-react";
+import { AutomationIcon as Bot, ActiveIcon as Check, ContractsIcon as ListChecks, SettingsIcon as Settings2 } from "@/components/repair-icons";
 import { OrderBoard } from "@/components/order-board";
 import { RepairLog } from "@/components/repair-log";
 import { WorkshopScene } from "@/components/workshop-scene";

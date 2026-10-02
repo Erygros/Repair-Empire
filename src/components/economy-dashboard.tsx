@@ -1,4 +1,5 @@
-import { BarChart3, BriefcaseBusiness, ReceiptText, TrendingUp, UserRoundCheck } from "lucide-react";
+import { ReceiptText } from "lucide-react";
+import { CapitalIcon, RepairsIcon } from "@/components/repair-icons";
 import type { GameState, RepairCategory } from "@/game/types";
 import { formatMoney, formatTime } from "@/utils/format";
 
@@ -19,11 +20,11 @@ export function EconomyDashboard({ state }: { state: GameState }) {
   return (
     <div className="economy-layout">
       <section className="economy-kpis">
-        <article><BriefcaseBusiness size={18} /><span>Heutiger Umsatz</span><strong>{formatMoney(daily.revenue)}</strong></article>
-        <article><ReceiptText size={18} /><span>Heutige Kosten</span><strong>{formatMoney(daily.materialCosts + daily.operatingCosts)}</strong></article>
-        <article className="profit-kpi"><TrendingUp size={18} /><span>Heutiger Gewinn</span><strong>{formatMoney(daily.profit)}</strong></article>
-        <article><BarChart3 size={18} /><span>Reparaturen heute</span><strong>{daily.repairsCompleted}</strong></article>
-        <article><UserRoundCheck size={18} /><span>Ø Gewinn / Auftrag</span><strong>{formatMoney(averageProfit)}</strong></article>
+        <article><CapitalIcon size={24} /><span>Heutiger Umsatz</span><strong>{formatMoney(daily.revenue)}</strong></article>
+        <article><CapitalIcon size={24} /><span>Heutige Kosten</span><strong>{formatMoney(daily.materialCosts + daily.operatingCosts)}</strong></article>
+        <article className="profit-kpi"><CapitalIcon size={24} /><span>Heutiger Gewinn</span><strong>{formatMoney(daily.profit)}</strong></article>
+        <article><RepairsIcon size={24} /><span>Reparaturen heute</span><strong>{daily.repairsCompleted}</strong></article>
+        <article><CapitalIcon size={24} /><span>Ø Gewinn / Auftrag</span><strong>{formatMoney(averageProfit)}</strong></article>
       </section>
 
       <div className="economy-detail-grid">

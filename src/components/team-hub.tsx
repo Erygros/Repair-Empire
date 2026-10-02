@@ -1,4 +1,5 @@
-import { BriefcaseBusiness, RefreshCw, Star, UserPlus, UsersRound, Zap } from "lucide-react";
+import { BriefcaseBusiness, RefreshCw, Zap } from "lucide-react";
+import { LevelUpIcon as Star, EmployeesIcon as UserPlus, EmployeesIcon as UsersRound } from "@/components/repair-icons";
 import { MARKET_REFRESH_COST } from "@/game/data/employees";
 import { getEmployeeLevelProgress } from "@/game/logic/game";
 import type { Employee, EmployeeCandidate, GameState } from "@/game/types";

@@ -1,4 +1,5 @@
-import { AlertTriangle, Clock3, Coins, TrendingUp, X } from "lucide-react";
+import { Clock3, X } from "lucide-react";
+import { ErrorIcon as AlertTriangle, CapitalIcon as Coins, CapitalIcon as TrendingUp, ReputationIcon, XpIcon, CompanyLevelIcon, ResearchIcon, LevelUpIcon } from "@/components/repair-icons";
 import type { OfflineSummary } from "@/game/types";
 import { formatMoney } from "@/utils/format";
 
@@ -25,7 +26,7 @@ export function OfflineReport({ summary, onClose }: { summary: OfflineSummary; o
           <span>Betriebskosten<strong>-{formatMoney(summary.operatingCosts)}</strong></span>
           <span className="offline-profit"><TrendingUp size={15} /> Gewinn<strong>{formatMoney(summary.profit)}</strong></span>
         </div>
-        <div className="offline-progress"><span>Reputation <strong>+{summary.reputation}</strong></span><span>Mitarbeiter-XP <strong>+{summary.employeeXp}</strong></span><span>Company-Level <strong>+{summary.companyLevelsGained}</strong></span><span>Forschung <strong>+{summary.researchPointsGained} FP</strong></span>{summary.levelUps.length > 0 && <span>Team-Level-Ups <strong>{summary.levelUps.join(", ")}</strong></span>}</div>
+        <div className="offline-progress"><span><ReputationIcon size="xs"/> Reputation <strong>+{summary.reputation}</strong></span><span><XpIcon size="xs"/> Mitarbeiter-XP <strong>+{summary.employeeXp}</strong></span><span><CompanyLevelIcon size="xs"/> Company-Level <strong>+{summary.companyLevelsGained}</strong></span><span><ResearchIcon size="xs"/> Forschung <strong>+{summary.researchPointsGained} FP</strong></span>{summary.levelUps.length > 0 && <span><LevelUpIcon size="xs"/> Team-Level-Ups <strong>{summary.levelUps.join(", ")}</strong></span>}</div>
         <button className="offline-confirm" onClick={onClose}><Coins size={17} /> Bericht schließen</button>
       </section>
     </div>

@@ -1,4 +1,5 @@
-import { ArrowUp, Check, Gauge, LockKeyhole } from "lucide-react";
+import { Gauge } from "lucide-react";
+import { UpgradeIcon as ArrowUp, ActiveIcon as Check, LockedIcon as LockKeyhole } from "@/components/repair-icons";
 import { UPGRADES } from "@/game/data/progression";
 import { getUpgradeCost, getUpgradeEffect } from "@/game/logic/game";
 import type { UpgradeId, UpgradeLevels } from "@/game/types";

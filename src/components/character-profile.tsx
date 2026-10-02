@@ -1,6 +1,8 @@
 "use client";
+import { RepairEmpireIcon } from "@/components/repair-icons";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Check, LockKeyhole, Save, Shirt } from "lucide-react";
+import { ArrowLeft, Save, Shirt } from "lucide-react";
+import { ActiveIcon as Check, LockedIcon as LockKeyhole } from "@/components/repair-icons";
 import { Character3D, type Character3DAppearance } from "@/components/character-3d";
 import { FounderEditor, FounderEditorTools } from "@/components/founder-editor";
 import { getFounderAppearance } from "@/components/founder-appearance";
@@ -26,7 +28,7 @@ export function CharacterProfile({state,onBack,onEquip,onUnequip,onSave,onDirtyC
   }
   return <section className="founder-studio"><header className="founder-studio-header"><button aria-label="Zur Firmenkarte" title="Zur Firmenkarte" onClick={onBack}><ArrowLeft size={18}/></button><div><p className="panel-label">FOUNDER STUDIO</p><h2>{character.displayName}</h2></div><button className="founder-save" disabled={!dirty||busy||name.trim().length<2} onClick={save}><Save size={16}/>{busy?"Speichert…":"Speichern"}</button></header>
     <div className="founder-studio-layout"><FounderEditor appearance={a} name={name} onChange={setA} onName={setName}/><section className="founder-studio-stage"><Character3D appearance={a} cosmetics={character.equippedCosmetics} resetKey={reset} motion={motion}/><FounderEditorTools onChange={setA} onResetView={()=>setReset(v=>v+1)}/></section><aside className="founder-wardrobe">
-      {character.founderSkill&&<div className="founder-skill"><strong>{FOUNDER_SKILLS[character.founderSkill].name}</strong><p>{FOUNDER_SKILLS[character.founderSkill].bonus}</p><small>Founder Skill · dauerhaft</small></div>}
+      {character.founderSkill&&<div className="founder-skill"><RepairEmpireIcon category="skills" name={character.founderSkill.toLowerCase()} size="lg"/><strong>{FOUNDER_SKILLS[character.founderSkill].name}</strong><p>{FOUNDER_SKILLS[character.founderSkill].bonus}</p><small>Founder Skill · dauerhaft</small></div>}
       {error&&<p role="alert" className="auth-error">{error}</p>}
       <h3><Shirt size={17}/> Garderobe</h3><nav aria-label="Cosmetic-Kategorie">{(["OUTFIT","HEADWEAR","ACCESSORY"] as const).map(slot=><button key={slot} aria-pressed={filter===slot} onClick={()=>setFilter(slot)}>{slot==="OUTFIT"?"Outfit":slot==="HEADWEAR"?"Kopfbedeckung":"Accessoires"}</button>)}</nav>
       {COSMETICS.filter(c=>c.equipSlot===filter).map(item=><article className="founder-cosmetic" key={item.cosmeticId}><strong>{item.name}</strong><button disabled={!owned.has(item.cosmeticId)||busy||dirty||character.equippedCosmetics[filter]===item.cosmeticId} onClick={()=>{onEquip(item.cosmeticId);if(filter==="OUTFIT")setA({...a,outfit:item.cosmeticId.includes("orange")?"ORANGE":item.cosmeticId.includes("dark")?"DARK":"BASIC"});}}>{character.equippedCosmetics[filter]===item.cosmeticId?<><Check size={14}/>Ausgerüstet</>:!owned.has(item.cosmeticId)?<><LockKeyhole size={14}/>Gesperrt</>:"Ausrüsten"}</button></article>)}

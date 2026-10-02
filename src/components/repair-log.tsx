@@ -1,4 +1,5 @@
-import { CheckCircle2, History, ShieldPlus } from "lucide-react";
+import { History } from "lucide-react";
+import { ActiveIcon as CheckCircle2, ReputationIcon as ShieldPlus } from "@/components/repair-icons";
 import type { CompletedRepair } from "@/game/types";
 import { formatMoney, formatTime } from "@/utils/format";
 

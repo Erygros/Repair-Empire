@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, FlaskConical, Landmark, PackageOpen, UsersRound, Wrench } from "lucide-react";
+import { CustomersNavIcon as BriefcaseBusiness, ResearchNavIcon as FlaskConical, FinanceNavIcon as Landmark, ToolsNavIcon as PackageOpen, TeamNavIcon as UsersRound, WorkshopNavIcon as Wrench } from "@/components/repair-icons";
 import { getBuildingDefinition, getBuildingState } from "@/game/data/buildings";
 import type { BuildingType, GameState } from "@/game/types";
 import type { CampusPlot } from "@/game/data/campus";

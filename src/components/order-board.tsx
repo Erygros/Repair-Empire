@@ -1,16 +1,6 @@
-import {
-  ArrowRight,
-  CircuitBoard,
-  Clock3,
-  Gamepad2,
-  LockKeyhole,
-  Laptop,
-  MonitorSmartphone,
-  Radio,
-  Smartphone,
-  Tablet,
-  WalletCards,
-} from "lucide-react";
+import { PremiumIcon } from "@/components/repair-icons";
+import { ArrowRight, CircuitBoard, Clock3, Gamepad2, Laptop, MonitorSmartphone, Radio, Smartphone, Tablet } from "lucide-react";
+import { LockedIcon as LockKeyhole, CapitalIcon as WalletCards } from "@/components/repair-icons";
 import { DIFFICULTY_LABELS } from "@/game/data/orders";
 import { getTool } from "@/game/data/progression";
 import { canAccessOrder, getJobEconomy } from "@/game/logic/game";
@@ -74,7 +64,7 @@ export function OrderBoard({ orders, money, reputation, ownedTools, upgrades, re
                 <div className="order-meta">
                   <span>{order.id}</span>
                   {order.variant === "urgent" && <em className="urgent-tag">Dringend · {formatClock((order.expiresAt ?? now) - now)}</em>}
-                  {order.variant === "premium" && <em className="premium-tag">Premium</em>}
+                  {order.variant === "premium" && <em className="premium-tag"><PremiumIcon size="xs"/> Premium</em>}
                   {order.variant === "complex" && <em>Komplex</em>}
                   {locked && <em className="locked-tag">Gesperrt</em>}
                 </div>

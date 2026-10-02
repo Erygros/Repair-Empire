@@ -1,4 +1,5 @@
-import { CalendarDays, Check, Target, Trophy } from "lucide-react";
+import { CalendarDays, Target, Trophy } from "lucide-react";
+import { ActiveIcon as Check, CapitalIcon, XpIcon, ReputationIcon, ResearchIcon } from "@/components/repair-icons";
 import type { Challenge, GameState } from "@/game/types";
 import { formatMoney, formatNumber } from "@/utils/format";
 
@@ -7,7 +8,7 @@ function ChallengeCard({ challenge, onClaim }: { challenge: Challenge; onClaim: 
   return <article className={`challenge-card ${challenge.completed ? "completed" : ""}`}>
     <div className="challenge-icon">{challenge.completed ? <Check size={18} /> : <Target size={18} />}</div>
     <div className="challenge-copy"><span>{challenge.daily ? "DAILY" : challenge.category.toUpperCase()}</span><h4>{challenge.title}</h4><p>{challenge.description}</p><div className="challenge-progress"><i><b style={{ width: `${percent}%` }} /></i><strong>{formatNumber(Math.floor(challenge.progress))} / {formatNumber(challenge.target)}</strong></div></div>
-    <div className="challenge-reward"><span>Belohnung</span><strong>{formatMoney(challenge.reward.money)}</strong><small>{challenge.reward.xp} XP · +{challenge.reward.reputation} Rep.{challenge.reward.researchPoints > 0 ? ` · ${challenge.reward.researchPoints} FP` : ""}</small><button disabled={!challenge.completed || challenge.claimed} onClick={() => onClaim(challenge.id)}>{challenge.claimed ? "Erhalten" : challenge.completed ? "Beanspruchen" : "In Arbeit"}</button></div>
+    <div className="challenge-reward"><span>Belohnung</span><strong><CapitalIcon size="xs"/> {formatMoney(challenge.reward.money)}</strong><small><span className="resource-readout"><XpIcon size="xs"/>{challenge.reward.xp} XP</span> · <span className="resource-readout"><ReputationIcon size="xs"/>+{challenge.reward.reputation} Rep.</span>{challenge.reward.researchPoints > 0 && <> · <span className="resource-readout"><ResearchIcon size="xs"/>{challenge.reward.researchPoints} FP</span></>}</small><button disabled={!challenge.completed || challenge.claimed} onClick={() => onClaim(challenge.id)}>{challenge.claimed ? "Erhalten" : challenge.completed ? "Beanspruchen" : "In Arbeit"}</button></div>
   </article>;
 }
 

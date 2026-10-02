@@ -1,0 +1,22 @@
+.repair-icon{display:inline-block;object-fit:contain;vertical-align:middle;flex-shrink:0;max-width:none}
+.brand-visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.repair-brand-logo{display:block;flex-shrink:0;width:210px;height:66px}.repair-brand-logo img{display:block;width:100%;height:100%;object-fit:contain}
+.repair-brand-logo.brand-mark{width:48px;height:48px;background:none;border:0;transform:none;box-shadow:none;clip-path:none}.repair-brand-logo.brand-compact{width:144px;height:72px}
+.website-v2 .public-brand{min-width:0}.website-v2 .public-brand>.repair-brand-logo{width:200px;height:64px;padding:0;background:none;border:0;transform:none}
+.game-v3 .brand-lockup{gap:12px}.game-v3 .brand-lockup>.repair-brand-logo{width:210px;height:64px}.game-v3 .brand-lockup .kicker{max-width:140px;white-space:normal;overflow-wrap:anywhere}
+.game-v3 .status-item>.repair-icon{width:24px!important;height:24px!important}
+.game-rail .repair-icon{opacity:.65}.game-rail button:hover .repair-icon,.game-rail button[aria-current=page] .repair-icon{opacity:1}
+.game-rail button[aria-current=page] .repair-icon{outline:1px solid #dc8743;outline-offset:3px;border-radius:3px}
+.repair-icon-navigation{max-width:32px;max-height:32px}
+.campus-label>.repair-icon{margin-right:4px}.settings-trigger .repair-icon{width:24px!important;height:24px!important}.hall-status{display:inline-flex;align-items:center;gap:6px}.reset-save-button .repair-icon{margin-right:8px}
+.skill-select>button:not(.create3d){display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:12px;align-items:center}.skill-select>button>.repair-icon{grid-column:1;grid-row:1/4}.skill-select>button>strong,.skill-select>button>span,.skill-select>button>p{grid-column:2}.skill-select>button:hover{border-color:#ef8f3f}.skill-select>button.active{border-color:#f69e50;box-shadow:inset 3px 0 #ef8f3f}
+.founder-skill>.repair-icon{float:left;margin:0 12px 8px 0}
+.creator-brand{padding:16px 25px 0}.creator-brand .repair-brand-logo{width:174px;height:84px}
+.re-hero-content h1 .repair-brand-logo{width:min(100%,490px);height:auto;aspect-ratio:552/176}.re-hero-content h1{line-height:1;margin-bottom:18px}
+.website-mobile-menu .repair-icon,.website-v2 .public-header nav .repair-icon{margin-right:7px}.website-v2 .public-header nav a{display:inline-flex;align-items:center}
+.website-v2 footer .repair-brand-logo{width:180px;height:58px}
+.resource-readout{display:inline-flex;align-items:center;gap:6px}.resource-readout .repair-icon{vertical-align:middle}.company-level .repair-icon{margin-right:6px}.level-xp .repair-icon{margin-right:6px}
+.hall-status .repair-icon{width:24px;height:24px}.state-chip .repair-icon{margin-right:5px}.re-season-emblem>.repair-icon{position:static!important;width:64px!important;height:64px!important}
+.game-v3 .level-feedback{grid-template-columns:32px minmax(0,1fr) 42px}.game-v3 .level-feedback>.repair-icon{grid-column:1;grid-row:1/3;align-self:center}.game-v3 .level-feedback>span{grid-column:2;grid-row:1}.game-v3 .level-feedback>strong{grid-column:2;grid-row:2;overflow-wrap:anywhere}.game-v3 .level-feedback>button{grid-column:3;grid-row:1/3}.game-v3 .toast{gap:8px}
+@media(max-width:1100px) and (min-width:621px){.website-v2 .public-brand>.repair-brand-logo,.game-v3 .brand-lockup>.repair-brand-logo{width:120px;height:60px}}
+@media(max-width:620px){.website-v2 .public-brand>.repair-brand-logo,.game-v3 .brand-lockup>.repair-brand-logo{width:42px;height:46px}.game-v3 .status-item{grid-template-columns:24px auto}.game-v3 .brand-lockup .kicker{font-size:11px;max-width:200px}.game-v3 .status-item>.repair-icon{grid-row:1/3}.game-v3 .status-item strong{grid-column:2}.creator-brand{padding-inline:18px}.creator-brand .repair-brand-logo{width:136px;height:68px}.re-hero-content h1 .repair-brand-logo{max-width:100%}.game-rail button{gap:9px}.skill-select>button:not(.create3d){grid-template-columns:48px minmax(0,1fr)}}

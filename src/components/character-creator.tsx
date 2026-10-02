@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Check, UserRound } from "lucide-react";
+import { UserRound } from "lucide-react";
+import { ActiveIcon as Check } from "@/components/repair-icons";
 import { CharacterRenderer } from "@/components/character-renderer";
 import { APPEARANCE_OPTIONS, DEFAULT_APPEARANCE } from "@/game/data/cosmetics";
 import { normalizeCharacterName, validateCharacterName } from "@/game/logic/cosmetics";

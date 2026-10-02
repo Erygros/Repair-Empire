@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Settings, Volume2, VolumeX, X } from "lucide-react";
+import { DeleteIcon } from "@/components/repair-icons";
+import { Volume2, VolumeX, X } from "lucide-react";
+import { SettingsIcon as Settings } from "@/components/repair-icons";
 import { AUDIO_SETTINGS_KEY, DEFAULT_AUDIO_SETTINGS, type AudioSettings } from "@/game/audio/prototype-audio";
 
 export function usePrototypeSettings() {
@@ -23,6 +25,6 @@ export function PrototypeSettings({ settings, onChange, onReset }: { settings: A
     <label>Ambience <span>{Math.round(settings.ambience * 100)}%</span><input type="range" min="0" max="1" step=".05" value={settings.ambience} onChange={(event) => onChange({ ...settings, ambience: Number(event.target.value) })} /></label>
     <button className={`mute-toggle ${settings.muted ? "active" : ""}`} onClick={() => onChange({ ...settings, muted: !settings.muted })}>{settings.muted ? <VolumeX size={17} /> : <Volume2 size={17} />}{settings.muted ? "Audio stumm" : "Audio aktiv"}</button>
     <fieldset><legend>Bewegung</legend>{(["AUTO", "FULL", "REDUCED"] as const).map((motion) => <button className={settings.motion === motion ? "active" : ""} key={motion} onClick={() => onChange({ ...settings, motion })}>{motion}</button>)}</fieldset>
-    <button className="reset-save-button" onClick={onReset}>Spielstand zurücksetzen</button>
+    <button className="reset-save-button" onClick={onReset}><DeleteIcon size="sm"/> Spielstand zurücksetzen</button>
   </section></div>}</>;
 }

@@ -1,4 +1,5 @@
-import { Check, CircuitBoard, Clock3, Cpu, Gauge, Wrench } from "lucide-react";
+import { Clock3, Gauge } from "lucide-react";
+import { ActiveIcon as Check, TechnologyIcon as CircuitBoard, TechnologyIcon as Cpu, RepairsIcon as Wrench } from "@/components/repair-icons";
 import type { ActiveRepair } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
 

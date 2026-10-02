@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Check, CircuitBoard, FlaskConical, ScanLine, Workflow } from "lucide-react";
+import { ScanLine } from "lucide-react";
+import { ActiveIcon as Check, TechnologyIcon as CircuitBoard, ResearchIcon as FlaskConical, AutomationIcon as Workflow } from "@/components/repair-icons";
 
 const ART = {
   starter: "/images/website-starter.webp",

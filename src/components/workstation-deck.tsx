@@ -1,4 +1,6 @@
-import { Bot, Check, Clock3, LockKeyhole, Power, UserRound, Wrench } from "lucide-react";
+import { WorkingIcon, RepairStatusIcon, PausedIcon } from "@/components/repair-icons";
+import { Clock3, UserRound } from "lucide-react";
+import { AutomationIcon as Bot, ActiveIcon as Check, LockedIcon as LockKeyhole, ReadyIcon as Power, RepairsIcon as Wrench } from "@/components/repair-icons";
 import { getRepairOperatingCost, getRepairProgress } from "@/game/logic/game";
 import type { AutomationPriority, Employee, GameState, Workstation } from "@/game/types";
 import { formatClock, formatMoney } from "@/utils/format";
@@ -66,7 +68,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
     <article className={`station-card station-${workstation.status}`}>
       <header>
         <div><span className="station-code">STATION 0{workstation.index}</span><h4>Arbeitsplatz {workstation.index}</h4></div>
-        <span className={`station-state ${workstation.status}`}>{completed ? "Fertig" : active ? "Reparatur" : "Bereit"}</span>
+        <span className={`station-state ${workstation.status}`}>{completed ? <Check size="xs"/> : active ? <RepairStatusIcon size="xs"/> : <Power size="xs"/>} {completed ? "Fertig" : active ? "Reparatur" : "Bereit"}</span>
       </header>
 
       <div className="station-operator">
@@ -91,7 +93,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
           <div className="station-modifiers"><span>{active.speedMultiplier.toFixed(2)}x Speed</span><span>Qualität {active.qualityRating}</span>{active.specializationBonus && <span className="bonus">Spezialbonus</span>}</div>
           {!workstation.automationEnabled && (
             <button className="station-complete" disabled={!completed} onClick={() => onComplete(workstation.id)}>
-              {completed ? <Check size={16} /> : <Clock3 size={16} />}{completed ? "Reparatur abnehmen" : "Reparatur läuft"}
+              {completed ? <Check size={16} /> : <WorkingIcon size={16} />}{completed ? "Reparatur abnehmen" : "Reparatur läuft"}
             </button>
           )}
         </div>
@@ -102,7 +104,7 @@ function StationCard({ workstation, state, now, onPurchase, onComplete, onAssign
       {workstation.index > 1 && (
         <div className="automation-controls">
           <button className={workstation.automationEnabled ? "is-on" : ""} disabled={!employee} onClick={() => onToggleAutomation(workstation.id)}>
-            <Bot size={15} /> Auto Repair: {workstation.automationEnabled ? "ON" : "OFF"}
+            {workstation.automationEnabled ? <Bot size={15}/> : <PausedIcon size="xs"/>} Auto Repair: {workstation.automationEnabled ? "ON" : "OFF"}
           </button>
           <select disabled={!employee || !workstation.automationEnabled} value={workstation.automationPriority} onChange={(event) => onSetPriority(workstation.id, event.target.value as AutomationPriority)} aria-label={`Priorität für Arbeitsplatz ${workstation.index}`}>
             {PRIORITIES.filter((priority) => priority.value !== "fastest-jobs" || state.researchedNodes.includes("advanced-automation") || workstation.automationPriority === "fastest-jobs").map((priority) => <option key={priority.value} value={priority.value}>{priority.label}{priority.value === "fastest-jobs" && !state.researchedNodes.includes("advanced-automation") ? " (gesperrt)" : ""}</option>)}

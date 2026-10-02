@@ -1,0 +1,650 @@
+{
+  "source": "User-provided Repair Empire asset sheet",
+  "sourceWidth": 1536,
+  "sourceHeight": 1024,
+  "assets": [
+    {
+      "group": "brand",
+      "name": "logo-full",
+      "width": 552,
+      "height": 176,
+      "sourceRect": {
+        "left": 30,
+        "top": 48,
+        "width": 552,
+        "height": 176
+      }
+    },
+    {
+      "group": "brand",
+      "name": "logo-compact",
+      "width": 264,
+      "height": 132,
+      "sourceRect": {
+        "left": 635,
+        "top": 78,
+        "width": 264,
+        "height": 132
+      }
+    },
+    {
+      "group": "brand",
+      "name": "mark",
+      "width": 150,
+      "height": 164,
+      "sourceRect": {
+        "left": 946,
+        "top": 56,
+        "width": 150,
+        "height": 164
+      }
+    },
+    {
+      "group": "brand",
+      "name": "mark-monochrome",
+      "width": 68,
+      "height": 79,
+      "sourceRect": {
+        "left": 1340,
+        "top": 313,
+        "width": 68,
+        "height": 79
+      }
+    },
+    {
+      "group": "brand",
+      "name": "mark-outline",
+      "width": 67,
+      "height": 79,
+      "sourceRect": {
+        "left": 1440,
+        "top": 313,
+        "width": 67,
+        "height": 79
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "capital",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 35,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "reputation",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 145,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "company-level",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 251,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "xp",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 358,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "research",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 465,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "employees",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 573,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "customers",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 680,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "contracts",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 786,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "repairs",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 894,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "tools",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 999,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "buildings",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 1106,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "automation",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 1213,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "technology",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 1320,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/resources",
+      "name": "seasons",
+      "width": 78,
+      "height": 78,
+      "sourceRect": {
+        "left": 1428,
+        "top": 553,
+        "width": 78,
+        "height": 78
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "company",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 36,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "workshop",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 123,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "tools",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 210,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "team",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 297,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "customers",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 383,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "research",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 470,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "finance",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 557,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "events",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 644,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "news",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 728,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "seasons",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 812,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/navigation",
+      "name": "settings",
+      "width": 48,
+      "height": 47,
+      "sourceRect": {
+        "left": 898,
+        "top": 750,
+        "width": 48,
+        "height": 47
+      }
+    },
+    {
+      "group": "icons/status",
+      "name": "active",
+      "width": 56,
+      "height": 57,
+      "sourceRect": {
+        "left": 990,
+        "top": 745,
+        "width": 56,
+        "height": 57
+      }
+    },
+    {
+      "group": "icons/status",
+      "name": "working",
+      "width": 56,
+      "height": 57,
+      "sourceRect": {
+        "left": 1058,
+        "top": 745,
+        "width": 56,
+        "height": 57
+      }
+    },
+    {
+      "group": "icons/status",
+      "name": "research",
+      "width": 56,
+      "height": 57,
+      "sourceRect": {
+        "left": 1127,
+        "top": 745,
+        "width": 56,
+        "height": 57
+      }
+    },
+    {
+      "group": "icons/status",
+      "name": "repair",
+      "width": 56,
+      "height": 57,
+      "sourceRect": {
+        "left": 1195,
+        "top": 745,
+        "width": 56,
+        "height": 57
+      }
+    },
+    {
+      "group": "icons/status",
+      "name": "paused",
+      "width": 56,
+      "height": 57,
+      "sourceRect": {
+        "left": 1261,
+        "top": 745,
+        "width": 56,
+        "height": 57
+      }
+    },
+    {
+      "group": "icons/status",
+      "name": "ready",
+      "width": 56,
+      "height": 57,
+      "sourceRect": {
+        "left": 1328,
+        "top": 745,
+        "width": 56,
+        "height": 57
+      }
+    },
+    {
+      "group": "icons/status",
+      "name": "locked",
+      "width": 56,
+      "height": 57,
+      "sourceRect": {
+        "left": 1394,
+        "top": 745,
+        "width": 56,
+        "height": 57
+      }
+    },
+    {
+      "group": "icons/status",
+      "name": "error",
+      "width": 56,
+      "height": 57,
+      "sourceRect": {
+        "left": 1460,
+        "top": 745,
+        "width": 56,
+        "height": 57
+      }
+    },
+    {
+      "group": "icons/skills",
+      "name": "finance",
+      "width": 84,
+      "height": 91,
+      "sourceRect": {
+        "left": 34,
+        "top": 883,
+        "width": 84,
+        "height": 91
+      }
+    },
+    {
+      "group": "icons/skills",
+      "name": "technician",
+      "width": 84,
+      "height": 91,
+      "sourceRect": {
+        "left": 140,
+        "top": 883,
+        "width": 84,
+        "height": 91
+      }
+    },
+    {
+      "group": "icons/skills",
+      "name": "researcher",
+      "width": 84,
+      "height": 91,
+      "sourceRect": {
+        "left": 246,
+        "top": 883,
+        "width": 84,
+        "height": 91
+      }
+    },
+    {
+      "group": "icons/skills",
+      "name": "manager",
+      "width": 84,
+      "height": 91,
+      "sourceRect": {
+        "left": 352,
+        "top": 883,
+        "width": 84,
+        "height": 91
+      }
+    },
+    {
+      "group": "icons/skills",
+      "name": "negotiator",
+      "width": 84,
+      "height": 91,
+      "sourceRect": {
+        "left": 458,
+        "top": 883,
+        "width": 84,
+        "height": 91
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "upgrade",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 807,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "level-up",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 880,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "expand",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 953,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "location",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 1026,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "warehouse",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 1099,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "technology",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 1172,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "premium",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 1245,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "info",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 1318,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "delete",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 1391,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "group": "icons/ui",
+      "name": "edit",
+      "width": 48,
+      "height": 48,
+      "sourceRect": {
+        "left": 1464,
+        "top": 904,
+        "width": 48,
+        "height": 48
+      }
+    }
+  ],
+  "resampledAppSizes": [
+    16,
+    32,
+    180,
+    192,
+    512
+  ]
+}

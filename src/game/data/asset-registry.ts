@@ -1,3 +1,4 @@
+export { BRAND_ASSETS, ICON_SIZES } from "./brand-assets";
 export const ASSET_REGISTRY: Record<string, { renderer: "CSS_LAYER"; token: string }> = {
   "character.outfit.basic": { renderer: "CSS_LAYER", token: "outfit-basic" },
   "character.outfit.dark": { renderer: "CSS_LAYER", token: "outfit-dark" },

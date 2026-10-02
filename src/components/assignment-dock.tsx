@@ -1,4 +1,5 @@
-import { Check, Cpu, X } from "lucide-react";
+import { X } from "lucide-react";
+import { ActiveIcon as Check, TechnologyIcon as Cpu } from "@/components/repair-icons";
 import { getAssignedEmployee, getJobEconomy, getWorkstationEligibility } from "@/game/logic/game";
 import type { GameState, RepairOrder } from "@/game/types";
 import { formatMoney } from "@/utils/format";

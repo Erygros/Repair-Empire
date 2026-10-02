@@ -3,7 +3,7 @@ import { Component, useEffect, useRef, useState, type ReactNode, type RefObject 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, OrbitControls, OrthographicCamera } from "@react-three/drei";
 import { BackSide, Vector3, type OrthographicCamera as Camera } from "three";
-import { Building2 } from "lucide-react";
+import { RepairEmpireIcon } from "@/components/repair-icons";
 import type { OrbitControls as Controls } from "three-stdlib";
 import { CAMPUS_PLOTS } from "@/game/data/campus";
 import { getBuildingState } from "@/game/data/buildings";
@@ -12,6 +12,7 @@ import { BuildingArt, CampusGround, MapFounder } from "@/components/campus-art";
 import type { BuildingType, GameState } from "@/game/types";
 
 export const CAMPUS_NAMES: Record<BuildingType, string> = { WORKSHOP: "Werkstatt", TOOL_WAREHOUSE: "Werkzeuglager", PERSONNEL: "Personal", BUSINESS_OFFICE: "Kundenbüro", RESEARCH: "Forschung", FINANCE: "Finanzen" };
+const CAMPUS_ICONS: Record<BuildingType,string> = { WORKSHOP: "workshop", TOOL_WAREHOUSE: "tools", PERSONNEL: "team", BUSINESS_OFFICE: "customers", RESEARCH: "research", FINANCE: "finance" };
 function CameraRig({ resetKey, zoomStep, focus, mobile }: { resetKey: number; zoomStep: number; focus: BuildingType | null; mobile: boolean }) {
   const { size, invalidate } = useThree();
   const camera = useRef<Camera>(null), controls = useRef<Controls>(null), previousZoom = useRef(zoomStep);
@@ -58,5 +59,5 @@ export function CampusScene3D({ state, selected, onSelect, onClear, onOpenProfil
     {CAMPUS_PLOTS.map(plot => <group key={plot.buildingId} name={`building-${plot.buildingId}`} position={[(plot.x + plot.width / 2 - 800) / 60, .12, (plot.y + plot.depth / 2 - 460) / 60]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onSelect(plot.buildingId); }} onPointerOver={event => { event.stopPropagation(); setHovered(plot.buildingId); }} onPointerOut={() => setHovered(null)}><BuildingArt id={plot.buildingId} w={plot.width / 60} d={plot.depth / 60} tier={getBuildingState(state, plot.buildingId).visualTier} selected={selected === plot.buildingId} hovered={hovered === plot.buildingId}/></group>)}
     {state.playerCharacter && <MapFounder character={state.playerCharacter} onOpen={onOpenProfile} reduced={reduced}/>}
     <ProjectLabels state={state} labels={labels}/>
-  </Canvas></SceneBoundary><div className="campus-labels">{CAMPUS_PLOTS.map(plot => { const building = getBuildingState(state, plot.buildingId), upgrade = getBuildingUpgradeCheck(state, plot.buildingId); return <div key={plot.buildingId} ref={element => { if (element) labels.current[plot.buildingId] = element; else delete labels.current[plot.buildingId]; }}><button className={`campus-label ${selected === plot.buildingId ? "selected" : ""} ${hovered === plot.buildingId ? "hovered" : ""}`} title={CAMPUS_NAMES[plot.buildingId]} aria-label={`${CAMPUS_NAMES[plot.buildingId]} auswählen`} aria-pressed={selected === plot.buildingId} onMouseEnter={() => setHovered(plot.buildingId)} onMouseLeave={() => setHovered(null)} onClick={() => onSelect(plot.buildingId)}><Building2 size={13}/><span>{CAMPUS_NAMES[plot.buildingId]}</span><small>Lv. {building.level} · {building.unlocked ? "In Betrieb" : "Gesperrt"}<br/>{upgrade.available ? "Ausbau möglich" : upgrade.reason}</small></button></div>; })}</div></div>;
+  </Canvas></SceneBoundary><div className="campus-labels">{CAMPUS_PLOTS.map(plot => { const building = getBuildingState(state, plot.buildingId), upgrade = getBuildingUpgradeCheck(state, plot.buildingId); return <div key={plot.buildingId} ref={element => { if (element) labels.current[plot.buildingId] = element; else delete labels.current[plot.buildingId]; }}><button className={`campus-label ${selected === plot.buildingId ? "selected" : ""} ${hovered === plot.buildingId ? "hovered" : ""}`} title={CAMPUS_NAMES[plot.buildingId]} aria-label={`${CAMPUS_NAMES[plot.buildingId]} auswählen`} aria-pressed={selected === plot.buildingId} onMouseEnter={() => setHovered(plot.buildingId)} onMouseLeave={() => setHovered(null)} onClick={() => onSelect(plot.buildingId)}><RepairEmpireIcon category="navigation" name={CAMPUS_ICONS[plot.buildingId]} size="xs"/><span>{CAMPUS_NAMES[plot.buildingId]}</span><small>Lv. {building.level} · {building.unlocked ? "In Betrieb" : "Gesperrt"}<br/>{upgrade.available ? "Ausbau möglich" : upgrade.reason}</small></button></div>; })}</div></div>;
 }
