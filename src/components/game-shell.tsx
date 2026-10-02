@@ -108,7 +108,7 @@ export function GameShell() {
       {view === "company" && <CompanyMap state={state} onOpenBuilding={openBuilding} onOpenProfile={openProfile} motion={settings.motion} />}
       {view === "profile" && state.playerCharacter && <CharacterProfile state={state} onBack={() => navigate("company")} onEquip={game.equipCharacterCosmetic} onUnequip={game.unequipCharacterCosmetic} onAppearance={game.updateFounderAppearance} />}
       {activeBuilding && <BuildingViewShell buildingId={activeBuilding} state={state} onClose={() => navigate("company")} onUpgrade={game.purchaseBuildingUpgrade}>
-        {view === "workshop" && <WorkshopExperience state={state} now={game.now} onAccept={acceptOrder} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} />}
+        {view === "workshop" && <WorkshopExperience state={state} now={game.now} onAccept={acceptOrder} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} motion={settings.motion} />}
         {view === "team" && <TeamHub state={state} onHire={game.hireCandidate} onRefresh={game.refreshCandidates} />}
         {view === "customers" && <CustomerCenter state={state} now={game.now} onAcceptContract={game.takeContract} onClaimContract={game.collectContractReward} onCreateMultiOrder={game.startMultiDeviceOrder} />}
         {view === "research" && <ResearchLab state={state} onResearch={game.purchaseResearch} />}

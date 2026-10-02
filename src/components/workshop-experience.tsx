@@ -12,7 +12,7 @@ import { formatClock, formatMoney } from "@/utils/format";
 
 type Panel = "JOBS" | "STATION" | "LOG";
 
-export function WorkshopExperience({ state, now, onAccept, onPurchase, onComplete, onAssignEmployee, onToggleAutomation, onSetPriority }: { state: GameState; now: number; onAccept: (id: string) => string | null; onPurchase: (id: string) => void; onComplete: (id: string) => void; onAssignEmployee: (stationId: string, employeeId: string | null) => void; onToggleAutomation: (id: string) => void; onSetPriority: (id: string, priority: AutomationPriority) => void }) {
+export function WorkshopExperience({ state, now, onAccept, onPurchase, onComplete, onAssignEmployee, onToggleAutomation, onSetPriority, motion }: { state: GameState; now: number; onAccept: (id: string) => string | null; onPurchase: (id: string) => void; onComplete: (id: string) => void; onAssignEmployee: (stationId: string, employeeId: string | null) => void; onToggleAutomation: (id: string) => void; onSetPriority: (id: string, priority: AutomationPriority) => void; motion?: "AUTO" | "FULL" | "REDUCED" }) {
   const initialStation = state.workstations.find(item => item.status === "completed") ?? state.workstations.find(item => item.activeRepair) ?? state.workstations[0];
   const [selectedId, setSelectedId] = useState(initialStation?.id ?? "");
   const [panel, setPanel] = useState<Panel>(initialStation?.activeRepair ? "STATION" : "JOBS");
@@ -21,8 +21,8 @@ export function WorkshopExperience({ state, now, onAccept, onPurchase, onComplet
   const progress = getRepairProgress(active, now);
   const employee = station?.assignedEmployeeId ? state.employees.find((item) => item.id === station.assignedEmployeeId) : null;
   const profit = active && station ? active.order.reward - active.chargedMaterialCost - getRepairOperatingCost(state, active, station) : 0;
-  return <div className="workshop-experience">
-    <WorkshopScene state={state} now={now} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); setPanel("STATION"); }} />
+  return <div className="workshop-experience workshop-industrial">
+    <WorkshopScene state={state} now={now} selectedId={selectedId} onSelect={(id) => { setSelectedId(id); setPanel("STATION"); }} motion={motion} />
     <aside className="workshop-control-panel">
       <nav aria-label="Werkstattsteuerung"><button className={panel === "JOBS" ? "active" : ""} onClick={() => setPanel("JOBS")}><ListChecks size={16} />Aufträge</button><button className={panel === "STATION" ? "active" : ""} onClick={() => setPanel("STATION")}><Settings2 size={16} />Station</button><button className={panel === "LOG" ? "active" : ""} onClick={() => setPanel("LOG")}><Check size={16} />Verlauf</button></nav>
       {panel === "JOBS" && <OrderBoard orders={state.availableOrders} money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} upgrades={state.upgrades} researchedNodes={state.researchedNodes} now={now} onAccept={id => { const assigned = onAccept(id); if (assigned) { setSelectedId(assigned); setPanel("STATION"); } }} />}

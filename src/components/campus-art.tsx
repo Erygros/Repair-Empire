@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { DataTexture, RepeatWrapping, RGBAFormat, SRGBColorSpace, type Group, type Object3D } from "three";
 import { getCampusWalkPose } from "@/components/campus-walk";
-import { FounderAvatar, type Character3DAppearance } from "@/components/character-3d";
+import { FounderAvatar } from "@/components/character-3d";
+import { getFounderAppearance } from "@/components/founder-appearance";
 import type { BuildingType, PlayerCharacter } from "@/game/types";
 
 type Point = [number, number, number];
@@ -154,9 +155,7 @@ export function MapFounder({ character, onOpen, reduced }: { character: PlayerCh
     if (limbs.current.leftLeg) limbs.current.leftLeg.rotation.x = stride;
     if (limbs.current.rightLeg) limbs.current.rightLeg.rotation.x = -stride;
   });
-  const saved = character.model3d && typeof character.model3d === "object" ? character.model3d as Partial<Character3DAppearance> : {};
-  const a: Character3DAppearance = { presentation: "FEMALE", height: 50, build: 50, shoulders: 50, arms: 50, chest: 50, torso: 50, waist: 50, hips: 50, legs: 50, skinTone: character.appearance.skinTone === "LIGHT" ? "PORCELAIN" : character.appearance.skinTone, headShape: "OVAL", eyeShape: "CALM", eyeColor: "BROWN", eyebrows: "NORMAL", nose: "STRAIGHT", mouth: "NEUTRAL", hair: "SHORT", hairColor: character.appearance.hairColor, outfit: "ORANGE", ...saved };
-  for (const key of ["height", "build", "shoulders", "arms", "chest", "torso", "waist", "hips", "legs"] as const) a[key] = typeof a[key] === "number" && Number.isFinite(a[key]) ? Math.min(100, Math.max(0, a[key])) : 50;
+  const a = getFounderAppearance(character);
   return <group ref={walker} name="campus-founder" position={[0, .125, 7.6]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onOpen(); }}>
     <mesh position={[0, .008, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[.3, 24]}/><meshBasicMaterial color="#141b1e" transparent opacity={.5}/></mesh>
     <group ref={body} position={[0, .6, 0]} scale={.37}><FounderAvatar a={a} reduced/></group>
