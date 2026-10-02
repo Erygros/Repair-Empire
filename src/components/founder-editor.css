@@ -1,0 +1,6 @@
+.founder-editor .creator-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.founder-editor .creator-options label{min-width:0}.founder-editor .creator-options select{width:100%;max-width:100%;font-size:11px}
+.founder-editor input[type=range]{margin-top:8px;height:16px;min-height:16px}
+.creator3d>section:first-child>.creator-controls{padding-bottom:0}
+.creator3d .founder-editor{padding-top:8px}
+.creator3d .founder-editor-tools{flex-wrap:wrap;justify-content:center;width:max-content}

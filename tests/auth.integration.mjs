@@ -154,6 +154,20 @@ test("Real PostgreSQL account lifecycle", async t => {
       assert.equal((await request("/play", { cookie })).response.status, 200);
       assert.equal((await request("/api/character", { body: { ceoName: "Test CEO", appearance, founderSkill: "TECHNICIAN" }, cookie })).response.status, 409);
     });
+    await t.test("full Founder edits persist and cannot change the permanent skill", async () => {
+      const [before] = await sql`select * from character where account_id = ${userId}`;
+      const appearance = {...before.appearance,height:83,nose:"WIDE",eyeColor:"GREEN",outfit:"ORANGE"};
+      const body = {ceoName:"Updated CEO",appearance};
+      assert.equal((await request("/api/character",{method:"PATCH",body})).response.status,401);
+      assert.equal((await request("/api/character",{method:"PATCH",body,cookie,origin:"https://foreign.example"})).response.status,403);
+      assert.equal((await request("/api/character",{method:"PATCH",body:{...body,founderSkill:"FINANCE"},cookie})).response.status,400);
+      assert.equal((await request("/api/character",{method:"PATCH",body:{...body,appearance:{...appearance,height:200}},cookie})).response.status,400);
+      assert.equal((await request("/api/character",{method:"PATCH",body,cookie})).response.status,200);
+      const [after] = await sql`select * from character where account_id = ${userId}`;
+      assert.equal(after.id,before.id);assert.equal(after.founder_skill,before.founder_skill);assert.equal(after.ceo_name,"Updated CEO");assert.equal(after.appearance.nose,"WIDE");assert.equal(after.appearance.height,83);
+      assert.equal((await sql`select ceo_name from "user" where id = ${userId}`)[0].ceo_name,"Updated CEO");
+      assert.equal((await sql`select id from company where account_id = ${userId}`).length,1);
+    });
     await t.test("login with existing character routes to play", async () => {
       await request("/api/auth/sign-out", { body: {}, cookie });
       const result = await request("/api/auth/sign-in/username", { body: { username, password } });

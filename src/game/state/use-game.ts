@@ -29,6 +29,8 @@ import { getBuildingFeatureValue, getBuildingState } from "@/game/data/buildings
 import { upgradeBuilding } from "@/game/logic/buildings";
 import { createPlayerCharacter, ensureDefaultCosmetics, equipCosmetic, grantCosmetic, unequipCosmetic } from "@/game/logic/cosmetics";
 import { isImportableSave } from "@/game/logic/health";
+import { updateFounderModel } from "@/game/logic/founder-model";
+import type { Character3DAppearance } from "@/components/character-3d";
 import type { AutomationPriority, BuildingType, CharacterAppearance, CharacterCosmeticSlot, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
 
 const STORAGE_KEY = "repair-empire-save-v1";
@@ -329,6 +331,7 @@ export function useGame() {
   const unequipCharacterCosmetic = useCallback((slot: CharacterCosmeticSlot) => commit((current) => ({ state: unequipCosmetic(current, slot), notice: `${slot} entfernt` })), [commit]);
 
   const updateFounderAppearance = useCallback((appearance: CharacterAppearance) => commit((current) => current.playerCharacter ? { state: { ...current, playerCharacter: { ...current.playerCharacter, appearance } }, notice: "Founder-Aussehen aktualisiert" } : { state: current, notice: "Founder Character fehlt" }), [commit]);
+  const updateFounder3D = useCallback((name:string, model:Character3DAppearance) => commit(current => current.playerCharacter ? {state:{...current,playerCharacter:updateFounderModel(current.playerCharacter,name,model)},notice:"Founder gespeichert"} : {state:current,notice:"Founder Character fehlt"}), [commit]);
 
   const importSave = useCallback((json: string) => {
     try {
@@ -379,6 +382,7 @@ export function useGame() {
     equipCharacterCosmetic,
     unequipCharacterCosmetic,
     updateFounderAppearance,
+    updateFounder3D,
     importSave,
     runDevAction,
     dismissCosmeticUnlock: () => commit((current) => ({ state: { ...current, cosmeticUnlockNotice: null }, notice: "" })),

@@ -17,6 +17,8 @@ import { TeamHub } from "@/components/team-hub";
 import { ToolStore } from "@/components/tool-store";
 import { UpgradeBay } from "@/components/upgrade-bay";
 import { WorkshopExperience } from "@/components/workshop-experience";
+import { DepartmentScene } from "@/components/department-scene";
+import { useWorkshopAmbience } from "@/components/use-workshop-ambience";
 import { PrototypeSettings, usePrototypeSettings } from "@/components/prototype-settings";
 import { PrototypeDevPanel } from "@/components/prototype-dev-panel";
 import { playPrototypeSound } from "@/game/audio/prototype-audio";
@@ -49,10 +51,13 @@ export function GameShell() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [levelFeedback, setLevelFeedback] = useState<string | null>(null);
   const previousLevel = useRef(state.companyLevel);
+  const profileDirty=useRef(false);
+  const setProfileDirty=useCallback((dirty:boolean)=>{profileDirty.current=dirty;},[]);
   const { settings, setSettings } = usePrototypeSettings();
+  useWorkshopAmbience(view === "workshop" && game.hydrated, settings);
   const selectedOrder = state.availableOrders.find((order) => order.id === selectedOrderId) ?? null;
   const activeBuilding = VIEW_BUILDINGS[view] ?? null;
-  const navigate = useCallback((next: GameView) => { setView(next); setSelectedOrderId(null); window.scrollTo({ top: 0, behavior: "instant" }); }, []);
+  const navigate = useCallback((next: GameView) => { if(profileDirty.current && next!=="profile" && !window.confirm("Ungespeicherte Character-Änderungen verwerfen?"))return;setView(next); setSelectedOrderId(null); window.scrollTo({ top: 0, behavior: "instant" }); }, []);
   const openBuilding = useCallback((buildingId: BuildingType) => navigate(BUILDING_VIEWS[buildingId]), [navigate]);
   const openProfile = useCallback(() => navigate("profile"), [navigate]);
   const acceptOrder = (orderId: string) => {
@@ -106,17 +111,18 @@ export function GameShell() {
       <div className="game-content">
       {(view === "challenges" || view === "upgrades") && <header className="game-view-title"><p className="panel-label">DEIN UNTERNEHMEN</p><h2>{view === "challenges" ? "Aufgaben" : "Upgrades"}</h2></header>}
       {view === "company" && <CompanyMap state={state} onOpenBuilding={openBuilding} onOpenProfile={openProfile} motion={settings.motion} />}
-      {view === "profile" && state.playerCharacter && <CharacterProfile state={state} onBack={() => navigate("company")} onEquip={game.equipCharacterCosmetic} onUnequip={game.unequipCharacterCosmetic} onAppearance={game.updateFounderAppearance} />}
+      {view === "profile" && state.playerCharacter && <CharacterProfile state={state} onBack={() => navigate("company")} onEquip={game.equipCharacterCosmetic} onUnequip={game.unequipCharacterCosmetic} onSave={game.updateFounder3D} onDirtyChange={setProfileDirty} motion={settings.motion} />}
       {activeBuilding && <BuildingViewShell buildingId={activeBuilding} state={state} onClose={() => navigate("company")} onUpgrade={game.purchaseBuildingUpgrade}>
         {view === "workshop" && <WorkshopExperience state={state} now={game.now} onAccept={acceptOrder} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} motion={settings.motion} />}
+        {view !== "workshop" && view !== "company" && view !== "profile" && view !== "challenges" && view !== "upgrades" && <div className="department-layout"><DepartmentScene key={view} department={view} state={state} motion={settings.motion} onProfile={openProfile}/><div className="department-controls">
         {view === "team" && <TeamHub state={state} onHire={game.hireCandidate} onRefresh={game.refreshCandidates} />}
         {view === "customers" && <CustomerCenter state={state} now={game.now} onAcceptContract={game.takeContract} onClaimContract={game.collectContractReward} onCreateMultiOrder={game.startMultiDeviceOrder} />}
         {view === "research" && <ResearchLab state={state} onResearch={game.purchaseResearch} />}
         {view === "economy" && <EconomyDashboard state={state} />}
         {view === "tools" && <ToolStore money={state.money} reputation={state.reputation} ownedTools={state.ownedTools} onPurchase={game.purchaseTool} />}
+        </div></div>}
       </BuildingViewShell>}
-      {view === "challenges" && <ChallengeCenter state={state} onClaim={game.claimChallenge} />}
-      {view === "upgrades" && <UpgradeBay money={state.money} reputation={state.reputation} upgrades={state.upgrades} onPurchase={game.purchaseUpgrade} />}
+      {(view === "challenges"||view === "upgrades") && <div className="department-layout"><DepartmentScene key={view} department={view} state={state} motion={settings.motion} onProfile={openProfile}/><div className="department-controls">{view === "challenges"?<ChallengeCenter state={state} onClaim={game.claimChallenge}/>:<UpgradeBay money={state.money} reputation={state.reputation} upgrades={state.upgrades} onPurchase={game.purchaseUpgrade}/>}</div></div>}
       </div></div>
 
       {selectedOrder && <AssignmentDock order={selectedOrder} state={state} onClose={() => setSelectedOrderId(null)} onAssign={(workstationId) => { game.assignOrder(selectedOrder.id, workstationId); setSelectedOrderId(null); }} />}

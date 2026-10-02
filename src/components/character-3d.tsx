@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls, RoundedBox } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import type { Group } from "three";
+import type { EquippedCharacterCosmetics } from "@/game/types";
 
 export interface Character3DAppearance { presentation: "MALE" | "FEMALE"; height: number; build: number; shoulders: number; arms: number; chest: number; torso: number; waist: number; hips: number; legs: number; skinTone: string; headShape: string; eyeShape: string; eyeColor: string; eyebrows: string; nose: string; mouth: string; hair: string; hairColor: string; outfit: string }
 const SKINS: Record<string, string> = { PORCELAIN: "#f2c9ad", WARM: "#d89a71", MEDIUM: "#aa6f4d", DEEP: "#70462f", DARK: "#432a22" };
@@ -15,7 +16,7 @@ function Part({ name, position, scale, color, rotation = [0, 0, 0] }: { name: st
 function Limb({ name, position, radius, length, color }: { name: string; position: Point; radius: number; length: number; color: string }) {
   return <mesh name={name} position={position} castShadow receiveShadow><capsuleGeometry args={[radius, length, 8, 20]}/><meshStandardMaterial color={color} roughness={.85}/></mesh>;
 }
-function Avatar({ a, reduced }: { a: Character3DAppearance; reduced: boolean }) {
+function Avatar({ a, reduced, cosmetics }: { a: Character3DAppearance; reduced: boolean; cosmetics?:EquippedCharacterCosmetics }) {
   const root = useRef<Group>(null);
   useFrame(({ clock }) => { if (root.current) root.current.rotation.y = reduced ? 0 : Math.sin(clock.elapsedTime * .65) * .025; });
   const skin = SKINS[a.skinTone] ?? SKINS.WARM, hair = HAIR[a.hairColor] ?? HAIR.BROWN;
@@ -45,10 +46,12 @@ function Avatar({ a, reduced }: { a: Character3DAppearance; reduced: boolean }) 
       <Part name="upper-lip" position={[0, -.17, .294]} scale={[.092, lips, .019]} color="#9a5749"/>
       <Part name="lower-lip" position={[0, -.19, .291]} scale={[.086, lips * .85, .018]} color="#be7964"/>
       <Part name="mouth-line" position={[0, -.18, .312]} scale={[.079, .004, .005]} color="#653b32"/>
-      <mesh name="hair-cap" position={[0, .03, -.025]} scale={[headWidth + .015, .405, .325]} castShadow><sphereGeometry args={[1, 32, 24, 0, Math.PI * 2, 0, a.hair === "BUZZ" ? .95 : 1.18]}/><meshStandardMaterial color={hair} roughness={.95}/></mesh>
-      {a.hair !== "BUZZ" && <Part name="fringe" position={[a.hair === "SIDE" ? -.09 : 0, .255, .19]} scale={[headWidth * .94, a.hair === "SLICK" ? .075 : .13, .16]} rotation={[0, 0, a.hair === "SIDE" ? -.22 : 0]} color={hair}/>}
+      {cosmetics?.HEADWEAR!=="headwear-technician-cap"&&<mesh name="hair-cap" position={[0, .03, -.025]} scale={[headWidth + .015, .405, .325]} castShadow><sphereGeometry args={[1, 32, 24, 0, Math.PI * 2, 0, a.hair === "BUZZ" ? .95 : 1.18]}/><meshStandardMaterial color={hair} roughness={.95}/></mesh>}
+      {a.hair !== "BUZZ" && cosmetics?.HEADWEAR!=="headwear-technician-cap" && <Part name="fringe" position={[a.hair === "SIDE" ? -.09 : 0, .255, .19]} scale={[headWidth * .94, a.hair === "SLICK" ? .075 : .13, .16]} rotation={[0, 0, a.hair === "SIDE" ? -.22 : 0]} color={hair}/>}
       {["MEDIUM", "LONG", "CURLY"].includes(a.hair) && <Part name="back-hair" position={[0, a.hair === "LONG" ? -.24 : -.07, -.22]} scale={[headWidth * 1.06, a.hair === "LONG" ? .53 : .34, .15]} color={hair}/>}
-      {a.hair === "CURLY" && [-2, -1, 0, 1, 2].map(i => <Part key={i} name={`curl-${i}`} position={[i * .115, .32 + (2 - Math.abs(i)) * .025, .1]} scale={[.11, .12, .16]} color={hair}/>)}
+      {a.hair === "CURLY" && cosmetics?.HEADWEAR!=="headwear-technician-cap" && [-2, -1, 0, 1, 2].map(i => <Part key={i} name={`curl-${i}`} position={[i * .115, .32 + (2 - Math.abs(i)) * .025, .1]} scale={[.11, .12, .16]} color={hair}/>)}
+      {cosmetics?.HEADWEAR==="headwear-technician-cap"&&<group name="founder-technician-cap"><mesh position={[0,.12,-.02]} scale={[headWidth+.035,.36,.34]} castShadow><sphereGeometry args={[1,24,16,0,Math.PI*2,0,Math.PI/2]}/><meshStandardMaterial color="#395960" roughness={.9}/></mesh><RoundedBox args={[headWidth*1.9,.045,.34]} radius={.018} position={[0,.18,.3]} castShadow><meshStandardMaterial color="#395960"/></RoundedBox></group>}
+      {cosmetics?.ACCESSORY==="accessory-safety-glasses"&&<group name="founder-safety-glasses" position={[0,.055,.36]}>{[-1,1].map(side=><group key={side} position={[side*.13,0,0]}><mesh><torusGeometry args={[.079,.009,8,24]}/><meshStandardMaterial color="#6e8e94" metalness={.6}/></mesh><mesh><circleGeometry args={[.069,24]}/><meshPhysicalMaterial color="#b4d9e0" transparent opacity={.18} roughness={.08}/></mesh></group>)}<mesh><boxGeometry args={[.1,.012,.012]}/><meshStandardMaterial color="#6e8e94"/></mesh></group>}
     </group>
     <Limb name="neck" position={[0, neckY + .14, 0]} radius={.115} length={.25} color={skin}/>
     <mesh name="jacket-torso" position={[0, 1.42 + torso / 2, 0]} scale={[1, 1, .72]} castShadow receiveShadow><cylinderGeometry args={[shoulder * (a.presentation === "MALE" ? 1.1 : 1), .28 + a.waist * .001, torso, 32]}/><meshStandardMaterial color={jacket} roughness={.88}/></mesh>
@@ -92,11 +95,11 @@ function CameraFraming({ resetKey }: { resetKey: number }) {
   }, [camera, size.width, size.height, resetKey]);
   return null;
 }
-export function Character3D({ appearance, quality = "AUTO", resetKey = 0 }: { appearance: Character3DAppearance; quality?: "AUTO" | "LOW" | "MEDIUM" | "HIGH"; resetKey?: number }) {
+export function Character3D({ appearance, quality = "AUTO", resetKey = 0, motion = "AUTO", cosmetics }: { appearance: Character3DAppearance; quality?: "AUTO" | "LOW" | "MEDIUM" | "HIGH"; resetKey?: number; motion?: "AUTO"|"FULL"|"REDUCED"; cosmetics?:EquippedCharacterCosmetics }) {
   const [reduced, setReduced] = useState(false);
   useEffect(() => { const media = matchMedia("(prefers-reduced-motion: reduce)"); const update = () => setReduced(media.matches); update(); media.addEventListener("change", update); return () => media.removeEventListener("change", update); }, []);
   return <Canvas aria-label="Drehbare 3D-Vorschau des Charakters" gl={{ preserveDrawingBuffer: true, antialias: quality !== "LOW" }} shadows={quality !== "LOW"} dpr={quality === "HIGH" ? [1, 2] : [1, 1.4]} camera={{ position: [0, .35, 6.5], fov: 37 }}>
     <color attach="background" args={["#0b1215"]}/><ambientLight intensity={.9}/><directionalLight position={[4, 6, 5]} intensity={2.2} color="#ffe0c3" castShadow/><directionalLight position={[-4, 3, 3]} intensity={1.4} color="#a8e3dc"/><pointLight position={[0, 3, -3]} intensity={2} color="#ef7c3b"/>
-    <CameraFraming resetKey={resetKey}/><Avatar a={appearance} reduced={reduced}/><ContactShadows position={[0, -1.62, 0]} opacity={.55} scale={5} blur={2}/><OrbitControls key={resetKey} target={[0, .15, 0]} enablePan={false} minDistance={3.3} maxDistance={20} minPolarAngle={Math.PI * .27} maxPolarAngle={Math.PI * .62}/>
+    <CameraFraming resetKey={resetKey}/><Avatar a={appearance} cosmetics={cosmetics} reduced={motion==="REDUCED"||(motion==="AUTO"&&reduced)}/><ContactShadows position={[0, -1.62, 0]} opacity={.55} scale={5} blur={2}/><OrbitControls key={resetKey} target={[0, .15, 0]} enablePan={false} minDistance={3.3} maxDistance={20} minPolarAngle={Math.PI * .27} maxPolarAngle={Math.PI * .62}/>
   </Canvas>;
 }

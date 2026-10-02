@@ -169,6 +169,6 @@ export function MapFounder({ character, onOpen, reduced }: { character: PlayerCh
   const a = getFounderAppearance(character);
   return <group ref={walker} name="campus-founder" position={[0, .125, 7.6]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onOpen(); }}>
     <mesh position={[0, .008, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[.3, 24]}/><meshBasicMaterial color="#141b1e" transparent opacity={.5}/></mesh>
-    <group ref={body} position={[0, .6, 0]} scale={.37}><FounderAvatar a={a} reduced/><group ref={phone} name="campus-founder-phone" visible={false} position={[.4, .3, .3]} rotation={[-.3, 0, 0]}><ArtBox position={[0, 0, 0]} size={[.15, .27, .025]} color="#192326"/><ArtBox position={[0, 0, .016]} size={[.125, .22, .005]} color="#8cbcd0" glow={.7}/></group></group>
+    <group ref={body} position={[0, .6, 0]} scale={.37}><FounderAvatar a={a} cosmetics={character.equippedCosmetics} reduced/><group ref={phone} name="campus-founder-phone" visible={false} position={[.4, .3, .3]} rotation={[-.3, 0, 0]}><ArtBox position={[0, 0, 0]} size={[.15, .27, .025]} color="#192326"/><ArtBox position={[0, 0, .016]} size={[.125, .22, .005]} color="#8cbcd0" glow={.7}/></group></group>
   </group>;
 }
