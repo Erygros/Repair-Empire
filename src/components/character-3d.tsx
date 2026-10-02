@@ -80,6 +80,7 @@ function Avatar({ a, reduced }: { a: Character3DAppearance; reduced: boolean }) 
     </group>)}
   </group>;
 }
+export { Avatar as FounderAvatar };
 function CameraFraming({ resetKey }: { resetKey: number }) {
   const { camera, size } = useThree();
   useEffect(() => {
