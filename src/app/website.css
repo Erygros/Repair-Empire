@@ -124,3 +124,4 @@
   .re-season-art,.re-season-art .re-season-emblem { min-height:270px; }.re-season-art .re-season-emblem span { bottom:30px; }.scene-kicker { left:16px;top:16px; }.campus-art-label { left:16px;font-size:9px; }
   .re-final > img { object-position:33% center; }
 }
+.public-site.website-v2{min-height:100svh;display:flex;flex-direction:column}.public-site.website-v2>.public-header,.public-site.website-v2>footer{flex-shrink:0}.public-site.website-v2>main{flex:1}.public-site.website-v2>footer{margin-top:auto}
