@@ -17,7 +17,7 @@ function loadModule(file, dependencies = {}) {
   return loaded.exports;
 }
 const data = loadModule("src/game/data/cosmetics.ts");
-const { ensureDefaultCosmetics, grantCosmetic } = loadModule("src/game/logic/cosmetics.ts", { "@/game/data/cosmetics": data });
+const { ensureDefaultCosmetics, grantCosmetic } = loadModule("src/game/logic/cosmetics.ts", { "@/game/data/cosmetics": data, "@/game/data/character-models": loadModule("src/game/data/character-models.ts") });
 const empty = () => ({ cosmeticEntitlements: [], cosmeticUnlockNotice: null, money: 500 });
 
 test("starter cosmetics are granted silently and do not mutate the save", () => {

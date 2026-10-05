@@ -23,7 +23,7 @@ test("server ranking sorts, paginates, hides private data and protects verified 
     assert.equal(anonymousPage.status, 307); assert.equal(anonymousPage.headers.get("location"), "/login");
     const signup = await request("/api/auth/sign-up/email", { username: prefix, email: `${prefix}@example.test`, emailConfirm: `${prefix}@example.test`, password: "Local-Ranking-2026!", passwordConfirm: "Local-Ranking-2026!", ceoName: "Ranking QA", terms: true });
     assert.equal(signup.status, 200); ownId = signup.json.user.id; ids.push(ownId); const cookie = signup.cookie;
-    assert.equal((await request("/api/character", { ceoName: "My CEO", appearance, founderSkill: "TECHNICIAN" }, cookie)).status, 200);
+    assert.equal((await request("/api/character", { ceoName: "My CEO", characterModelId: "founder_male_01", founderSkill: "TECHNICIAN" }, cookie)).status, 200);
     assert.equal((await request("/api/game/verified", undefined, cookie)).json.enabled, false);
     assert.equal((await request("/api/game/verified", { activate: true }, cookie, "https://invalid.test")).status, 403);
     assert.equal((await request("/api/game/verified", { activate: true })).status, 401);

@@ -1,5 +1,6 @@
 import { DEFAULT_APPEARANCE, DEFAULT_COSMETIC_IDS, getCosmetic } from "@/game/data/cosmetics";
 import type { CharacterAppearance, CharacterCosmeticSlot, CosmeticSourceType, GameState, PlayerCharacter } from "@/game/types";
+import { cosmeticCompatible, resolveCharacterModel } from "@/game/data/character-models";
 
 export function normalizeCharacterName(value: string) { return value.trim().replace(/\s+/g, " ").slice(0, 24); }
 export function validateCharacterName(value: string) { const name = normalizeCharacterName(value); return name.length >= 2 ? null : "Name muss mindestens 2 Zeichen besitzen"; }
@@ -23,6 +24,7 @@ export function equipCosmetic(state: GameState, cosmeticId: string) {
   const cosmetic = getCosmetic(cosmeticId);
   if (!state.playerCharacter) return { state, error: "Founder Character fehlt" };
   if (!cosmetic?.equipSlot) return { state, error: "Cosmetic kann nicht am Character ausgerüstet werden" };
+  if (!cosmeticCompatible(resolveCharacterModel(state.playerCharacter), cosmeticId)) return { state, error: "Cosmetic ist mit diesem festen Modell nicht kompatibel." };
   if (!state.cosmeticEntitlements.some((entry) => entry.cosmeticId === cosmeticId)) return { state, error: "Cosmetic ist nicht freigeschaltet" };
   return { state: { ...state, playerCharacter: { ...state.playerCharacter, equippedCosmetics: { ...state.playerCharacter.equippedCosmetics, [cosmetic.equipSlot]: cosmeticId } } }, error: null };
 }

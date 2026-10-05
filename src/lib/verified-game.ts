@@ -5,8 +5,8 @@ import { characters, companies, leaderboardEntries } from "@/db/schema";
 import { createInitialState, processOfflineProgress, runWorkstationTick } from "@/game/logic/game";
 import { applyGameAction, type GameAction } from "@/game/logic/actions";
 import { ensureDefaultCosmetics } from "@/game/logic/cosmetics";
-import { updateFounderModel } from "@/game/logic/founder-model";
-import type { Character3DAppearance } from "@/components/character-3d";
+import { updateFounderIdentity } from "@/game/logic/founder-model";
+import { resolveCharacterModel } from "@/game/data/character-models";
 import type { FounderSkill } from "@/game/data/founder-skills";
 import type { GameState } from "@/game/types";
 
@@ -32,7 +32,7 @@ export async function verifiedGame(accountId: string, input?: { activate?: true;
       state.identity = { ...state.identity, accountId, companyId: company.id, characterId: character.id, companyName: "" };
       state.playerCharacter = { characterId: character.id, displayName: character.ceoName, appearance: { bodyPreset: "BALANCED", skinTone: "WARM", facePreset: "CALM", hairStyle: "SHORT", hairColor: "BROWN" }, equippedCosmetics: { OUTFIT: null, HEADWEAR: null, ACCESSORY: null }, createdAt: character.createdAt.getTime(), founderSkill: character.founderSkill as FounderSkill };
     }
-    state.playerCharacter = updateFounderModel(state.playerCharacter!, character.ceoName, character.appearance as Character3DAppearance);
+    state.playerCharacter = { ...updateFounderIdentity(state.playerCharacter!, character.ceoName, resolveCharacterModel(character)), founderSkill: character.founderSkill as FounderSkill };
     const revision = entry?.revision ?? 0;
     if (entry && input?.revision !== undefined && input.revision !== revision) return { status: 409, enabled: true, state, revision, message: "Spielstand wurde aktualisiert. Bitte Aktion erneut ausführen." };
     const now = Date.now();

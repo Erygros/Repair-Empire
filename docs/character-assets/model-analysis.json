@@ -1,0 +1,924 @@
+[
+  {
+    "source": "rp_nathan_animated_003_walking.fbx",
+    "gender": "male",
+    "meshes": [
+      {
+        "name": "rp_nathan_animated_003_walking_geo",
+        "triangles": 21501,
+        "skinned": true,
+        "bones": 88
+      }
+    ],
+    "triangles": 21501,
+    "materials": 1,
+    "runtimeMaterials": 1,
+    "bones": [
+      {
+        "name": "rp_nathan_animated_003_walking_root",
+        "parent": "rp_nathan_animated_003_walking_CTRL"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_hip",
+        "parent": "rp_nathan_animated_003_walking_root"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_spine_01",
+        "parent": "rp_nathan_animated_003_walking_hip"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_spine_02",
+        "parent": "rp_nathan_animated_003_walking_spine_01"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_spine_03",
+        "parent": "rp_nathan_animated_003_walking_spine_02"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_neck",
+        "parent": "rp_nathan_animated_003_walking_spine_03"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_head",
+        "parent": "rp_nathan_animated_003_walking_neck"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_head_end",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_jaw",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_jaw_end",
+        "parent": "rp_nathan_animated_003_walking_jaw"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eye_l",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eye_end_l",
+        "parent": "rp_nathan_animated_003_walking_eye_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eye_r",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eye_end_r",
+        "parent": "rp_nathan_animated_003_walking_eye_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_mouth_l",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_mouth_r",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eyelid_l",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eyelid_end_l",
+        "parent": "rp_nathan_animated_003_walking_eyelid_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eyelid_r",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eyelid_end_r",
+        "parent": "rp_nathan_animated_003_walking_eyelid_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eyebrow_l",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_eyebrow_r",
+        "parent": "rp_nathan_animated_003_walking_head"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_shoulder_l",
+        "parent": "rp_nathan_animated_003_walking_spine_03"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_upperarm_l",
+        "parent": "rp_nathan_animated_003_walking_shoulder_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_lowerarm_l",
+        "parent": "rp_nathan_animated_003_walking_upperarm_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_hand_l",
+        "parent": "rp_nathan_animated_003_walking_lowerarm_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_thumb_01_l",
+        "parent": "rp_nathan_animated_003_walking_hand_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_thumb_02_l",
+        "parent": "rp_nathan_animated_003_walking_thumb_01_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_thumb_03_l",
+        "parent": "rp_nathan_animated_003_walking_thumb_02_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_thumb_end_l",
+        "parent": "rp_nathan_animated_003_walking_thumb_03_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_index_01_l",
+        "parent": "rp_nathan_animated_003_walking_hand_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_index_02_l",
+        "parent": "rp_nathan_animated_003_walking_index_01_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_index_03_l",
+        "parent": "rp_nathan_animated_003_walking_index_02_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_index_end_l",
+        "parent": "rp_nathan_animated_003_walking_index_03_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_middle_01_l",
+        "parent": "rp_nathan_animated_003_walking_hand_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_middle_02_l",
+        "parent": "rp_nathan_animated_003_walking_middle_01_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_middle_03_l",
+        "parent": "rp_nathan_animated_003_walking_middle_02_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_middle_end_l",
+        "parent": "rp_nathan_animated_003_walking_middle_03_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ring_01_l",
+        "parent": "rp_nathan_animated_003_walking_hand_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ring_02_l",
+        "parent": "rp_nathan_animated_003_walking_ring_01_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ring_03_l",
+        "parent": "rp_nathan_animated_003_walking_ring_02_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ring_end_l",
+        "parent": "rp_nathan_animated_003_walking_ring_03_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_pinky_01_l",
+        "parent": "rp_nathan_animated_003_walking_hand_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_pinky_02_l",
+        "parent": "rp_nathan_animated_003_walking_pinky_01_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_pinky_03_l",
+        "parent": "rp_nathan_animated_003_walking_pinky_02_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_pinky_end_l",
+        "parent": "rp_nathan_animated_003_walking_pinky_03_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_lowerarm_twist_l",
+        "parent": "rp_nathan_animated_003_walking_lowerarm_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_upperarm_twist_l",
+        "parent": "rp_nathan_animated_003_walking_upperarm_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_shoulder_r",
+        "parent": "rp_nathan_animated_003_walking_spine_03"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_upperarm_r",
+        "parent": "rp_nathan_animated_003_walking_shoulder_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_lowerarm_r",
+        "parent": "rp_nathan_animated_003_walking_upperarm_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_hand_r",
+        "parent": "rp_nathan_animated_003_walking_lowerarm_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_thumb_01_r",
+        "parent": "rp_nathan_animated_003_walking_hand_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_thumb_02_r",
+        "parent": "rp_nathan_animated_003_walking_thumb_01_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_thumb_03_r",
+        "parent": "rp_nathan_animated_003_walking_thumb_02_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_thumb_end_r",
+        "parent": "rp_nathan_animated_003_walking_thumb_03_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_index_01_r",
+        "parent": "rp_nathan_animated_003_walking_hand_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_index_02_r",
+        "parent": "rp_nathan_animated_003_walking_index_01_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_index_03_r",
+        "parent": "rp_nathan_animated_003_walking_index_02_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_index_end_r",
+        "parent": "rp_nathan_animated_003_walking_index_03_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_middle_01_r",
+        "parent": "rp_nathan_animated_003_walking_hand_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_middle_02_r",
+        "parent": "rp_nathan_animated_003_walking_middle_01_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_middle_03_r",
+        "parent": "rp_nathan_animated_003_walking_middle_02_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_middle_end_r",
+        "parent": "rp_nathan_animated_003_walking_middle_03_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ring_01_r",
+        "parent": "rp_nathan_animated_003_walking_hand_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ring_02_r",
+        "parent": "rp_nathan_animated_003_walking_ring_01_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ring_03_r",
+        "parent": "rp_nathan_animated_003_walking_ring_02_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ring_end_r",
+        "parent": "rp_nathan_animated_003_walking_ring_03_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_pinky_01_r",
+        "parent": "rp_nathan_animated_003_walking_hand_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_pinky_02_r",
+        "parent": "rp_nathan_animated_003_walking_pinky_01_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_pinky_03_r",
+        "parent": "rp_nathan_animated_003_walking_pinky_02_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_pinky_end_r",
+        "parent": "rp_nathan_animated_003_walking_pinky_03_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_lowerarm_twist_r",
+        "parent": "rp_nathan_animated_003_walking_lowerarm_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_upperarm_twist_r",
+        "parent": "rp_nathan_animated_003_walking_upperarm_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_upperleg_l",
+        "parent": "rp_nathan_animated_003_walking_hip"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_lowerleg_l",
+        "parent": "rp_nathan_animated_003_walking_upperleg_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_foot_l",
+        "parent": "rp_nathan_animated_003_walking_lowerleg_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ball_l",
+        "parent": "rp_nathan_animated_003_walking_foot_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_foot_end_l",
+        "parent": "rp_nathan_animated_003_walking_ball_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_lowerleg_twist_l",
+        "parent": "rp_nathan_animated_003_walking_lowerleg_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_upperleg_twist_l",
+        "parent": "rp_nathan_animated_003_walking_upperleg_l"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_upperleg_r",
+        "parent": "rp_nathan_animated_003_walking_hip"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_lowerleg_r",
+        "parent": "rp_nathan_animated_003_walking_upperleg_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_foot_r",
+        "parent": "rp_nathan_animated_003_walking_lowerleg_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_ball_r",
+        "parent": "rp_nathan_animated_003_walking_foot_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_foot_end_r",
+        "parent": "rp_nathan_animated_003_walking_ball_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_lowerleg_twist_r",
+        "parent": "rp_nathan_animated_003_walking_lowerleg_r"
+      },
+      {
+        "name": "rp_nathan_animated_003_walking_upperleg_twist_r",
+        "parent": "rp_nathan_animated_003_walking_upperleg_r"
+      }
+    ],
+    "clips": [
+      {
+        "name": "WALK",
+        "duration": 2.2666666507720947,
+        "tracks": 176
+      }
+    ],
+    "sourceClips": [
+      {
+        "name": "Take 001",
+        "duration": 2.2666666507720947,
+        "tracks": 176
+      }
+    ],
+    "textures": [
+      {
+        "label": "diffuse",
+        "width": 8192,
+        "height": 8192
+      },
+      {
+        "label": "normal",
+        "width": 8192,
+        "height": 8192
+      },
+      {
+        "label": "gloss",
+        "width": 8192,
+        "height": 8192
+      }
+    ],
+    "posedBounds": {
+      "size": [
+        58.22552965265462,
+        183.4267169551183,
+        89.77608016723518
+      ],
+      "center": [
+        -0.6510600762481964,
+        91.3975779723697,
+        12.808805262101437
+      ]
+    },
+    "bounds": {
+      "min": [
+        -95.39098358154298,
+        -0.1511513232728645,
+        -13.269074242219512
+      ],
+      "max": [
+        93.87062072753905,
+        186.76197204263337,
+        21.350507734322548
+      ],
+      "size": [
+        189.26160430908203,
+        186.91312336590624,
+        34.61958197654206
+      ],
+      "center": [
+        -0.7601814270019673,
+        93.30541035968025,
+        4.040716746051518
+      ]
+    },
+    "sourceRotation": [
+      0,
+      0,
+      0,
+      "XYZ"
+    ],
+    "sourceScale": [
+      1,
+      1,
+      1
+    ],
+    "failed": [],
+    "runtimeBytes": 6702040
+  },
+  {
+    "source": "rp_sophia_animated_003_idling_ue4.fbx",
+    "gender": "female",
+    "meshes": [
+      {
+        "name": "rp_sophia_rigged_003_ue4",
+        "triangles": 16472,
+        "skinned": true,
+        "bones": 95
+      }
+    ],
+    "triangles": 16472,
+    "materials": 1,
+    "runtimeMaterials": 1,
+    "bones": [
+      {
+        "name": "root",
+        "parent": "rp_sophia_rigged_003_ue4"
+      },
+      {
+        "name": "pelvis",
+        "parent": "root"
+      },
+      {
+        "name": "spine_01",
+        "parent": "pelvis"
+      },
+      {
+        "name": "spine_02",
+        "parent": "spine_01"
+      },
+      {
+        "name": "spine_03",
+        "parent": "spine_02"
+      },
+      {
+        "name": "neck_01",
+        "parent": "spine_03"
+      },
+      {
+        "name": "head",
+        "parent": "neck_01"
+      },
+      {
+        "name": "head_end",
+        "parent": "head"
+      },
+      {
+        "name": "jaw",
+        "parent": "head"
+      },
+      {
+        "name": "jaw_end",
+        "parent": "jaw"
+      },
+      {
+        "name": "eye_l",
+        "parent": "head"
+      },
+      {
+        "name": "eye_end_l",
+        "parent": "eye_l"
+      },
+      {
+        "name": "eye_r",
+        "parent": "head"
+      },
+      {
+        "name": "eye_end_r",
+        "parent": "eye_r"
+      },
+      {
+        "name": "mouth_l",
+        "parent": "head"
+      },
+      {
+        "name": "mouth_r",
+        "parent": "head"
+      },
+      {
+        "name": "eyelid_l",
+        "parent": "head"
+      },
+      {
+        "name": "eyelid_end_l",
+        "parent": "eyelid_l"
+      },
+      {
+        "name": "eyelid_r",
+        "parent": "head"
+      },
+      {
+        "name": "eyelid_end_r",
+        "parent": "eyelid_r"
+      },
+      {
+        "name": "eyebrow_l",
+        "parent": "head"
+      },
+      {
+        "name": "eyebrow_r",
+        "parent": "head"
+      },
+      {
+        "name": "clavicle_l",
+        "parent": "spine_03"
+      },
+      {
+        "name": "upperarm_l",
+        "parent": "clavicle_l"
+      },
+      {
+        "name": "lowerarm_l",
+        "parent": "upperarm_l"
+      },
+      {
+        "name": "hand_l",
+        "parent": "lowerarm_l"
+      },
+      {
+        "name": "thumb_01_l",
+        "parent": "hand_l"
+      },
+      {
+        "name": "thumb_02_l",
+        "parent": "thumb_01_l"
+      },
+      {
+        "name": "thumb_03_l",
+        "parent": "thumb_02_l"
+      },
+      {
+        "name": "thumb_end_l",
+        "parent": "thumb_03_l"
+      },
+      {
+        "name": "index_01_l",
+        "parent": "hand_l"
+      },
+      {
+        "name": "index_02_l",
+        "parent": "index_01_l"
+      },
+      {
+        "name": "index_03_l",
+        "parent": "index_02_l"
+      },
+      {
+        "name": "index_end_l",
+        "parent": "index_03_l"
+      },
+      {
+        "name": "middle_01_l",
+        "parent": "hand_l"
+      },
+      {
+        "name": "middle_02_l",
+        "parent": "middle_01_l"
+      },
+      {
+        "name": "middle_03_l",
+        "parent": "middle_02_l"
+      },
+      {
+        "name": "middle_end_l",
+        "parent": "middle_03_l"
+      },
+      {
+        "name": "ring_01_l",
+        "parent": "hand_l"
+      },
+      {
+        "name": "ring_02_l",
+        "parent": "ring_01_l"
+      },
+      {
+        "name": "ring_03_l",
+        "parent": "ring_02_l"
+      },
+      {
+        "name": "ring_end_l",
+        "parent": "ring_03_l"
+      },
+      {
+        "name": "pinky_01_l",
+        "parent": "hand_l"
+      },
+      {
+        "name": "pinky_02_l",
+        "parent": "pinky_01_l"
+      },
+      {
+        "name": "pinky_03_l",
+        "parent": "pinky_02_l"
+      },
+      {
+        "name": "pinky_end_l",
+        "parent": "pinky_03_l"
+      },
+      {
+        "name": "lowerarm_twist_01_l",
+        "parent": "lowerarm_l"
+      },
+      {
+        "name": "upperarm_twist_01_l",
+        "parent": "upperarm_l"
+      },
+      {
+        "name": "clavicle_r",
+        "parent": "spine_03"
+      },
+      {
+        "name": "upperarm_r",
+        "parent": "clavicle_r"
+      },
+      {
+        "name": "lowerarm_r",
+        "parent": "upperarm_r"
+      },
+      {
+        "name": "hand_r",
+        "parent": "lowerarm_r"
+      },
+      {
+        "name": "thumb_01_r",
+        "parent": "hand_r"
+      },
+      {
+        "name": "thumb_02_r",
+        "parent": "thumb_01_r"
+      },
+      {
+        "name": "thumb_03_r",
+        "parent": "thumb_02_r"
+      },
+      {
+        "name": "thumb_end_r",
+        "parent": "thumb_03_r"
+      },
+      {
+        "name": "index_01_r",
+        "parent": "hand_r"
+      },
+      {
+        "name": "index_02_r",
+        "parent": "index_01_r"
+      },
+      {
+        "name": "index_03_r",
+        "parent": "index_02_r"
+      },
+      {
+        "name": "index_end_r",
+        "parent": "index_03_r"
+      },
+      {
+        "name": "middle_01_r",
+        "parent": "hand_r"
+      },
+      {
+        "name": "middle_02_r",
+        "parent": "middle_01_r"
+      },
+      {
+        "name": "middle_03_r",
+        "parent": "middle_02_r"
+      },
+      {
+        "name": "middle_end_r",
+        "parent": "middle_03_r"
+      },
+      {
+        "name": "ring_01_r",
+        "parent": "hand_r"
+      },
+      {
+        "name": "ring_02_r",
+        "parent": "ring_01_r"
+      },
+      {
+        "name": "ring_03_r",
+        "parent": "ring_02_r"
+      },
+      {
+        "name": "ring_end_r",
+        "parent": "ring_03_r"
+      },
+      {
+        "name": "pinky_01_r",
+        "parent": "hand_r"
+      },
+      {
+        "name": "pinky_02_r",
+        "parent": "pinky_01_r"
+      },
+      {
+        "name": "pinky_03_r",
+        "parent": "pinky_02_r"
+      },
+      {
+        "name": "pinky_end_r",
+        "parent": "pinky_03_r"
+      },
+      {
+        "name": "lowerarm_twist_01_r",
+        "parent": "lowerarm_r"
+      },
+      {
+        "name": "upperarm_twist_01_r",
+        "parent": "upperarm_r"
+      },
+      {
+        "name": "thigh_l",
+        "parent": "pelvis"
+      },
+      {
+        "name": "calf_l",
+        "parent": "thigh_l"
+      },
+      {
+        "name": "foot_l",
+        "parent": "calf_l"
+      },
+      {
+        "name": "ball_l",
+        "parent": "foot_l"
+      },
+      {
+        "name": "foot_end_l",
+        "parent": "ball_l"
+      },
+      {
+        "name": "calf_twist_01_l",
+        "parent": "calf_l"
+      },
+      {
+        "name": "thigh_twist_01_l",
+        "parent": "thigh_l"
+      },
+      {
+        "name": "thigh_r",
+        "parent": "pelvis"
+      },
+      {
+        "name": "calf_r",
+        "parent": "thigh_r"
+      },
+      {
+        "name": "foot_r",
+        "parent": "calf_r"
+      },
+      {
+        "name": "ball_r",
+        "parent": "foot_r"
+      },
+      {
+        "name": "foot_end_r",
+        "parent": "ball_r"
+      },
+      {
+        "name": "calf_twist_01_r",
+        "parent": "calf_r"
+      },
+      {
+        "name": "thigh_twist_01_r",
+        "parent": "thigh_r"
+      },
+      {
+        "name": "ik_foot_root",
+        "parent": "root"
+      },
+      {
+        "name": "ik_foot_r",
+        "parent": "ik_foot_root"
+      },
+      {
+        "name": "ik_foot_l",
+        "parent": "ik_foot_root"
+      },
+      {
+        "name": "ik_hand_root",
+        "parent": "root"
+      },
+      {
+        "name": "ik_hand_gun",
+        "parent": "ik_hand_root"
+      },
+      {
+        "name": "ik_hand_r",
+        "parent": "ik_hand_gun"
+      },
+      {
+        "name": "ik_hand_l",
+        "parent": "ik_hand_gun"
+      }
+    ],
+    "clips": [
+      {
+        "name": "IDLE",
+        "duration": 20.33338768881597,
+        "tracks": 190
+      }
+    ],
+    "sourceClips": [
+      {
+        "name": "Take 001",
+        "duration": 20.366666793823242,
+        "tracks": 190
+      }
+    ],
+    "textures": [
+      {
+        "label": "diffuse",
+        "width": 8192,
+        "height": 8192
+      },
+      {
+        "label": "normal",
+        "width": 8192,
+        "height": 8192
+      },
+      {
+        "label": "gloss",
+        "width": 8192,
+        "height": 8192
+      }
+    ],
+    "posedBounds": {
+      "size": [
+        0.534128155758526,
+        1.7080414948196965,
+        0.4537532489935737
+      ],
+      "center": [
+        -0.05005468806635663,
+        0.8390220695650565,
+        -0.07288335114681817
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.6014192173976555,
+        -0.000727147128637244,
+        -0.11646558519994916
+      ],
+      "max": [
+        0.6180223349996052,
+        1.7834096719208052,
+        0.2115506701309769
+      ],
+      "size": [
+        1.2194415523972606,
+        1.7841368190494424,
+        0.32801625533092604
+      ],
+      "center": [
+        0.008301558800974884,
+        0.891341262396084,
+        0.047542542465513864
+      ]
+    },
+    "sourceRotation": [
+      0,
+      0,
+      0,
+      "XYZ"
+    ],
+    "sourceScale": [
+      1,
+      1,
+      1
+    ],
+    "failed": [],
+    "runtimeBytes": 5336460
+  }
+]

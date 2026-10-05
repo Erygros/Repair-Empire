@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { DataTexture, RGBAFormat, SRGBColorSpace, Vector3, type Group, type Object3D } from "three";
+import { DataTexture, RGBAFormat, SRGBColorSpace, type Group } from "three";
 import { getCampusFounderActivity } from "@/components/campus-walk";
 import { Asphalt, CampusTree, DetailedVehicle, Entrance, Glazing, GrassBed, HallRoof, RoofEdges } from "@/components/campus-details";
 import { FounderAvatar } from "@/components/character-3d";
@@ -132,43 +132,21 @@ export function CampusGround({ mobile }: { mobile: boolean }) {
 }
 export function MapFounder({ character, onOpen, reduced }: { character: PlayerCharacter; onOpen: () => void; reduced: boolean }) {
   const walker = useRef<Group>(null), body = useRef<Group>(null), elapsed = useRef(0);
-  const phone = useRef<Group>(null), handPoint = useMemo(() => new Vector3(), []);
-  const limbs = useRef<{ leftArm?: Object3D; rightArm?: Object3D; leftLeg?: Object3D; rightLeg?: Object3D; hand?: Object3D; head?: Object3D }>({});
-  useEffect(() => {
-    const model = body.current; if (!model) return;
-    limbs.current = { leftArm: model.getObjectByName("arm--1"), rightArm: model.getObjectByName("arm-1"), leftLeg: model.getObjectByName("trouser-leg--1")?.parent ?? undefined, rightLeg: model.getObjectByName("trouser-leg-1")?.parent ?? undefined, hand: model.getObjectByName("hand-1"), head: model.getObjectByName("head") };
-    // Pivot the map instance's legs at the hips without changing the creator model.
-    const legs = [limbs.current.leftLeg, limbs.current.rightLeg].filter((leg): leg is Object3D => !!leg);
-    for (const leg of legs) { leg.position.y += 1.35; for (const child of leg.children) child.position.y -= 1.35; }
-    return () => { for (const leg of legs) { leg.position.y -= 1.35; for (const child of leg.children) child.position.y += 1.35; } };
-  }, []);
+  const movingRef = useRef(true), [moving, setMoving] = useState(true);
   useFrame((_, delta) => {
     if (!walker.current || !body.current) return;
     if (!reduced) elapsed.current += Math.min(delta, .05);
-    const pose = getCampusFounderActivity(reduced ? 0 : elapsed.current), stride = reduced || pose.phone ? 0 : pose.stride * .34;
+    const pose = getCampusFounderActivity(reduced ? 0 : elapsed.current);
+    const walking = !reduced && !pose.phone;
+    if (walking !== movingRef.current) { movingRef.current = walking; setMoving(walking); }
     const blend = reduced ? 1 : 1 - Math.exp(-delta * 12);
     const turn = (pose.phone ? .35 : pose.direction * Math.PI / 2) - body.current.rotation.y;
     walker.current.position.x = pose.x;
     body.current.rotation.y += Math.atan2(Math.sin(turn), Math.cos(turn)) * blend;
-    body.current.position.y = .6 + Math.abs(stride) * .035;
-    if (limbs.current.leftArm) limbs.current.leftArm.rotation.x += ((pose.phone ? -.8 : -stride) - limbs.current.leftArm.rotation.x) * blend;
-    if (limbs.current.rightArm) limbs.current.rightArm.rotation.x += ((pose.phone ? -1.35 : stride) - limbs.current.rightArm.rotation.x) * blend;
-    if (limbs.current.leftLeg) limbs.current.leftLeg.rotation.x = stride;
-    if (limbs.current.rightLeg) limbs.current.rightLeg.rotation.x = -stride;
-    if (limbs.current.head) limbs.current.head.rotation.x += ((pose.phone ? .24 : 0) - limbs.current.head.rotation.x) * blend;
-    if (phone.current) {
-      phone.current.visible = pose.phone && !reduced;
-      if (limbs.current.hand) {
-        body.current.updateWorldMatrix(true, true);
-        limbs.current.hand.getWorldPosition(handPoint);
-        phone.current.position.copy(body.current.worldToLocal(handPoint));
-        phone.current.position.y += .09;
-      }
-    }
   });
   const a = getFounderAppearance(character);
   return <group ref={walker} name="campus-founder" position={[0, .125, 7.6]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onOpen(); }}>
     <mesh position={[0, .008, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[.3, 24]}/><meshBasicMaterial color="#141b1e" transparent opacity={.5}/></mesh>
-    <group ref={body} position={[0, .6, 0]} scale={.37}><FounderAvatar a={a} cosmetics={character.equippedCosmetics} reduced/><group ref={phone} name="campus-founder-phone" visible={false} position={[.4, .3, .3]} rotation={[-.3, 0, 0]}><ArtBox position={[0, 0, 0]} size={[.15, .27, .025]} color="#192326"/><ArtBox position={[0, 0, .016]} size={[.125, .22, .005]} color="#8cbcd0" glow={.7}/></group></group>
+    <group ref={body} position={[0, .6, 0]} scale={.37}><FounderAvatar a={a} cosmetics={character.equippedCosmetics} reduced={reduced} animation={moving ? "WALK" : "IDLE"}/></group>
   </group>;
 }

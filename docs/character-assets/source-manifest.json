@@ -1,0 +1,182 @@
+[
+  {
+    "path": "Renderpeople_Model_Catalog.pdf",
+    "bytes": 2402998,
+    "sha256": "7486730ce8595e6f9bdeee82465b2c1a032a91ea5bf28e583aabc8325cf25dae"
+  },
+  {
+    "path": "Renderpeople_Renderpoints_Voucher.pdf",
+    "bytes": 697296,
+    "sha256": "a9dccd677e4994a4d4d947e6dbe9338213146f9bd786718f7bcee95dca70178a"
+  },
+  {
+    "path": "rp_nathan_animated_003_walking.fbx",
+    "bytes": 24646304,
+    "sha256": "7a7a65df5a382049dd6bbb2d0ecbeba260702191916fbca97de537cf952f97ec"
+  },
+  {
+    "path": "rp_nathan_animated_003_walking_A.jpg",
+    "bytes": 118129,
+    "sha256": "5ec03372ff06e76d39ab777d086efcac2c748686640917154a39d3e4237eca8a"
+  },
+  {
+    "path": "rp_nathan_animated_003_walking_corona.c4d",
+    "bytes": 7571343,
+    "sha256": "1c142ebf3ab50ab580542804049c5e0312a9b83abbc003d66eb0ceb19887115c"
+  },
+  {
+    "path": "rp_nathan_animated_003_walking_native.c4d",
+    "bytes": 7601972,
+    "sha256": "81b6769bd8f3f195538aa58b090561a3498db0f5ba9a36b529403036b2a76735"
+  },
+  {
+    "path": "rp_nathan_animated_003_walking_octane.c4d",
+    "bytes": 7624644,
+    "sha256": "a777fac47e79bf2a1797fce342003688e3eb4537a579cda8e64a7c1889c82dae"
+  },
+  {
+    "path": "rp_nathan_animated_003_walking_vray.c4d",
+    "bytes": 7616426,
+    "sha256": "68aed4b53d4d49ed9fe426b0801eefa5381e3336af2516f2de3f21f2c1eb1fad"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_A.jpg",
+    "bytes": 47057,
+    "sha256": "b43202c15c8fa5bc90b42d2c67ff8ca50d484b295d4b9522b06b9d78bc436e3e"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/00_Animations/rp_sophia_animated_003_idling_ue4.uasset",
+    "bytes": 3094981,
+    "sha256": "e8a905f829ed6c8547a1e151bf029510bdf6a315647f20cde57423273d287cb8"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/00_rp_master/rp_master_placeholder/rp_master_normal.uasset",
+    "bytes": 7736,
+    "sha256": "6c692defd4a399c96e3e09791c8dc32e1cc2035e96a2588b18dfea7e0c81a0a2"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/00_rp_master/rp_master_placeholder/rp_master_texture.uasset",
+    "bytes": 6796,
+    "sha256": "d50f45f3729c3829669108a3822f8d0922c52ef50c6e25f8e8d870ed4e1dc74b"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/00_rp_master/RP_Prop_MasterMaterial.uasset",
+    "bytes": 132984,
+    "sha256": "e6272836ced0b27751615d51506079882721f7aa85e9130ced3faed798bb3e88"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/00_rp_master/RP_Prop_MasterMaterial_Inst.uasset",
+    "bytes": 87504,
+    "sha256": "c2211b60cee65fe63cfd70cb46a7e66f10bd421229a810f2c747ba0ebac66583"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/00_rp_master/RP_Rigged_MasterMaterial.uasset",
+    "bytes": 140246,
+    "sha256": "1a0f4e29d7741557dcfc19113dcab291f093477f6aac971a1017d0f6ba6e3933"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/00_rp_master/RP_Rigged_MasterMaterial_Inst.uasset",
+    "bytes": 88264,
+    "sha256": "f0fa075a1a21bd2e26817d077cce3c401233dd56aacb3c5a86b84570b7af15eb"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/00_rp_master/UE4_Mannequin_Skeleton.uasset",
+    "bytes": 53917,
+    "sha256": "ab36af427f62e68a2feecd9b79392e4c20667b182d1f1041de8a138be78198ea"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/rp_sophia_rigged_003_ue4/Materials/rp_sophia_rigged_003_dif.uasset",
+    "bytes": 17672745,
+    "sha256": "f1d4a5325f18fb21928c36ba3748ad2c5eb079809cce02904109efcb58fd175d"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/rp_sophia_rigged_003_ue4/Materials/rp_sophia_rigged_003_gloss.uasset",
+    "bytes": 19344623,
+    "sha256": "44edc1d0097110f96ad18879ca174976b69b401ffc3f05a19d81e285109a2e8a"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/rp_sophia_rigged_003_ue4/Materials/rp_sophia_rigged_003_mask01.uasset",
+    "bytes": 1208186,
+    "sha256": "699fc41daa8b7a523dc11a0483c61ff6e2fa51c6cdebfbb5eb84406e62f56124"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/rp_sophia_rigged_003_ue4/Materials/rp_sophia_rigged_003_mask02.uasset",
+    "bytes": 865225,
+    "sha256": "1a5d6a15a4eb1b6334ede55e04e460afc8229a2e49a90d6496f1953c703cebbc"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/rp_sophia_rigged_003_ue4/Materials/rp_sophia_rigged_003_mat.uasset",
+    "bytes": 141247,
+    "sha256": "d18813124365e7e8b6c0927e52d9f068c912004487744d3e2b79a97bbb8257ce"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/rp_sophia_rigged_003_ue4/Materials/rp_sophia_rigged_003_norm.uasset",
+    "bytes": 30660661,
+    "sha256": "8130c1a0a5dfd9fdd01270e73e1a1eb661c9580f99e1a6d5af09ccb48d551564"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/rp_sophia_rigged_003_ue4/rp_sophia_rigged_003_ue4.uasset",
+    "bytes": 1823639,
+    "sha256": "b7c1fe365d86e89ebd707ad4d2685976394b31553907a46c94ae72f68b313970"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_UE4/RP_Character/rp_sophia_rigged_003_ue4/rp_sophia_rigged_003_ue4_PhysicsAsset.uasset",
+    "bytes": 18069,
+    "sha256": "5be415c1bebfe1f88995951c4530444a1dd5e009b7644fdde4e3421bec2decaf"
+  },
+  {
+    "path": "rp_sophia_animated_003_idling_ue4.fbx",
+    "bytes": 2970512,
+    "sha256": "62d301f5c3cf23860b9b96352b58693749a793ba639b9808b7b6bb6b8006c18e"
+  },
+  {
+    "path": "tex/rp_nathan_animated_003_dif.jpg",
+    "bytes": 5293636,
+    "sha256": "38eae688b4524559c7337593bdc26a2f860c166be1aee44a646bbd1b3e7eb221"
+  },
+  {
+    "path": "tex/rp_nathan_animated_003_gloss.jpg",
+    "bytes": 13314171,
+    "sha256": "47e3b42b61e962ad875c0b1bd46f57749e572db573a3c7f8150de5edce39ccbe"
+  },
+  {
+    "path": "tex/rp_nathan_animated_003_mask01.jpg",
+    "bytes": 2205648,
+    "sha256": "6b61c6a336c16362f2ae3d64221da339b315647872a117da3168e2d538bfa15a"
+  },
+  {
+    "path": "tex/rp_nathan_animated_003_mask02.jpg",
+    "bytes": 201922,
+    "sha256": "71def3bb622b4febb8f016599cc690412673d82e7f861c1a26971fc7b8e00d5e"
+  },
+  {
+    "path": "tex/rp_nathan_animated_003_norm.jpg",
+    "bytes": 11737676,
+    "sha256": "43445715628c596a375f76584aaa4018bd316f2cad1154d01a9f7b7d09cac7a5"
+  },
+  {
+    "path": "tex/rp_sophia_animated_003_dif.jpg",
+    "bytes": 6829656,
+    "sha256": "ccb0cad47ddde26e7d605b563aec0e9116b84ede69457f9ea4bf4e9573e4ee09"
+  },
+  {
+    "path": "tex/rp_sophia_animated_003_gloss.jpg",
+    "bytes": 3898111,
+    "sha256": "370723365824c74e542718df3dc3eed10512ea630a73c95f5245f2f774e4e3ba"
+  },
+  {
+    "path": "tex/rp_sophia_animated_003_mask01.jpg",
+    "bytes": 2216039,
+    "sha256": "3eab692cbd0da9ab2021215ac14eb1f0c38a933e58fbf4e0bbd7aed8d8f90365"
+  },
+  {
+    "path": "tex/rp_sophia_animated_003_mask02.jpg",
+    "bytes": 2173596,
+    "sha256": "5aaffdb3bfd1374c56327575572b2e4981cd2723e3ddd5176c8a34300e59304c"
+  },
+  {
+    "path": "tex/rp_sophia_animated_003_norm.jpg",
+    "bytes": 14802922,
+    "sha256": "6a27a7eb601163843ebbcd7b0b83f9ba0af313d4f82d71186619321fc736f30f"
+  }
+]

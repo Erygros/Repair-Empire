@@ -1,5 +1,7 @@
 import type { Character3DAppearance } from "@/components/character-3d";
 import type { PlayerCharacter } from "@/game/types";
+import type { CharacterModelId } from "@/game/data/character-models";
+export function updateFounderIdentity(character: PlayerCharacter, name: string, modelId: CharacterModelId): PlayerCharacter { return { ...character, displayName: name.trim(), characterModelId: modelId }; }
 
 export function updateFounderModel(character:PlayerCharacter,name:string,model:Character3DAppearance):PlayerCharacter {
   return { ...character, displayName:name.trim(), model3d:{...model}, appearance:{

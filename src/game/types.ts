@@ -55,6 +55,7 @@ export interface EquippedCharacterCosmetics {
 }
 
 export interface PlayerCharacter {
+  characterModelId?: import("@/game/data/character-models").CharacterModelId;
   characterId: string;
   displayName: string;
   appearance: CharacterAppearance;

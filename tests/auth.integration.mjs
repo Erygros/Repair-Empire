@@ -144,27 +144,27 @@ test("Real PostgreSQL account lifecycle", async t => {
       assert.equal((await request("/api/character", { origin: "https://foreign.example", body: {}, cookie })).response.status, 403);
     });
     await t.test("character and company persist, then creator redirects to play", async () => {
-      const appearance = { presentation: "FEMALE", height: 50, build: 50, shoulders: 50, arms: 50, chest: 50, torso: 50, waist: 50, hips: 50, legs: 50, skinTone: "WARM", headShape: "OVAL", eyeShape: "CALM", eyeColor: "BROWN", eyebrows: "NORMAL", nose: "STRAIGHT", mouth: "NEUTRAL", hair: "MEDIUM", hairColor: "BROWN", outfit: "DARK" };
-      const result = await request("/api/character", { body: { ceoName: "Test CEO", appearance, founderSkill: "TECHNICIAN" }, cookie });
+      const body = { ceoName: "Test CEO", characterModelId: "founder_female_01", founderSkill: "TECHNICIAN" };
+      const result = await request("/api/character", { body, cookie });
       assert.equal(result.response.status, 200);
       assert.equal((await sql`select id from character where account_id = ${userId}`).length, 1);
       assert.equal((await sql`select id from company where account_id = ${userId}`).length, 1);
       assert.equal((await request("/api/account/status", { cookie })).json.characterCreated, true);
       await expectRedirect("/create-character", "/play", cookie);
       assert.equal((await request("/play", { cookie })).response.status, 200);
-      assert.equal((await request("/api/character", { body: { ceoName: "Test CEO", appearance, founderSkill: "TECHNICIAN" }, cookie })).response.status, 409);
+      assert.equal((await request("/api/character", { body, cookie })).response.status, 409);
     });
-    await t.test("full Founder edits persist and cannot change the permanent skill", async () => {
+    await t.test("CEO name edits preserve permanent model, skill and legacy data", async () => {
       const [before] = await sql`select * from character where account_id = ${userId}`;
-      const appearance = {...before.appearance,height:83,nose:"WIDE",eyeColor:"GREEN",outfit:"ORANGE"};
-      const body = {ceoName:"Updated CEO",appearance};
+      const body = {ceoName:"Updated CEO"};
       assert.equal((await request("/api/character",{method:"PATCH",body})).response.status,401);
       assert.equal((await request("/api/character",{method:"PATCH",body,cookie,origin:"https://foreign.example"})).response.status,403);
       assert.equal((await request("/api/character",{method:"PATCH",body:{...body,founderSkill:"FINANCE"},cookie})).response.status,400);
-      assert.equal((await request("/api/character",{method:"PATCH",body:{...body,appearance:{...appearance,height:200}},cookie})).response.status,400);
+      assert.equal((await request("/api/character",{method:"PATCH",body:{...body,appearance:{height:200}},cookie})).response.status,400);
+      assert.equal((await request("/api/character",{method:"PATCH",body:{...body,characterModelId:"founder_male_01"},cookie})).response.status,400);
       assert.equal((await request("/api/character",{method:"PATCH",body,cookie})).response.status,200);
       const [after] = await sql`select * from character where account_id = ${userId}`;
-      assert.equal(after.id,before.id);assert.equal(after.founder_skill,before.founder_skill);assert.equal(after.ceo_name,"Updated CEO");assert.equal(after.appearance.nose,"WIDE");assert.equal(after.appearance.height,83);
+      assert.equal(after.id,before.id);assert.equal(after.founder_skill,before.founder_skill);assert.equal(after.ceo_name,"Updated CEO");assert.deepEqual(after.appearance,before.appearance);assert.equal(after.character_model_id,before.character_model_id);
       assert.equal((await sql`select ceo_name from "user" where id = ${userId}`)[0].ceo_name,"Updated CEO");
       assert.equal((await sql`select id from company where account_id = ${userId}`).length,1);
     });

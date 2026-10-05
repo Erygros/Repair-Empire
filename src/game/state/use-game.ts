@@ -1,9 +1,11 @@
 "use client";
 
-import type { Character3DAppearance } from "@/components/character-3d";
+import { resolveCharacterModel, isCharacterModelId } from "@/game/data/character-models";
+import { DEFAULT_APPEARANCE } from "@/game/data/cosmetics";
+import type { FounderSkill } from "@/game/data/founder-skills";
 import { SAVE_VERSION } from "@/game/data/progression";
 import { createPlayerCharacter, ensureDefaultCosmetics, equipCosmetic, unequipCosmetic } from "@/game/logic/cosmetics";
-import { updateFounderModel } from "@/game/logic/founder-model";
+import { updateFounderIdentity } from "@/game/logic/founder-model";
 import {
   createInitialState,
   processOfflineProgress,
@@ -13,7 +15,7 @@ import { isImportableSave } from "@/game/logic/health";
 import { awardCompanyXp } from "@/game/logic/progression";
 import { migrateSave } from "@/game/logic/save";
 import { getCurrentTime } from "@/game/logic/time";
-import type { AutomationPriority, BuildingType, CharacterAppearance, CharacterCosmeticSlot, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
+import type { AutomationPriority, BuildingType, CharacterCosmeticSlot, GameState, OfflineSummary, ResearchId, ToolId, UpgradeId } from "@/game/types";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { applyGameAction, type GameAction } from "@/game/logic/actions";
@@ -77,10 +79,21 @@ export function useGame() {
     fetch("/api/game/verified", { cache: "no-store" }).then(async response => {
       if (!response.ok) throw new Error();
       const result = await response.json();
-      if (!disposed) receiveVerified(result);
+      if (disposed) return;
+      if (!result.enabled) {
+        const identityResponse = await fetch("/api/character", { cache: "no-store" });
+        if (!identityResponse.ok) throw new Error();
+        const identity = await identityResponse.json();
+        if (disposed) return;
+        if (!isCharacterModelId(identity.characterModelId)) throw new Error();
+        const current = ensureDefaultCosmetics(stateRef.current, getCurrentTime());
+        const character = current.playerCharacter ?? { ...createPlayerCharacter(identity.ceoName, DEFAULT_APPEARANCE, "outfit-basic-workwear", Date.parse(identity.createdAt)), equippedCosmetics: { OUTFIT: null, HEADWEAR: null, ACCESSORY: null } };
+        applyState({ ...current, playerCharacter: { ...updateFounderIdentity(character, identity.ceoName, identity.characterModelId), characterId: identity.id, founderSkill: identity.founderSkill as FounderSkill } });
+      }
+      receiveVerified(result);
     }).catch(() => { if (!disposed) setNotice("Server-Spielstand nicht erreichbar. Bitte Seite neu laden."); });
     return () => { disposed = true; };
-  }, [receiveVerified]);
+  }, [receiveVerified, applyState]);
 
   const sendVerified = useCallback((action?: GameAction) => {
     queue.current = queue.current.then(async () => {
@@ -196,13 +209,6 @@ export function useGame() {
 
   const purchaseBuildingUpgrade = useCallback((buildingId: BuildingType) => dispatch({ type: "purchaseBuildingUpgrade", buildingId }), [dispatch]);
 
-  const createFounder = useCallback((name: string, appearance: CharacterAppearance, outfitId: string) => commit((current) => {
-    if (current.playerCharacter) return { state: current, notice: "Founder existiert bereits" };
-    const now = getCurrentTime();
-    const withDefaults = ensureDefaultCosmetics(current, now);
-    return { state: { ...withDefaults, playerCharacter: createPlayerCharacter(name, appearance, outfitId, now), cosmeticUnlockNotice: null }, notice: `Founder ${name} erstellt` };
-  }), [commit]);
-
   const equipCharacterCosmetic = useCallback((cosmeticId: string) => commit((current) => {
     const result = equipCosmetic(current, cosmeticId);
     return { state: result.state, notice: result.error ?? "Cosmetic ausgerüstet" };
@@ -210,8 +216,7 @@ export function useGame() {
 
   const unequipCharacterCosmetic = useCallback((slot: CharacterCosmeticSlot) => commit((current) => ({ state: unequipCosmetic(current, slot), notice: `${slot} entfernt` })), [commit]);
 
-  const updateFounderAppearance = useCallback((appearance: CharacterAppearance) => commit((current) => current.playerCharacter ? { state: { ...current, playerCharacter: { ...current.playerCharacter, appearance } }, notice: "Founder-Aussehen aktualisiert" } : { state: current, notice: "Founder Character fehlt" }), [commit]);
-  const updateFounder3D = useCallback((name: string, model: Character3DAppearance) => commit(current => current.playerCharacter ? { state: { ...current, playerCharacter: updateFounderModel(current.playerCharacter, name, model) }, notice: "Founder gespeichert" } : { state: current, notice: "Founder Character fehlt" }), [commit]);
+  const updateFounder3D = useCallback((name: string) => commit(current => current.playerCharacter ? { state: { ...current, playerCharacter: updateFounderIdentity(current.playerCharacter, name, resolveCharacterModel(current.playerCharacter)) }, notice: "Founder gespeichert" } : { state: current, notice: "Founder Character fehlt" }), [commit]);
 
   const importSave = useCallback((json: string) => {
     if (verifiedRef.current !== false) return "Import ist im serverbestätigten Spielstand nicht verfügbar.";
@@ -220,7 +225,10 @@ export function useGame() {
       if (!isImportableSave(parsed)) return "Save-Struktur ist ungültig";
       const migrated = migrateSave(parsed);
       if (!migrated) return "Save konnte nicht migriert werden";
-      applyState(migrated);
+      const founder = stateRef.current.playerCharacter;
+      const importedFounder = migrated.playerCharacter ?? founder;
+      // Save imports may restore progress and collection, never replace the account's permanent founder.
+      applyState({ ...migrated, playerCharacter: founder && importedFounder ? { ...importedFounder, characterId: founder.characterId, displayName: founder.displayName, characterModelId: resolveCharacterModel(founder), founderSkill: founder.founderSkill, createdAt: founder.createdAt } : founder });
       setNotice("Spielstand importiert");
       return null;
     } catch (error) {
@@ -262,10 +270,8 @@ export function useGame() {
     takeContract,
     collectContractReward,
     purchaseBuildingUpgrade,
-    createFounder,
     equipCharacterCosmetic,
     unequipCharacterCosmetic,
-    updateFounderAppearance,
     updateFounder3D,
     importSave,
     runDevAction,

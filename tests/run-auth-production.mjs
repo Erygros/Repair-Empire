@@ -34,7 +34,7 @@ async function stop(child) {
 const origin = "http://127.0.0.1:3001";
 const app = await server(3001, { BETTER_AUTH_URL: origin });
 try {
-  const tests = spawn(process.execPath, ["--test", "tests/auth.integration.mjs", "tests/leaderboard-game.test.mjs", "tests/leaderboard.integration.mjs"], { env: { ...process.env, NODE_ENV: "production", BETTER_AUTH_URL: origin }, windowsHide: true, stdio: "inherit" });
+  const tests = spawn(process.execPath, ["--test", "tests/auth.integration.mjs", "tests/leaderboard-game.test.mjs", "tests/leaderboard.integration.mjs", "tests/character-models.integration.mjs", "tests/character-models.test.mjs"], { env: { ...process.env, NODE_ENV: "production", BETTER_AUTH_URL: origin }, windowsHide: true, stdio: "inherit" });
   const [code] = await once(tests, "exit");
   assert.equal(code, 0, "Production lifecycle tests must pass.");
 } finally { await stop(app); }

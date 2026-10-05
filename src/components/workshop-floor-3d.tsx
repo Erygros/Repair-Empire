@@ -1,8 +1,8 @@
 "use client";
-import { Component, useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { Component, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, OrthographicCamera } from "@react-three/drei";
-import { Vector3, type Group, type Object3D, type OrthographicCamera as Camera } from "three";
+import { Vector3, type Group, type OrthographicCamera as Camera } from "three";
 import { FounderAvatar, type Character3DAppearance } from "@/components/character-3d";
 import { getFounderAppearance } from "@/components/founder-appearance";
 import { ArtBox } from "@/components/campus-art";
@@ -57,12 +57,11 @@ function Workbench({ station, row, now, selected, onSelect }: { station: Worksta
   </group>;
 }
 export function WorkshopActor({ name, appearance, targetX, targetZ, homeZ, working, reduced, cosmetics, homeX=-5.9, clipboard=false }: { name: string; appearance: Character3DAppearance; targetX: number; targetZ: number; homeZ: number; working: boolean; reduced: boolean; cosmetics?:EquippedCharacterCosmetics;homeX?:number;clipboard?:boolean }) {
-  const root=useRef<Group>(null),body=useRef<Group>(null),time=useRef(0),limbs=useRef<{arms:Object3D[];legs:Object3D[]}>({arms:[],legs:[]});
-  const board=useRef<Group>(null),handPoint=useRef(new Vector3());
-  useEffect(()=>{const model=body.current;if(!model)return;const arms=[model.getObjectByName("arm--1"),model.getObjectByName("arm-1")].filter((item):item is Object3D=>!!item);const legs=[model.getObjectByName("trouser-leg--1")?.parent,model.getObjectByName("trouser-leg-1")?.parent].filter((item):item is Object3D=>!!item);limbs.current={arms,legs};for(const leg of legs){leg.position.y+=1.35;for(const child of leg.children)child.position.y-=1.35}return()=>{for(const leg of legs){leg.position.y-=1.35;for(const child of leg.children)child.position.y+=1.35}}},[]);
-  useFrame((_,delta)=>{const actor=root.current,model=body.current;if(!actor||!model)return;const dt=Math.min(delta,.05);time.current+=dt;const dx=targetX-actor.position.x,dz=targetZ-actor.position.z,distance=Math.hypot(dx,dz),moving=distance>.035;const amount=reduced?1:Math.min(1,dt*2.4/Math.max(distance,.001));actor.position.x+=dx*amount;actor.position.z+=dz*amount;const heading=moving?Math.atan2(dx,dz):working?Math.PI:.2;model.rotation.y=heading;const stride=reduced?0:Math.sin(time.current*7)*(moving?.35:.03);model.position.y=.6+(moving?Math.abs(stride)*.035:0);limbs.current.legs.forEach((leg,i)=>{leg.rotation.x=moving?(i===0?stride:-stride):0});limbs.current.arms.forEach((arm,i)=>{arm.rotation.x=moving?(i===0?-stride:stride):working?-1.4+(reduced?0:Math.sin(time.current*5+i)*.1):0});});
-  useFrame(()=>{if(!board.current||!body.current||!root.current)return;const settled=Math.hypot(targetX-root.current.position.x,targetZ-root.current.position.z)<.05;board.current.visible=clipboard&&working&&settled;const hand=body.current.getObjectByName("hand-1");if(hand&&board.current.visible){body.current.updateWorldMatrix(true,true);hand.getWorldPosition(handPoint.current);board.current.position.copy(body.current.worldToLocal(handPoint.current));board.current.position.x-=.12;board.current.position.y+=.05;}});
-  return <group ref={root} name={name} position={[homeX,.035,homeZ]}><mesh position={[0,.005,0]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.3,24]}/><meshBasicMaterial color="#19292d" transparent opacity={.55}/></mesh><group ref={body} position={[0,.6,0]} scale={.37}><FounderAvatar a={appearance} cosmetics={cosmetics} reduced/>{clipboard&&<group ref={board} visible={false} name="founder-clipboard" rotation={[-.4,0,0]}><ArtBox position={[0,0,0]} size={[.4,.5,.025]} color="#856b4b"/><ArtBox position={[0,0,.019]} size={[.34,.42,.008]} color="#d7ddcd"/>{[-.12,-.02,.08].map(y=><ArtBox key={y} position={[0,y,.026]} size={[.24,.013,.006]} color="#647877"/>)}</group>}</group></group>;
+  const root=useRef<Group>(null), body=useRef<Group>(null), movingRef=useRef(false);
+  const [moving,setMoving]=useState(false);
+  useFrame((_,delta)=>{const actor=root.current,model=body.current;if(!actor||!model)return;const dt=Math.min(delta,.05),dx=targetX-actor.position.x,dz=targetZ-actor.position.z,distance=Math.hypot(dx,dz),walking=!reduced&&distance>.035;const amount=reduced?1:Math.min(1,dt*2.4/Math.max(distance,.001));actor.position.x+=dx*amount;actor.position.z+=dz*amount;model.rotation.y=walking?Math.atan2(dx,dz):working?Math.PI:.2;if(walking!==movingRef.current){movingRef.current=walking;setMoving(walking)}});
+  // Clipboard and procedural limb animation are not fitted to the supplied rigs.
+  return <group ref={root} name={name} position={[homeX,.035,homeZ]} userData={{homeZ,clipboardCompatible:false,requestedClipboard:clipboard}}><mesh position={[0,.005,0]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.3,24]}/><meshBasicMaterial color="#19292d" transparent opacity={.55}/></mesh><group ref={body} position={[0,.6,0]} scale={.37}><FounderAvatar a={appearance} cosmetics={cosmetics} reduced={reduced} animation={moving?"WALK":"IDLE"}/></group></group>;
 }
 export function SpeechProjection({ element, actorName = "workshop-founder" }: { element: RefObject<HTMLDivElement | null>; actorName?:string }) {
   const point=useRef(new Vector3());

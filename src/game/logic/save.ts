@@ -9,6 +9,7 @@ import { migrateBuildings } from "@/game/logic/buildings";
 import { JOB_BOARD_REFRESH_MS, OFFLINE_CAPACITY_MS, getCurrentTime, getDayKey } from "@/game/logic/time";
 import { ensureDefaultCosmetics } from "@/game/logic/cosmetics";
 import { COSMETICS } from "@/game/data/cosmetics";
+import { resolveCharacterModel } from "@/game/data/character-models";
 import type { ActiveRepair, CompletedRepair, Employee, EmployeeCandidate, GameState, RepairOrder, UpgradeId, Workstation } from "@/game/types";
 
 type LegacySave = Partial<GameState> & { activeRepair?: unknown };
@@ -189,7 +190,7 @@ export function migrateSave(value: unknown): GameState | null {
     nextContractNumber: Number.isFinite(value.nextContractNumber) ? Math.max(1, value.nextContractNumber!) : 1,
     buildings: migrateBuildings(value.buildings, { workstations: validatedWorkstations, employees, ownedTools: Array.isArray(value.ownedTools) && value.ownedTools.length > 0 ? value.ownedTools : ["basic-kit"], researchedNodes: Array.isArray(value.researchedNodes) ? value.researchedNodes : [], contracts: Array.isArray(value.contracts) ? value.contracts : [] }),
     lastBuildingUpgrade: value.lastBuildingUpgrade && typeof value.lastBuildingUpgrade === "object" ? value.lastBuildingUpgrade : null,
-    playerCharacter: value.playerCharacter && typeof value.playerCharacter === "object" ? value.playerCharacter : null,
+    playerCharacter: value.playerCharacter && typeof value.playerCharacter === "object" ? { ...value.playerCharacter, characterModelId: resolveCharacterModel(value.playerCharacter) } : null,
     cosmeticEntitlements: Array.isArray(value.cosmeticEntitlements) ? value.cosmeticEntitlements.filter((entry) => COSMETICS.some((cosmetic) => cosmetic.cosmeticId === entry.cosmeticId)) : [],
     cosmeticUnlockNotice: typeof value.cosmeticUnlockNotice === "string" ? value.cosmeticUnlockNotice : null,
   };
