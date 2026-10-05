@@ -57,12 +57,13 @@ export function GameShell() {
   const [levelFeedback, setLevelFeedback] = useState<string | null>(null);
   const previousLevel = useRef(state.companyLevel);
   const profileDirty=useRef(false);
+  const contentRef=useRef<HTMLDivElement>(null);
   const setProfileDirty=useCallback((dirty:boolean)=>{profileDirty.current=dirty;},[]);
   const { settings, setSettings } = usePrototypeSettings();
   useWorkshopAmbience(view === "workshop" && game.hydrated, settings);
   const selectedOrder = state.availableOrders.find((order) => order.id === selectedOrderId) ?? null;
   const activeBuilding = VIEW_BUILDINGS[view] ?? null;
-  const navigate = useCallback((next: GameView) => { if(profileDirty.current && next!=="profile" && !window.confirm("Ungespeicherte Character-Änderungen verwerfen?"))return;setView(next); setSelectedOrderId(null); window.scrollTo({ top: 0, behavior: "instant" }); }, []);
+  const navigate = useCallback((next: GameView) => { if(profileDirty.current && next!=="profile" && !window.confirm("Ungespeicherte Character-Änderungen verwerfen?"))return;setView(next); setSelectedOrderId(null); contentRef.current?.scrollTo({ top: 0, behavior: "instant" }); window.scrollTo({ top: 0, behavior: "instant" }); }, []);
   const openBuilding = useCallback((buildingId: BuildingType) => navigate(BUILDING_VIEWS[buildingId]), [navigate]);
   const openProfile = useCallback(() => navigate("profile"), [navigate]);
   const acceptOrder = (orderId: string) => {
@@ -113,7 +114,7 @@ export function GameShell() {
 
       <div className="game-workspace">
       <nav className="game-rail" aria-label="Spielbereiche">{NAV_ITEMS.map(item => { const Icon = view===item.view&&item.view==="profile"?FounderActiveIcon:view===item.view&&item.view==="challenges"?ChallengeActiveIcon:item.icon; return <button key={item.view} className={item.view === "profile" ? "rail-profile" : undefined} aria-current={view === item.view ? "page" : undefined} onClick={() => navigate(item.view)}><Icon size={24}/><span>{item.label}</span></button>; })}<LogoutButton label="Abmelden" icon beforeLogout={() => { if (profileDirty.current && !window.confirm("Ungespeicherte Character-Änderungen verwerfen und abmelden?")) return false; const now = Date.now(); localStorage.setItem("repair-empire-save-v1", JSON.stringify({ ...state, lastSavedAt: now, lastActiveAt: now })); return true; }}/></nav>
-      <div className="game-content">
+      <div className="game-content" ref={contentRef}>
       {view === "settings" && <AccountSettings/>}
       {(view === "challenges" || view === "upgrades") && <header className="game-view-title"><p className="panel-label">DEIN UNTERNEHMEN</p><h2>{view === "challenges" ? "Aufgaben" : "Upgrades"}</h2></header>}
       {view === "company" && <CompanyMap state={state} onOpenBuilding={openBuilding} onOpenProfile={openProfile} motion={settings.motion} />}
