@@ -5,7 +5,7 @@
 .website-v2 .public-brand{min-width:0}.website-v2 .public-brand>.repair-brand-logo{width:200px;height:64px;padding:0;background:none;border:0;transform:none}
 .game-v3 .brand-lockup{gap:12px}.game-v3 .brand-lockup>.repair-brand-logo{width:210px;height:64px}.game-v3 .brand-lockup .kicker{max-width:140px;white-space:normal;overflow-wrap:anywhere}
 .game-v3 .status-item>.repair-icon{width:24px!important;height:24px!important}
-.game-rail .repair-icon{opacity:.65}.game-rail button:hover .repair-icon,.game-rail button[aria-current=page] .repair-icon{opacity:1}
+.game-rail .repair-icon{opacity:1}.game-rail button:hover .repair-icon,.game-rail button[aria-current=page] .repair-icon{opacity:1}
 .game-rail button[aria-current=page] .repair-icon{outline:1px solid #dc8743;outline-offset:3px;border-radius:3px}
 .repair-icon-navigation{max-width:32px;max-height:32px}
 .campus-label>.repair-icon{margin-right:4px}.settings-trigger .repair-icon{width:24px!important;height:24px!important}.hall-status{display:inline-flex;align-items:center;gap:6px}.reset-save-button .repair-icon{margin-right:8px}

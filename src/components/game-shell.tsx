@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import { BrandLogo, InfoIcon, LevelUpIcon, FounderActiveIcon, ChallengeActiveIcon } from "@/components/repair-icons";
 import { ChallengeIcon as Target, FounderIcon as UserRound } from "@/components/repair-icons";
-import { CompanyLevelIcon as Activity, CapitalIcon as Banknote, CompanyNavIcon as Building2, ResearchNavIcon as FlaskConical, ToolsNavIcon as PackageOpen, ReputationIcon as ShieldCheck, UpgradeIcon as SlidersHorizontal, TeamNavIcon as UsersRound, FinanceNavIcon as Wallet, WorkshopNavIcon as Wrench, CustomersNavIcon as Handshake } from "@/components/repair-icons";
+import { CompanyLevelIcon as Activity, CapitalIcon as Banknote, BuildingsIcon as Building2, ResearchIcon as FlaskConical, ToolsIcon as PackageOpen, ReputationIcon as ShieldCheck, UpgradeIcon as SlidersHorizontal, EmployeesIcon as UsersRound, ReceiptIcon as Wallet, RepairsIcon as Wrench, CustomersIcon as Handshake } from "@/components/repair-icons";
 import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
 import { CompanyMap } from "@/components/company-map";
