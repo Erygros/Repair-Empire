@@ -5,7 +5,7 @@ import { BrandLogo, InfoIcon, LevelUpIcon, FounderActiveIcon, ChallengeActiveIco
 import { AccountSettings } from "@/components/account-settings";
 import { LogoutButton } from "@/components/logout-button";
 import { ChallengeIcon as Target, FounderIcon as UserRound } from "@/components/repair-icons";
-import { CompanyLevelIcon as Activity, CapitalIcon as Banknote, BuildingsIcon as Building2, ResearchIcon as FlaskConical, ToolsIcon as PackageOpen, ReputationIcon as ShieldCheck, UpgradeIcon as SlidersHorizontal, EmployeesIcon as UsersRound, ReceiptIcon as Wallet, RepairsIcon as Wrench, CustomersIcon as Handshake } from "@/components/repair-icons";
+import { CompanyLevelIcon as Activity, CapitalIcon as Banknote, BuildingsIcon as Building2, ResearchIcon as FlaskConical, ToolsIcon as PackageOpen, ReputationIcon as ShieldCheck, EfficiencyIcon as SlidersHorizontal, EmployeesIcon as UsersRound, ReceiptIcon as Wallet, RepairsIcon as Wrench, CustomersIcon as Handshake } from "@/components/repair-icons";
 import { AssignmentDock } from "@/components/assignment-dock";
 import { ChallengeCenter } from "@/components/challenge-center";
 import { CompanyMap } from "@/components/company-map";
