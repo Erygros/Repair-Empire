@@ -24,7 +24,7 @@ test("both fixed identities support all skills, reject legacy requests and survi
       const created=await request("/api/character",body,cookie);assert.equal(created.status,200);
       assert.equal(created.json.gameState.playerCharacter.characterModelId,characterModelId);
       const [character]=await db`select * from character where account_id=${user.id}`;
-      assert.equal(character.character_model_id,characterModelId);assert.equal(character.founder_skill,founderSkill);assert.deepEqual(character.appearance,{});
+      assert.equal(character.founder_skill,founderSkill);assert.deepEqual(character.appearance,{characterModelId});
       const [company]=await db`select game_state from company where account_id=${user.id}`;
       assert.equal(company.game_state.playerCharacter.characterModelId,characterModelId);
       assert.equal((await request("/api/character",{ceoName:"Changed",characterModelId:characterModelId==="founder_male_01"?"founder_female_01":"founder_male_01"},cookie,"PATCH")).status,400);

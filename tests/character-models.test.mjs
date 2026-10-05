@@ -2,12 +2,29 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { loadGameModule } from "./helpers/game-loader.mjs";
-const { CHARACTER_MODELS, CHARACTER_MODEL_IDS, resolveCharacterModel, isCharacterModelId } = loadGameModule("src/game/data/character-models.ts");
+const { CHARACTER_MODELS, CHARACTER_MODEL_IDS, resolveCharacterModel, resolveStoredCharacterModel, isCharacterModelId } = loadGameModule("src/game/data/character-models.ts");
 const { migrateSave } = loadGameModule("src/game/logic/save.ts");
 const { createInitialState } = loadGameModule("src/game/logic/game.ts");
 const { equipCosmetic, createPlayerCharacter } = loadGameModule("src/game/logic/cosmetics.ts");
 const { COSMETICS, DEFAULT_APPEARANCE } = loadGameModule("src/game/data/cosmetics.ts");
 const { applyGameAction } = loadGameModule("src/game/logic/actions.ts");
+test("existing databases resolve fixed founders without the new model column", () => {
+  assert.equal(resolveStoredCharacterModel({ presentation: "MALE", appearance: { height: 99 } }), "founder_male_01");
+  assert.equal(resolveStoredCharacterModel({ presentation: "FEMALE", appearance: {} }), "founder_female_01");
+  assert.equal(resolveStoredCharacterModel({ presentation: "MALE", appearance: { characterModelId: "founder_female_01" } }), "founder_female_01");
+  assert.equal(resolveStoredCharacterModel({ presentation: "MALE", appearance: { characterModelId: "/old.glb" } }), "founder_male_01");
+  for (const path of ["src/app/api/character/route.ts", "src/lib/verified-game.ts"]) {
+    assert.doesNotMatch(readFileSync(path, "utf8"), /characters\.characterModelId|tx\.select\(\)\.from\(characters\)/);
+  }
+  assert.equal(JSON.parse(readFileSync("package.json", "utf8")).scripts.build, "next build");
+});
+
+test("character profile has no legacy wardrobe or appearance controls", () => {
+  const source = readFileSync("src/components/character-profile.tsx", "utf8");
+  assert.doesNotMatch(source, /COSMETICS|onEquip|onUnequip|type="range"|WardrobeIcon/);
+  assert.match(source, /Character3D modelId=\{modelId\}/);
+});
+
 function imageSize(data,mime) {
   if(mime==="image/png")return[data.readUInt32BE(16),data.readUInt32BE(20)];
   assert.equal(data.readUInt16BE(0),0xffd8);

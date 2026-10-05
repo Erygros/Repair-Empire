@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { accountServiceError, getAccountConfig } from "@/lib/account-config";
 import { getAuth } from "@/lib/auth";
@@ -8,7 +8,7 @@ import { characters, companies, users } from "@/db/schema";
 import { createInitialState } from "@/game/logic/game";
 import { ensureDefaultCosmetics, createPlayerCharacter } from "@/game/logic/cosmetics";
 import { DEFAULT_APPEARANCE } from "@/game/data/cosmetics";
-import { CHARACTER_MODELS, CHARACTER_MODEL_IDS } from "@/game/data/character-models";
+import { CHARACTER_MODELS, CHARACTER_MODEL_IDS, resolveStoredCharacterModel } from "@/game/data/character-models";
 
 export const runtime = "nodejs";
 const identity = z.object({ ceoName: z.string().trim().min(2).max(24) }).strict();
@@ -18,8 +18,8 @@ export async function GET() {
   try {
     const session = await getAuth().api.getSession({ headers: await headers() });
     if (!session || session.user.accountStatus !== "ACTIVE") return Response.json({ message: "Unauthorized" }, { status: 401 });
-    const [character] = await getDb().select({ id: characters.id, ceoName: characters.ceoName, characterModelId: characters.characterModelId, founderSkill: characters.founderSkill, createdAt: characters.createdAt }).from(characters).where(eq(characters.accountId, session.user.id));
-    return character ? Response.json(character, { headers: { "Cache-Control": "no-store" } }) : Response.json({ message: "Character not found" }, { status: 404 });
+    const [character] = await getDb().select({ id: characters.id, ceoName: characters.ceoName, presentation: characters.presentation, appearance: characters.appearance, founderSkill: characters.founderSkill, createdAt: characters.createdAt }).from(characters).where(eq(characters.accountId, session.user.id));
+    return character ? Response.json({ id: character.id, ceoName: character.ceoName, characterModelId: resolveStoredCharacterModel(character), founderSkill: character.founderSkill, createdAt: character.createdAt }, { headers: { "Cache-Control": "no-store" } }) : Response.json({ message: "Character not found" }, { status: 404 });
   } catch (error) { return accountServiceError(error); }
 }
 
@@ -53,7 +53,8 @@ export async function POST(request: Request) {
     state.identity = { ...state.identity, accountId: session.user.id, characterId, companyId };
     state.playerCharacter = { ...createPlayerCharacter(ceoName, DEFAULT_APPEARANCE, "outfit-basic-workwear", now), characterId, characterModelId, founderSkill, equippedCosmetics: { OUTFIT: null, HEADWEAR: null, ACCESSORY: null } };
     await getDb().transaction(async tx => {
-      await tx.insert(characters).values({ id: characterId, accountId: session.user.id, ceoName, characterModelId, presentation: CHARACTER_MODELS[characterModelId].presentation, appearance: {}, founderSkill });
+      // Explicit legacy columns also work before the additive model-ID migration.
+      await tx.execute(sql`insert into "character" (id, account_id, ceo_name, presentation, appearance, founder_skill) values (${characterId}, ${session.user.id}, ${ceoName}, ${CHARACTER_MODELS[characterModelId].presentation}, ${JSON.stringify({ characterModelId })}::jsonb, ${founderSkill})`);
       await tx.insert(companies).values({ id: companyId, accountId: session.user.id, characterId, gameState: state });
       await tx.update(users).set({ characterCreated: true, ceoName, updatedAt: new Date() }).where(eq(users.id, session.user.id));
     });

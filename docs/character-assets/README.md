@@ -74,11 +74,11 @@ The additive 0003 migration maps MALE to founder_male_01; FEMALE/ambiguous legac
 presentation maps to founder_female_01, the former default. Old appearance, skills,
 cosmetics, inventory and all economic progress remain untouched. The only change to
 existing company JSON is the characterModelId field when playerCharacter exists.
-Run `npm run db:migrate` with the deployment database before serving this revision.
-The Vercel build first performs a read-only column check. It refuses a new deployment
-if migration is missing, keeping the previous live deployment rather than publishing
-a version that would break character endpoints. It does not run migrations implicitly.
-The migration was applied only to the dedicated local database during development.
+The current runtime no longer requires migration 0003 before deployment: new fixed
+IDs are stored in the existing appearance JSON, and old accounts resolve their model
+from the existing presentation column. Character and verified-game queries explicitly
+avoid the new column. The migration remains available for launch, but Vercel builds
+do not query or mutate the database. Supabase setup can therefore wait until launch.
 
 The models are normalized using measured rest-pose bounds to 3.2 scene units, the same
 floor and center. Existing map, department and workshop rendering technology remains
@@ -101,7 +101,8 @@ No legacy character cosmetic is fitted to either supplied model. The old cosmeti
 are CSS-layer tokens rather than rigged/fitted meshes. Head bones are present, but
 the cap and glasses have no fitted 3D geometry, verified anchors or skin bindings.
 Basic Workwear, Dark Technician, Orange Workshop Jacket, Technician Cap and Safety
-Glasses remain collected/owned, clearly marked incompatible and cannot be equipped.
+Glasses remain collected/owned and cannot be equipped. The profile no longer shows
+wardrobe categories or equip controls while clothing implementation is deferred.
 Existing equipped IDs remain as legacy data; no clipping props are glued onto models.
 Building themes and workstation cosmetics are unaffected. Clothing cannot be swapped
 independently because it is part of each fixed skinned mesh. Clipboard/phone props

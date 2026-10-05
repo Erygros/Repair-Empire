@@ -2,6 +2,26 @@
 
 Local PostgreSQL and browser QA, 2026-10-05. No production data was changed.
 
+## Follow-Up: Fixed Models on Existing Deployments
+
+The live domain returned 404 for both model GLBs before this correction, confirming
+that the new assets were not present in its deployment. The migration-dependent build
+check has been removed. Runtime character queries avoid character_model_id, store new
+IDs in the existing appearance JSON and map legacy presentation to the fixed models.
+No production database migration or Supabase setup is performed by this correction.
+
+Character profile wardrobe/equip controls are removed; owned legacy items stay saved.
+Both models are static everywhere, including map, workshop and departments.
+Typecheck, lint, production build and 32 focused/unit/integration tests pass.
+The production account regression runner passes 43 tests and its safe-503 checks.
+Visible Chromium QA passes for Nathan and Sophia on desktop and touch-emulated mobile:
+creator, profile, workshop, map, static-pose pixels, mouse/touch rotation and zoom,
+identity after reload/tampering/logout/login, nonblank canvases and zero page errors.
+Screenshots and measurements are in .local/qa-fixed-founders. Physical devices and
+the final Vercel deployment still require separate confirmation after the push.
+
+The sections below describe the original rework verification, before this follow-up.
+
 ## Coverage
 
 - 58 automated tests pass across the full existing and new test suites.

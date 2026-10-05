@@ -13,3 +13,10 @@ export function resolveCharacterModel(character: { characterModelId?: unknown; m
   return "founder_female_01";
 }
 export function cosmeticCompatible(modelId: CharacterModelId, cosmeticId: string) { return CHARACTER_MODELS[modelId].compatibleCosmetics.includes(cosmeticId); }
+// Existing databases already have presentation and appearance; no new column is
+// required to deploy the fixed models before the launch database migration.
+export function resolveStoredCharacterModel(character: { presentation: string; appearance: unknown }): CharacterModelId {
+  const appearance = character.appearance;
+  if (appearance && typeof appearance === "object" && "characterModelId" in appearance && isCharacterModelId(appearance.characterModelId)) return appearance.characterModelId;
+  return character.presentation === "MALE" ? "founder_male_01" : "founder_female_01";
+}

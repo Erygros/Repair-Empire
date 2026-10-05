@@ -61,7 +61,7 @@ npm run db:migrate
 
 This migration command loads the normal Next environment files, so confirm the target first. Running it with the generated local .env.local migrates only the local database, not Vercel. Do not use schema resets or drizzle-kit push against production.
 
-Then **Vercel > Deployments > latest deployment > Redeploy**. Saving environment variables does not update an already deployed function. There is no automatic production migration in the build; run migrations explicitly before exercising accounts. Since the fixed-Founder-model revision, Vercel builds run a read-only character_model_id column check first and refuse to deploy if the schema is missing. This protects the previous live deployment without implicitly changing production data.
+Then **Vercel > Deployments > latest deployment > Redeploy**. Saving environment variables does not update an already deployed function. There is no automatic production migration in the build; run migrations explicitly for a new database before exercising accounts. Fixed Founder models also support the existing pre-0003 database: identity is stored in appearance JSON, and legacy presentation resolves to Nathan or Sophia. Builds no longer require the new model-ID column, so Supabase setup can wait until launch.
 
 ## Migrations
 
