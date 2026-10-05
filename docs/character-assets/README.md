@@ -82,10 +82,12 @@ The migration was applied only to the dedicated local database during developmen
 
 The models are normalized using measured rest-pose bounds to 3.2 scene units, the same
 floor and center. Existing map, department and workshop rendering technology remains
-unchanged. Actor movement uses the existing patrol/repair timing. Nathan uses WALK
-only during movement; idle is a frozen supplied walking pose. Sophia uses IDLE; no
-walking clip was supplied, so there is no fabricated walk. WORK/INTERACT/CELEBRATE
-states currently fall back to the supplied idle/static pose.
+unchanged. At the user's request, both founders now use a frozen supplied pose.
+No idle, walking, repair, phone, interaction or celebration animations play.
+Map and workshop/department actors stay at their home positions instead of sliding
+without a walk animation. Repair progression and speech bubbles are unaffected.
+Embedded source clips remain solely to sample the static pose; no additional
+animation assets are required.
 
 Geometry and materials are shared in a bounded two-model lazy cache; scene skeletons
 and mixers are cloned per actor, never shared. Actions and mixer bindings are removed
@@ -105,9 +107,9 @@ Building themes and workstation cosmetics are unaffected. Clothing cannot be swa
 independently because it is part of each fixed skinned mesh. Clipboard/phone props
 and procedural limb overrides are no longer attached to incompatible rigs.
 
-Missing: Nathan idle, Sophia walk, both work/interaction/celebration clips, fitted
-outfit/headwear/accessory assets, plus third-party license/redistribution proof.
-Prefer skeleton-compatible FBX or GLB animation clips and rigged GLB cosmetic meshes.
+Clothing, headwear and accessories are deferred to a later implementation, not a
+requirement for the current milestone. Third-party license/redistribution proof
+remains separate from this animation scope decision.
 
 ## Verification
 

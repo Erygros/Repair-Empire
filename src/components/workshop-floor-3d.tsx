@@ -1,5 +1,5 @@
 "use client";
-import { Component, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { Component, useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, OrthographicCamera } from "@react-three/drei";
 import { Vector3, type Group, type OrthographicCamera as Camera } from "three";
@@ -56,12 +56,8 @@ function Workbench({ station, row, now, selected, onSelect }: { station: Worksta
     </group>
   </group>;
 }
-export function WorkshopActor({ name, appearance, targetX, targetZ, homeZ, working, reduced, cosmetics, homeX=-5.9, clipboard=false }: { name: string; appearance: Character3DAppearance; targetX: number; targetZ: number; homeZ: number; working: boolean; reduced: boolean; cosmetics?:EquippedCharacterCosmetics;homeX?:number;clipboard?:boolean }) {
-  const root=useRef<Group>(null), body=useRef<Group>(null), movingRef=useRef(false);
-  const [moving,setMoving]=useState(false);
-  useFrame((_,delta)=>{const actor=root.current,model=body.current;if(!actor||!model)return;const dt=Math.min(delta,.05),dx=targetX-actor.position.x,dz=targetZ-actor.position.z,distance=Math.hypot(dx,dz),walking=!reduced&&distance>.035;const amount=reduced?1:Math.min(1,dt*2.4/Math.max(distance,.001));actor.position.x+=dx*amount;actor.position.z+=dz*amount;model.rotation.y=walking?Math.atan2(dx,dz):working?Math.PI:.2;if(walking!==movingRef.current){movingRef.current=walking;setMoving(walking)}});
-  // Clipboard and procedural limb animation are not fitted to the supplied rigs.
-  return <group ref={root} name={name} position={[homeX,.035,homeZ]} userData={{homeZ,clipboardCompatible:false,requestedClipboard:clipboard}}><mesh position={[0,.005,0]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.3,24]}/><meshBasicMaterial color="#19292d" transparent opacity={.55}/></mesh><group ref={body} position={[0,.6,0]} scale={.37}><FounderAvatar a={appearance} cosmetics={cosmetics} reduced={reduced} animation={moving?"WALK":"IDLE"}/></group></group>;
+export function WorkshopActor({ name, appearance, homeZ, reduced, cosmetics, homeX=-5.9 }: { name: string; appearance: Character3DAppearance; targetX: number; targetZ: number; homeZ: number; working: boolean; reduced: boolean; cosmetics?:EquippedCharacterCosmetics;homeX?:number;clipboard?:boolean }) {
+  return <group name={name} position={[homeX,.035,homeZ]}><mesh position={[0,.005,0]} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[.3,24]}/><meshBasicMaterial color="#19292d" transparent opacity={.55}/></mesh><group position={[0,.6,0]} rotation={[0,.2,0]} scale={.37}><FounderAvatar a={appearance} cosmetics={cosmetics} reduced={reduced}/></group></group>;
 }
 export function SpeechProjection({ element, actorName = "workshop-founder" }: { element: RefObject<HTMLDivElement | null>; actorName?:string }) {
   const point=useRef(new Vector3());

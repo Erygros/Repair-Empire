@@ -1,8 +1,6 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useFrame } from "@react-three/fiber";
-import { DataTexture, RGBAFormat, SRGBColorSpace, type Group } from "three";
-import { getCampusFounderActivity } from "@/components/campus-walk";
+import { useEffect, useMemo } from "react";
+import { DataTexture, RGBAFormat, SRGBColorSpace } from "three";
 import { Asphalt, CampusTree, DetailedVehicle, Entrance, Glazing, GrassBed, HallRoof, RoofEdges } from "@/components/campus-details";
 import { FounderAvatar } from "@/components/character-3d";
 import { getFounderAppearance } from "@/components/founder-appearance";
@@ -131,22 +129,9 @@ export function CampusGround({ mobile }: { mobile: boolean }) {
   </group>;
 }
 export function MapFounder({ character, onOpen, reduced }: { character: PlayerCharacter; onOpen: () => void; reduced: boolean }) {
-  const walker = useRef<Group>(null), body = useRef<Group>(null), elapsed = useRef(0);
-  const movingRef = useRef(true), [moving, setMoving] = useState(true);
-  useFrame((_, delta) => {
-    if (!walker.current || !body.current) return;
-    if (!reduced) elapsed.current += Math.min(delta, .05);
-    const pose = getCampusFounderActivity(reduced ? 0 : elapsed.current);
-    const walking = !reduced && !pose.phone;
-    if (walking !== movingRef.current) { movingRef.current = walking; setMoving(walking); }
-    const blend = reduced ? 1 : 1 - Math.exp(-delta * 12);
-    const turn = (pose.phone ? .35 : pose.direction * Math.PI / 2) - body.current.rotation.y;
-    walker.current.position.x = pose.x;
-    body.current.rotation.y += Math.atan2(Math.sin(turn), Math.cos(turn)) * blend;
-  });
   const a = getFounderAppearance(character);
-  return <group ref={walker} name="campus-founder" position={[0, .125, 7.6]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onOpen(); }}>
+  return <group name="campus-founder" position={[0, .125, 7.6]} onClick={event => { event.stopPropagation(); if (event.delta < 5) onOpen(); }}>
     <mesh position={[0, .008, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[.3, 24]}/><meshBasicMaterial color="#141b1e" transparent opacity={.5}/></mesh>
-    <group ref={body} position={[0, .6, 0]} scale={.37}><FounderAvatar a={a} cosmetics={character.equippedCosmetics} reduced={reduced} animation={moving ? "WALK" : "IDLE"}/></group>
+    <group position={[0, .6, 0]} scale={.37}><FounderAvatar a={a} cosmetics={character.equippedCosmetics} reduced={reduced}/></group>
   </group>;
 }

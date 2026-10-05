@@ -7,7 +7,7 @@ import type { EquippedCharacterCosmetics } from "@/game/types";
 import type { CharacterModelId } from "@/game/data/character-models";
 // Retained only for legacy save migration and the map's lightweight representation.
 export interface Character3DAppearance { presentation: "MALE" | "FEMALE"; height: number; build: number; shoulders: number; arms: number; chest: number; torso: number; waist: number; hips: number; legs: number; skinTone: string; headShape: string; eyeShape: string; eyeColor: string; eyebrows: string; nose: string; mouth: string; hair: string; hairColor: string; outfit: string }
-export function FounderAvatar({ a, reduced, animation = "IDLE" }: { a: Character3DAppearance; reduced: boolean; cosmetics?: EquippedCharacterCosmetics; animation?: "IDLE" | "WALK" }) { return <FounderModel3D modelId={a.presentation === "MALE" ? "founder_male_01" : "founder_female_01"} reduced={reduced} animation={animation}/>; }
+export function FounderAvatar({ a }: { a: Character3DAppearance; reduced: boolean; cosmetics?: EquippedCharacterCosmetics }) { return <FounderModel3D modelId={a.presentation === "MALE" ? "founder_male_01" : "founder_female_01"}/>; }
 function CameraFraming({ resetKey }: { resetKey: number }) {
   const { camera, size } = useThree();
   useEffect(() => { const distance = Math.max(size.height < 600 ? 7.5 : 6.6, 3.4 / (size.width / size.height)); camera.position.set(0, .15, distance); camera.lookAt(0, .05, 0); camera.updateProjectionMatrix(); }, [camera, size.width, size.height, resetKey]); return null;
