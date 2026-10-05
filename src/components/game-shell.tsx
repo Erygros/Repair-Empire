@@ -98,7 +98,7 @@ export function GameShell() {
       <header className="topbar">
         <div className="brand-lockup">
           <BrandLogo/>
-          <div><p className="kicker">{state.identity.companyName}</p><h1 className="brand-visually-hidden">Repair Empire</h1></div>
+          <h1 className="brand-visually-hidden">Repair Empire</h1>
         </div>
         <div className="status-strip" aria-label="Werkstattstatus">
           <div className="status-item"><Banknote size={17} /><span>Kapital</span><strong>{formatMoney(state.money)}</strong></div>
