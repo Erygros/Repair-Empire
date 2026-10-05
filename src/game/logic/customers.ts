@@ -89,11 +89,12 @@ export function recordCustomerRepair(state: GameState, order: RepairOrder, now: 
     : [updated, ...state.recentCustomers.filter((customer) => customer.id !== updated.id)].slice(0, RECENT_CUSTOMER_LIMIT);
   return {
     ...state,
+    servedCustomerIds: { ...state.servedCustomerIds, [order.customerId]: true as const },
     persistentCustomers,
     recentCustomers,
     lifetimeStats: {
       ...state.lifetimeStats,
-      customersServed: state.lifetimeStats.customersServed + (base.successfulJobs === 0 ? 1 : 0),
+      customersServed: state.lifetimeStats.customersServed + (!state.servedCustomerIds?.[order.customerId] && base.successfulJobs === 0 ? 1 : 0),
       returningCustomers: state.lifetimeStats.returningCustomers + (order.returningCustomer ? 1 : 0),
     },
   };

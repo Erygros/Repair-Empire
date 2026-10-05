@@ -34,7 +34,7 @@ async function stop(child) {
 const origin = "http://127.0.0.1:3001";
 const app = await server(3001, { BETTER_AUTH_URL: origin });
 try {
-  const tests = spawn(process.execPath, ["--test", "tests/auth.integration.mjs"], { env: { ...process.env, NODE_ENV: "production", BETTER_AUTH_URL: origin }, windowsHide: true, stdio: "inherit" });
+  const tests = spawn(process.execPath, ["--test", "tests/auth.integration.mjs", "tests/leaderboard-game.test.mjs", "tests/leaderboard.integration.mjs"], { env: { ...process.env, NODE_ENV: "production", BETTER_AUTH_URL: origin }, windowsHide: true, stdio: "inherit" });
   const [code] = await once(tests, "exit");
   assert.equal(code, 0, "Production lifecycle tests must pass.");
 } finally { await stop(app); }
@@ -44,12 +44,17 @@ try {
   const response = await fetch("http://127.0.0.1:3002/api/auth/get-session");
   assert.equal(response.status, 503);
   assert.equal((await response.json()).code, "ACCOUNT_SERVICE_NOT_CONFIGURED");
-  for (const path of ["/play", "/create-character", "/account"]) {
+  for (const path of ["/play", "/create-character", "/account", "/leaderboard"]) {
     const result = await fetch("http://127.0.0.1:3002" + path, { redirect: "manual" });
     assert.equal(result.status, 307);
     assert.equal(new URL(result.headers.get("location"), "http://127.0.0.1:3002").pathname, "/login");
   }
   console.log("Missing production configuration: explicit 503 and all protected routes fail closed.");
+  for (const path of ["/api/leaderboard", "/api/game/verified"]) {
+    const response = await fetch("http://127.0.0.1:3002" + path);
+    assert.equal(response.status, 503);
+    assert.equal(JSON.stringify(await response.json()).includes("postgresql://"), false);
+  }
 } finally { await stop(missing); }
 
 const offlineOrigin = "http://127.0.0.1:3003";

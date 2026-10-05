@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import { BrandLogo, InfoIcon, LevelUpIcon, FounderActiveIcon, ChallengeActiveIcon, SettingsIcon } from "@/components/repair-icons";
 import { AccountSettings } from "@/components/account-settings";
+import { Leaderboard } from "@/components/leaderboard";
+import { CompanyLevelIcon } from "@/components/repair-icons";
 import { LogoutButton } from "@/components/logout-button";
 import { ChallengeIcon as Target, FounderIcon as UserRound } from "@/components/repair-icons";
 import { CompanyLevelIcon as Activity, CapitalIcon as Banknote, BuildingsIcon as Building2, ResearchIcon as FlaskConical, ToolsIcon as PackageOpen, ReputationIcon as ShieldCheck, EfficiencyIcon as SlidersHorizontal, EmployeesIcon as UsersRound, ReceiptIcon as Wallet, RepairsIcon as Wrench, CustomersIcon as Handshake } from "@/components/repair-icons";
@@ -32,7 +34,7 @@ import { formatMoney } from "@/utils/format";
 import type { BuildingType } from "@/game/types";
 import "./game-v3.css";
 
-type GameView = "company" | "profile" | "workshop" | "customers" | "team" | "research" | "challenges" | "economy" | "tools" | "upgrades" | "settings";
+type GameView = "company" | "profile" | "workshop" | "customers" | "team" | "research" | "challenges" | "economy" | "tools" | "upgrades" | "settings" | "leaderboard";
 const BUILDING_VIEWS: Record<BuildingType, GameView> = { WORKSHOP: "workshop", PERSONNEL: "team", FINANCE: "economy", TOOL_WAREHOUSE: "tools", RESEARCH: "research", BUSINESS_OFFICE: "customers" };
 const VIEW_BUILDINGS: Partial<Record<GameView, BuildingType>> = { workshop: "WORKSHOP", team: "PERSONNEL", economy: "FINANCE", tools: "TOOL_WAREHOUSE", research: "RESEARCH", customers: "BUSINESS_OFFICE" };
 const NAV_ITEMS = [
@@ -45,14 +47,15 @@ const NAV_ITEMS = [
   { view: "economy", label: "Finanzen", icon: Wallet },
   { view: "challenges", label: "Aufgaben", icon: Target },
   { view: "upgrades", label: "Upgrades", icon: SlidersHorizontal },
+  { view: "leaderboard", label: "Rangliste", icon: CompanyLevelIcon },
   { view: "profile", label: "Charakter", icon: UserRound },
   { view: "settings", label: "Einstellungen", icon: SettingsIcon },
 ] satisfies { view: GameView; label: string; icon: ComponentType<{size?:number}> }[];
 
-export function GameShell() {
+export function GameShell({ initialView = "company" }: { initialView?: GameView }) {
   const game = useGame();
   const { state } = game;
-  const [view, setView] = useState<GameView>("company");
+  const [view, setView] = useState<GameView>(initialView);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [levelFeedback, setLevelFeedback] = useState<string | null>(null);
   const previousLevel = useRef(state.companyLevel);
@@ -63,7 +66,7 @@ export function GameShell() {
   useWorkshopAmbience(view === "workshop" && game.hydrated, settings);
   const selectedOrder = state.availableOrders.find((order) => order.id === selectedOrderId) ?? null;
   const activeBuilding = VIEW_BUILDINGS[view] ?? null;
-  const navigate = useCallback((next: GameView) => { if(profileDirty.current && next!=="profile" && !window.confirm("Ungespeicherte Character-Änderungen verwerfen?"))return;setView(next); setSelectedOrderId(null); contentRef.current?.scrollTo({ top: 0, behavior: "instant" }); window.scrollTo({ top: 0, behavior: "instant" }); }, []);
+  const navigate = useCallback((next: GameView) => { if(profileDirty.current && next!=="profile" && !window.confirm("Ungespeicherte Character-Änderungen verwerfen?"))return;setView(next); if(next === "leaderboard") window.history.replaceState(null,"","/leaderboard"); else if(window.location.pathname === "/leaderboard") window.history.replaceState(null,"","/play"); setSelectedOrderId(null); contentRef.current?.scrollTo({ top: 0, behavior: "instant" }); window.scrollTo({ top: 0, behavior: "instant" }); }, []);
   const openBuilding = useCallback((buildingId: BuildingType) => navigate(BUILDING_VIEWS[buildingId]), [navigate]);
   const openProfile = useCallback(() => navigate("profile"), [navigate]);
   const acceptOrder = (orderId: string) => {
@@ -113,15 +116,16 @@ export function GameShell() {
       </header>
 
       <div className="game-workspace">
-      <nav className="game-rail" aria-label="Spielbereiche">{NAV_ITEMS.map(item => { const Icon = view===item.view&&item.view==="profile"?FounderActiveIcon:view===item.view&&item.view==="challenges"?ChallengeActiveIcon:item.icon; return <button key={item.view} className={item.view === "profile" ? "rail-profile" : undefined} aria-current={view === item.view ? "page" : undefined} onClick={() => navigate(item.view)}><Icon size={24}/><span>{item.label}</span></button>; })}<LogoutButton label="Abmelden" icon beforeLogout={() => { if (profileDirty.current && !window.confirm("Ungespeicherte Character-Änderungen verwerfen und abmelden?")) return false; const now = Date.now(); localStorage.setItem("repair-empire-save-v1", JSON.stringify({ ...state, lastSavedAt: now, lastActiveAt: now })); return true; }}/></nav>
+      <nav className="game-rail" aria-label="Spielbereiche">{NAV_ITEMS.map(item => { const Icon = view===item.view&&item.view==="profile"?FounderActiveIcon:view===item.view&&item.view==="challenges"?ChallengeActiveIcon:item.icon; return <button key={item.view} className={item.view === "profile" ? "rail-profile" : undefined} aria-current={view === item.view ? "page" : undefined} onClick={() => navigate(item.view)}><Icon size={24}/><span>{item.label}</span></button>; })}<LogoutButton label="Abmelden" icon beforeLogout={() => { if (profileDirty.current && !window.confirm("Ungespeicherte Character-Änderungen verwerfen und abmelden?")) return false; const now = Date.now(); if (game.verified === false) localStorage.setItem("repair-empire-save-v1", JSON.stringify({ ...state, lastSavedAt: now, lastActiveAt: now })); return true; }}/></nav>
       <div className="game-content" ref={contentRef}>
+      {view === "leaderboard" && <Leaderboard verified={game.verified} onActivate={game.activateVerified}/>}
       {view === "settings" && <AccountSettings/>}
       {(view === "challenges" || view === "upgrades") && <header className="game-view-title"><p className="panel-label">DEIN UNTERNEHMEN</p><h2>{view === "challenges" ? "Aufgaben" : "Upgrades"}</h2></header>}
       {view === "company" && <CompanyMap state={state} onOpenBuilding={openBuilding} onOpenProfile={openProfile} motion={settings.motion} />}
       {view === "profile" && state.playerCharacter && <CharacterProfile state={state} onBack={() => navigate("company")} onEquip={game.equipCharacterCosmetic} onUnequip={game.unequipCharacterCosmetic} onSave={game.updateFounder3D} onDirtyChange={setProfileDirty} motion={settings.motion} />}
       {activeBuilding && <BuildingViewShell buildingId={activeBuilding} state={state} onClose={() => navigate("company")} onUpgrade={game.purchaseBuildingUpgrade}>
         {view === "workshop" && <WorkshopExperience state={state} now={game.now} onAccept={acceptOrder} onPurchase={game.purchaseWorkstation} onComplete={game.completeRepair} onAssignEmployee={game.assignEmployee} onToggleAutomation={game.toggleAutomation} onSetPriority={game.setAutomationPriority} motion={settings.motion} />}
-        {view !== "workshop" && view !== "company" && view !== "profile" && view !== "challenges" && view !== "upgrades" && view !== "settings" && <div className="department-layout"><DepartmentScene key={view} department={view} state={state} motion={settings.motion} onProfile={openProfile}/><div className="department-controls">
+        {view !== "workshop" && view !== "company" && view !== "profile" && view !== "challenges" && view !== "upgrades" && view !== "settings" && view !== "leaderboard" && <div className="department-layout"><DepartmentScene key={view} department={view} state={state} motion={settings.motion} onProfile={openProfile}/><div className="department-controls">
         {view === "team" && <TeamHub state={state} onHire={game.hireCandidate} onRefresh={game.refreshCandidates} />}
         {view === "customers" && <CustomerCenter state={state} now={game.now} onAcceptContract={game.takeContract} onClaimContract={game.collectContractReward} onCreateMultiOrder={game.startMultiDeviceOrder} />}
         {view === "research" && <ResearchLab state={state} onResearch={game.purchaseResearch} />}

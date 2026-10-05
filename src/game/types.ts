@@ -407,6 +407,7 @@ export interface IdentityState {
 }
 
 export interface GameState {
+  servedCustomerIds?: Record<string, true>;
   saveVersion: number;
   identity: IdentityState;
   money: number;

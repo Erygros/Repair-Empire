@@ -206,6 +206,7 @@ export function createInitialState(): GameState {
   const context: ProgressionContext = { ownedTools: ["basic-kit"], reputation: 10, upgrades: { ...INITIAL_UPGRADES }, companyLevel: 1, researchedNodes: [] };
   const availableOrders = createOrderBoard(INITIAL_ORDER_COUNT, 1, context, now);
   const initial: GameState = {
+    servedCustomerIds: {},
     saveVersion: SAVE_VERSION,
     identity: {
       accountId: "local-account",
@@ -503,8 +504,9 @@ export function runWorkstationTick(state: GameState, now = getCurrentTime()) {
 function addOfflinePipelineOrder(state: GameState, workstation: Workstation, now: number) {
   let next = state;
   for (let attempt = 0; attempt < ORDER_TEMPLATES.length * 2; attempt += 1) {
-    const order = createOrder(next.nextOrderNumber, getProgressionContext(next), now + attempt, "accessible");
-    const candidateState = { ...next, availableOrders: [...next.availableOrders, order], nextOrderNumber: next.nextOrderNumber + 1 };
+    const selection = chooseCustomer(next, next.nextOrderNumber, now + attempt);
+    const order = createOrder(next.nextOrderNumber, getProgressionContext(next), now + attempt, "accessible", selection.customer, selection.returning);
+    const candidateState = { ...next, availableOrders: [...next.availableOrders, order], nextOrderNumber: next.nextOrderNumber + 1, nextCustomerNumber: next.nextCustomerNumber + (selection.returning ? 0 : 1) };
     const current = candidateState.workstations.find((item) => item.id === workstation.id)!;
     const selected = selectAutomationOrder(candidateState, current);
     next = { ...next, nextOrderNumber: next.nextOrderNumber + 1 };
@@ -513,7 +515,7 @@ function addOfflinePipelineOrder(state: GameState, workstation: Workstation, now
   return { state: next, order: null };
 }
 
-export function processOfflineProgress(state: GameState, now = getCurrentTime()) {
+export function processOfflineProgress(state: GameState, now = getCurrentTime(), source: "offline" | "automated" = "offline") {
   const window = getOfflineWindow(state.lastActiveAt || state.lastSavedAt, now, state.offlineCapacityMs);
   let next = refreshOrderBoard(state, state.lastActiveAt || state.lastSavedAt);
   const summary: OfflineSummary = {
@@ -560,7 +562,7 @@ export function processOfflineProgress(state: GameState, now = getCurrentTime())
       next = { ...next, workstations: next.workstations.map((item) => item.id === station.id ? { ...item, status: "completed" as const } : item) };
       continue;
     }
-    const settled = settleWorkstation(next, station.id, nextEvent.endsAt, "offline");
+    const settled = settleWorkstation(next, station.id, nextEvent.endsAt, source);
     next = settled.state;
     summary.completedRepairs += 1;
     summary.revenue += settled.earnings;
