@@ -18,8 +18,7 @@ export function UpgradeBay({ money, reputation, upgrades, onPurchase }: UpgradeB
     <section className="progression-layout">
       <div className="panel progression-intro upgrade-intro">
         <p className="panel-label">PROZESSKERN // {totalLevels}/25</p>
-        <h3>Gute Werkstätten kaufen Geräte. Große Werkstätten optimieren Abläufe.</h3>
-        <p>Jede Stufe verändert die laufende Economy. Neue Effekte greifen sofort oder bei der nächsten Auftragsgeneration.</p>
+        <h3>Prozess-Upgrades</h3>
         <div className="upgrade-meter"><span style={{ width: `${(totalLevels / 25) * 100}%` }} /></div>
         <div className="inventory-readout"><Gauge size={18} /><strong>{totalLevels}</strong><span>Prozessstufen aktiv</span></div>
       </div>

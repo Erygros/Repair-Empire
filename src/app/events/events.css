@@ -1,0 +1,7 @@
+.events-page .news-hero h1{font-size:72px;line-height:1.05}
+.website-v2:has(.events-page) .website-mobile-menu a[href="/events"]{color:#fbb074;border-bottom:2px solid #f18d4b}
+.events-season{display:flex;align-items:center;gap:28px;padding:36px 0;border-bottom:1px solid var(--news-line)}
+.events-season>div{min-width:0}.events-season h2{font:750 36px/1.2 var(--font-display);margin:14px 0}.events-season p:last-child{color:var(--news-soft);font-size:15px;line-height:1.7;margin:0}
+.events-status-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:28px}
+.events-status-list article{display:flex;align-items:flex-start;gap:18px;padding:26px 0;border-top:1px solid var(--news-line);min-width:0}.events-status-list article>div{min-width:0}.events-status-list h3{font:700 25px/1.25 var(--font-display);margin:12px 0 0}
+@media(max-width:760px){.events-page .news-hero h1{font-size:48px}.events-season{gap:18px;align-items:flex-start}.events-season h2{font-size:28px}.events-status-list{grid-template-columns:1fr;gap:0}}

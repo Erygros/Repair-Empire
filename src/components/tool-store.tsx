@@ -16,8 +16,7 @@ export function ToolStore({ money, reputation, ownedTools, onPurchase }: ToolSto
     <section className="progression-layout">
       <div className="panel progression-intro">
         <p className="panel-label">WERKZEUGLAGER // TIER {ownedTools.length}</p>
-        <h3>Neue Fähigkeiten liegen nicht im Menü. Sie liegen auf der Werkbank.</h3>
-        <p>Jedes Werkzeug öffnet eine neue Reparaturklasse. Reputation und Vorgängergerät sichern den kontrollierten Ausbau.</p>
+        <h3>Werkzeugbestand</h3>
         <div className="tier-track" aria-label={`${ownedTools.length} von ${TOOLS.length} Werkzeugen vorhanden`}>
           {TOOLS.map((tool, index) => <span key={tool.id} className={index < ownedTools.length ? "filled" : ""} />)}
         </div>
